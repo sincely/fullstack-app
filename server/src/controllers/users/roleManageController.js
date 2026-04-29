@@ -4,9 +4,9 @@
  */
 
 import userRoleDao from '../../models/dao/userRoleDao.js'
-import userMenuDao from '../../models/dao/userMenuDao.js'
 import { businessCode, businessMsg } from '../../config/businessCode.js'
 import { httpCode } from '../../config/httpError.js'
+import { toRoleCode, toRoleRecord } from '../../utils/systemManageFormatter.js'
 
 /**
  * @summary 获取角色列表
@@ -15,25 +15,51 @@ import { httpCode } from '../../config/httpError.js'
  * @returns {object} 200 - 获取成功
  */
 const listRoles = async (ctx) => {
-  const [roles, menus] = await Promise.all([userRoleDao.listRoles(), userMenuDao.listMenus()])
-  const roleList = await Promise.all(
-    roles.map(async (role) => {
-      const routeIds = await userRoleDao.getRouteIdsByRoleId(role.roleId)
-      return {
-        ...role,
-        routeIds
-      }
-    })
-  )
+  const { current = 1, size = 10, roleName, roleCode, status } = ctx.query
+  const currentPage = Number(current) || 1
+  const pageSize = Number(size) || 10
+  const records = (await userRoleDao.listRoles()).map(toRoleRecord)
+  const filteredRecords = records.filter((item) => {
+    if (roleName && !item.roleName.includes(roleName)) {
+      return false
+    }
+    if (roleCode && !item.roleCode.toUpperCase().includes(String(roleCode).toUpperCase())) {
+      return false
+    }
+    if (status && item.status !== status) {
+      return false
+    }
+
+    return true
+  })
+  const start = (currentPage - 1) * pageSize
+  const pageRecords = filteredRecords.slice(start, start + pageSize)
 
   ctx.status = httpCode.ok
   ctx.body = {
-    code: businessCode.success,
+    code: '0000',
     msg: '获取角色列表成功',
     data: {
-      list: roleList,
-      menuOptions: menus
+      records: pageRecords,
+      current: currentPage,
+      size: pageSize,
+      total: filteredRecords.length
     }
+  }
+}
+
+const getAllRoles = async (ctx) => {
+  const roles = await userRoleDao.listRoles()
+
+  ctx.status = httpCode.ok
+  ctx.body = {
+    code: '0000',
+    msg: '获取全部角色成功',
+    data: roles.map((role) => ({
+      id: String(role.roleId),
+      roleName: role.roleName ?? '',
+      roleCode: toRoleCode(role.roleName)
+    }))
   }
 }
 
@@ -148,6 +174,7 @@ const deleteRole = async (ctx) => {
 
 export default {
   listRoles,
+  getAllRoles,
   createRole,
   updateRole,
   deleteRole

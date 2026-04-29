@@ -8,6 +8,7 @@ import userRoleDao from '../../models/dao/userRoleDao.js'
 import { businessCode, businessMsg } from '../../config/businessCode.js'
 import { httpCode } from '../../config/httpError.js'
 import { hashPassword } from '../../utils/password.js'
+import { toUserRecord } from '../../utils/systemManageFormatter.js'
 
 /**
  * @summary 获取用户列表
@@ -21,26 +22,45 @@ import { hashPassword } from '../../utils/password.js'
  * @returns {object} 200 - 获取成功
  */
 const listUsers = async (ctx) => {
-  const { page, pageSize, keyword, status, roleId } = ctx.query
-  const [list, total, roleOptions] = await Promise.all([
-    userDao.listUsers({ page, pageSize, keyword, status, roleId }),
-    userDao.countUsers({ keyword, status, roleId }),
-    userDao.listRoleOptions()
-  ])
+  const { current = 1, size = 10, userName, userGender, nickName, userPhone, userEmail, userStatus, status } = ctx.query
+  const currentPage = Number(current) || 1
+  const pageSize = Number(size) || 10
+  const records = (await userDao.listAllUsersWithRoles()).map(toUserRecord)
+  const normalizedStatus = userStatus ?? status
+  const filteredRecords = records.filter((item) => {
+    if (userName && !item.userName.includes(userName)) {
+      return false
+    }
+    if (userGender && item.userGender !== userGender) {
+      return false
+    }
+    if (nickName && !item.nickName.includes(nickName)) {
+      return false
+    }
+    if (userPhone && !item.userPhone.includes(userPhone)) {
+      return false
+    }
+    if (userEmail && !item.userEmail.includes(userEmail)) {
+      return false
+    }
+    if (normalizedStatus && item.status !== normalizedStatus) {
+      return false
+    }
+
+    return true
+  })
+  const start = (currentPage - 1) * pageSize
+  const pageRecords = filteredRecords.slice(start, start + pageSize)
 
   ctx.status = httpCode.ok
   ctx.body = {
-    code: businessCode.success,
+    code: '0000',
     msg: '获取用户列表成功',
     data: {
-      list,
-      roleOptions,
-      pagination: {
-        total,
-        page,
-        pageSize,
-        totalPages: Math.ceil(total / pageSize)
-      }
+      records: pageRecords,
+      current: currentPage,
+      size: pageSize,
+      total: filteredRecords.length
     }
   }
 }

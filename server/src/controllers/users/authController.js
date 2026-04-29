@@ -30,10 +30,10 @@ const toRoleCode = (roleName = '') => {
     return upper
   }
   if (upper.includes('SUPER')) {
-    return 'R_SUPER'
+    return 'super'
   }
   if (upper.includes('ADMIN')) {
-    return 'R_ADMIN'
+    return 'admin'
   }
   return 'R_USER'
 }

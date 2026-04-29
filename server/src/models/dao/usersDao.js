@@ -83,6 +83,24 @@ const listUsers = async ({ keyword, status, roleId, page, pageSize }) => {
   return query(sql, [...params, offset, pageSize])
 }
 
+const listAllUsersWithRoles = async () => {
+  const sql = `
+    select
+      u.id,
+      u.username,
+      u.gender,
+      u.email,
+      u.createTime,
+      u.status,
+      r.roleName
+    from Users u
+    left join Roles r on r.roleId = u.roleId
+    order by u.id desc
+  `
+
+  return query(sql)
+}
+
 const countUsers = async ({ keyword, status, roleId }) => {
   const { whereSql, params } = buildUserFilters({ keyword, status, roleId })
   const sql = `
@@ -179,6 +197,7 @@ export default {
   findUserName,
   register,
   listUsers,
+  listAllUsersWithRoles,
   countUsers,
   findUserById,
   findUserByUsername,
