@@ -13,7 +13,7 @@
     "eslint:fix": "eslint \"src/**/*.{vue,js,jsx}\" --fix",
     "prettier:fix": "prettier --write \"src/**/*.{js,vue,scss,css,json,html}\"",
     "lint-staged": "lint-staged",
-    "prepare": "husky install"
+    "prepare": "node scripts/prepare.js"
   },
   "dependencies": {
     "@better-scroll/core": "2.5.1",
