@@ -1,5 +1,5 @@
 import Router from '@koa/router'
-import usersRouter from './router/usersRouter.js'
+import usersAuthRouter from './router/usersAuthRouter.js'
 
 const router = new Router({ prefix: '/api' })
 // 健康检查
@@ -10,6 +10,6 @@ router.get('/health', (ctx) => {
   }
 })
 
-router.use(usersRouter.routes(), usersRouter.allowedMethods())
+router.use(usersAuthRouter.routes(), usersAuthRouter.allowedMethods())
 
 export default router

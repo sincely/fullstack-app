@@ -11,9 +11,12 @@ import { AuthLoginBodySchema, RefreshTokenBodySchema } from '../../schemas/model
 // 根路由已在 src/routers/index.js 统一挂载 ApiPrefix，这里不要重复添加 prefix
 const usersRouter = new Router()
 
-usersRouter.post('/user/login', validateBody(LoginBodySchema), errorControllerWrapper(User.login))
-usersRouter.post('/user/findUserName', validateBody(FindUserNameBodySchema), errorControllerWrapper(User.findUserName))
-usersRouter.post('/user/register', validateBody(RegisterBodySchema), errorControllerWrapper(User.register))
+usersRouter.post(
+  '/user/auth/findUserName',
+  validateBody(FindUserNameBodySchema),
+  errorControllerWrapper(User.findUserName)
+)
+usersRouter.post('/user/auth/register', validateBody(RegisterBodySchema), errorControllerWrapper(User.register))
 
 usersRouter.post(
   '/user/auth/login',
