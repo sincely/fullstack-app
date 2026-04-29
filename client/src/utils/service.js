@@ -35,6 +35,8 @@ export function createServiceConfig(env) {
     other: otherConfig
   }
 
+  console.log('config', config)
+
   return config
 }
 
@@ -66,8 +68,8 @@ export function getServiceBaseURL(env, isProxy) {
  */
 function createProxyPattern(key) {
   if (!key) {
-    return '/proxy-default'
+    return '/api'
   }
 
-  return `/proxy-${key}`
+  return `/api-${key}`
 }

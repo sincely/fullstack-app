@@ -13,6 +13,11 @@ import { generateToken, decodeToken } from '../../utils/jwt.js'
 import { buildMenuTree, extractPermissionCodes } from '../../utils/adminPermission.js'
 import { getRedisClient } from '../../utils/redis.js'
 
+const SUCCESS_CODE = '0000'
+const LOGIN_FAIL_CODE = '10001'
+const TOKEN_INVALID_CODE = '9998'
+
+// 后台管理端用户信息输出（内部接口使用）
 const formatUserInfo = (user) => {
   return {
     id: user.id,
@@ -26,6 +31,37 @@ const formatUserInfo = (user) => {
   }
 }
 
+// 将数据库角色名规范化为前端静态路由识别的角色编码
+const toRoleCode = (roleName = '') => {
+  const normalized = String(roleName).trim()
+  if (!normalized) {
+    return 'R_USER'
+  }
+
+  const upper = normalized.toUpperCase()
+  if (upper.startsWith('R_')) {
+    return upper
+  }
+  if (upper.includes('SUPER')) {
+    return 'R_SUPER'
+  }
+  if (upper.includes('ADMIN')) {
+    return 'R_ADMIN'
+  }
+  return 'R_USER'
+}
+
+// `/auth/getUserInfo` 兼容接口返回结构
+const formatLegacyUserInfo = (user, permissionSnapshot) => {
+  return {
+    userId: String(user.id),
+    userName: user.username,
+    roles: [toRoleCode(user.roleName)],
+    buttons: permissionSnapshot.permissionCodes.buttons
+  }
+}
+
+// 聚合角色对应的菜单与按钮权限，便于登录后一次性返回
 const buildPermissionSnapshot = async (roleId) => {
   const menus = await adminPermissionDao.findMenusByRoleId(roleId)
   const buttons = await adminPermissionDao.findButtonsByRoleId(roleId)
@@ -263,11 +299,95 @@ const logout = async (ctx) => {
   }
 }
 
+/**
+ * @summary 用户名+密码登录（兼容前端旧接口）
+ * @description 对齐 `/auth/login` 响应结构，返回 token 与 refreshToken
+ * @api POST /auth/login
+ */
+const legacyLogin = async (ctx) => {
+  const { userName, password } = ctx.request.body
+
+  const user = await adminAuthDao.findAdminUserByUsername(userName)
+  if (!user || user.status !== 'active') {
+    ctx.status = httpCode.ok
+    ctx.body = {
+      code: LOGIN_FAIL_CODE,
+      msg: businessMsg[businessCode.userLoginFail]
+    }
+    return
+  }
+
+  const passwordMatched = await comparePassword(password, user.password)
+  if (!passwordMatched) {
+    ctx.status = httpCode.ok
+    ctx.body = {
+      code: LOGIN_FAIL_CODE,
+      msg: businessMsg[businessCode.userLoginFail]
+    }
+    return
+  }
+
+  const tokenPayload = {
+    userId: user.id,
+    username: user.username,
+    roleId: user.roleId,
+    roleName: user.roleName
+  }
+
+  ctx.status = httpCode.ok
+  ctx.body = {
+    code: SUCCESS_CODE,
+    msg: '登录成功',
+    data: {
+      token: generateToken(tokenPayload),
+      refreshToken: generateToken({ ...tokenPayload, tokenType: 'refresh' })
+    }
+  }
+}
+
+/**
+ * @summary 获取用户信息（兼容前端旧接口）
+ * @description 对齐 `/auth/getUserInfo` 响应结构，返回 userId/userName/roles/buttons
+ * @api GET /auth/getUserInfo
+ */
+const legacyGetUserInfo = async (ctx) => {
+  const userId = ctx.state.user?.userId
+  if (!userId) {
+    ctx.status = httpCode.ok
+    ctx.body = {
+      code: TOKEN_INVALID_CODE,
+      msg: 'Token 无效'
+    }
+    return
+  }
+
+  const currentUser = await adminAuthDao.findAdminUserById(userId)
+  if (!currentUser || currentUser.status !== 'active') {
+    ctx.status = httpCode.ok
+    ctx.body = {
+      code: businessCode.userNotFound,
+      msg: businessMsg[businessCode.userNotFound]
+    }
+    return
+  }
+
+  const permissionSnapshot = await buildPermissionSnapshot(currentUser.roleId)
+
+  ctx.status = httpCode.ok
+  ctx.body = {
+    code: SUCCESS_CODE,
+    msg: '获取用户信息成功',
+    data: formatLegacyUserInfo(currentUser, permissionSnapshot)
+  }
+}
+
 export default {
   register,
   login,
   getProfile,
   getMenus,
   getPermissions,
-  logout
+  logout,
+  legacyLogin,
+  legacyGetUserInfo
 }

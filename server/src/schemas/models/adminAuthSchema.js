@@ -11,6 +11,12 @@ export const AdminLoginBodySchema = z.object({
   password: z.string().regex(passwordRule, '密码格式不正确，长度需为 6-20 位')
 })
 
+// 接口文档 `/auth/login` 请求体校验：字段名固定为 userName
+export const AuthLoginBodySchema = z.object({
+  userName: z.string().regex(usernameRule, '用户名格式不正确'),
+  password: z.string().regex(passwordRule, '密码格式不正确，长度需为 6-20 位')
+})
+
 // 管理员注册请求体校验（含确认密码一致性检查）
 export const AdminRegisterBodySchema = z
   .object({
