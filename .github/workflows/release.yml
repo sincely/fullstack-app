@@ -19,7 +19,8 @@ on:
           - beta
 
 env:
-  NODE_VERSION: '20'
+  NODE_VERSION: '22'
+  PNPM_VERSION: '8.15.7'
 
 jobs:
   release:
@@ -37,17 +38,31 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
+          cache: 'pnpm'
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Install root dependencies
+        run: pnpm install --frozen-lockfile
 
-      - name: Build project
-        run: npm run build
+      - name: Install client dependencies
+        run: pnpm -C client install --frozen-lockfile
+
+      - name: Install server dependencies
+        run: pnpm -C server install --frozen-lockfile
+
+      - name: Build client
+        run: pnpm -C client run build:prod
+
+      - name: Build server
+        run: pnpm -C server run build
 
       - name: Configure Git User
         run: |
@@ -60,9 +75,9 @@ jobs:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            npx release-it ${{ github.event.inputs.version-type }} --ci
+            pnpm exec release-it ${{ github.event.inputs.version-type }} --ci
           else
-            npx release-it --ci
+            pnpm exec release-it --ci
           fi
 
       - name: Upload Build Artifacts
@@ -71,6 +86,8 @@ jobs:
         with:
           name: build-artifacts
           path: |
-            dist/
+            client/dist/
+            server/dist/
             CHANGELOG.md
+            server/CHANGELOG.md
           retention-days: 7
