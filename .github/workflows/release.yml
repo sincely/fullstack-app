@@ -50,13 +50,13 @@ jobs:
           cache: 'pnpm'
 
       - name: Install root dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --no-frozen-lockfile
 
       - name: Install client dependencies
-        run: pnpm -C client install --frozen-lockfile
+        run: pnpm -C client install --no-frozen-lockfile
 
       - name: Install server dependencies
-        run: pnpm -C server install --frozen-lockfile
+        run: pnpm -C server install --no-frozen-lockfile
 
       - name: Build client
         run: pnpm -C client run build:prod
