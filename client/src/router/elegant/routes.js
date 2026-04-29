@@ -122,7 +122,7 @@ export const generatedRoutes = [
           title: '超级管理员页',
           icon: 'ic:round-supervisor-account',
           order: 5,
-          roles: ['R_SUPER']
+          roles: ['super']
         }
       },
       {
@@ -176,7 +176,7 @@ export const generatedRoutes = [
       title: '系统管理',
       icon: 'carbon:cloud-service-management',
       order: 9,
-      roles: ['R_ADMIN']
+      roles: ['admin']
     },
     children: [
       {
@@ -187,7 +187,7 @@ export const generatedRoutes = [
           title: '菜单管理',
           icon: 'material-symbols:route',
           order: 3,
-          roles: ['R_ADMIN'],
+          roles: ['admin'],
           keepAlive: true
         }
       },
@@ -199,7 +199,7 @@ export const generatedRoutes = [
           title: '角色管理',
           icon: 'carbon:user-role',
           order: 2,
-          roles: ['R_SUPER']
+          roles: ['super']
         }
       },
       {
@@ -210,7 +210,7 @@ export const generatedRoutes = [
           title: '用户管理',
           icon: 'ic:round-manage-accounts',
           order: 1,
-          roles: ['R_ADMIN']
+          roles: ['admin']
         }
       },
       {
@@ -221,7 +221,7 @@ export const generatedRoutes = [
         meta: {
           title: '用户详情',
           hideInMenu: true,
-          roles: ['R_ADMIN'],
+          roles: ['admin'],
           activeMenu: 'manage_user'
         }
       }
