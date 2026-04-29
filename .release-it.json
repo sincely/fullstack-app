@@ -3,7 +3,7 @@
     "commitMessage": "chore: v${version}",
     "tagName": "v${version}",
     "tagAnnotation": "Release v${version}",
-    "requireCleanWorkingDir": true,
+    "requireCleanWorkingDir": false,
     "requireBranch": "main",
     "requireUpstream": true,
     "requireCommits": true,
