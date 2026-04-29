@@ -9,27 +9,14 @@ import { httpCode } from '../../config/httpError.js'
 import { businessCode, businessMsg } from '../../config/businessCode.js'
 import { defaultAdminRoleName } from '../../config/admin.js'
 import { hashPassword, comparePassword } from '../../utils/password.js'
-import { generateToken, decodeToken } from '../../utils/jwt.js'
+import { generateToken, decodeToken, verifyToken } from '../../utils/jwt.js'
 import { buildMenuTree, extractPermissionCodes } from '../../utils/adminPermission.js'
 import { getRedisClient } from '../../utils/redis.js'
 
 const SUCCESS_CODE = '0000'
 const LOGIN_FAIL_CODE = '10001'
 const TOKEN_INVALID_CODE = '9998'
-
-// 后台管理端用户信息输出（内部接口使用）
-const formatUserInfo = (user) => {
-  return {
-    id: user.id,
-    username: user.username,
-    email: user.email,
-    status: user.status,
-    avatar: user.avatar,
-    roleId: user.roleId,
-    roleName: user.roleName,
-    roleDescription: user.roleDescription
-  }
-}
+const REFRESH_TOKEN_INVALID_CODE = '8888'
 
 // 将数据库角色名规范化为前端静态路由识别的角色编码
 const toRoleCode = (roleName = '') => {
@@ -51,8 +38,8 @@ const toRoleCode = (roleName = '') => {
   return 'R_USER'
 }
 
-// `/auth/getCurrentUserInfo` 兼容接口返回结构
-const formatLegacyUserInfo = (user, permissionSnapshot) => {
+// 接口返回结构
+const formatUserInfo = (user, permissionSnapshot) => {
   return {
     userId: String(user.id),
     userName: user.username,
@@ -287,6 +274,63 @@ const login = async (ctx) => {
 }
 
 /**
+ * @summary 刷新 token
+ * @description 使用 refreshToken 换取新的 token 和 refreshToken
+ * @api POST /user/auth/refreshToken
+ */
+const refreshToken = async (ctx) => {
+  const { refreshToken: rawRefreshToken } = ctx.request.body
+
+  let decoded
+  try {
+    decoded = verifyToken(rawRefreshToken)
+  } catch {
+    ctx.status = httpCode.ok
+    ctx.body = {
+      code: REFRESH_TOKEN_INVALID_CODE,
+      msg: '登录已过期，请重新登录'
+    }
+    return
+  }
+
+  if (decoded?.tokenType !== 'refresh') {
+    ctx.status = httpCode.ok
+    ctx.body = {
+      code: REFRESH_TOKEN_INVALID_CODE,
+      msg: 'refreshToken 无效'
+    }
+    return
+  }
+
+  const currentUser = await userAuthDao.findAdminUserById(decoded.userId)
+  if (!currentUser || currentUser.status !== 'active') {
+    ctx.status = httpCode.ok
+    ctx.body = {
+      code: REFRESH_TOKEN_INVALID_CODE,
+      msg: '登录已过期，请重新登录'
+    }
+    return
+  }
+
+  const tokenPayload = {
+    userId: currentUser.id,
+    username: currentUser.username,
+    roleId: currentUser.roleId,
+    roleName: currentUser.roleName
+  }
+
+  ctx.status = httpCode.ok
+  ctx.body = {
+    code: SUCCESS_CODE,
+    msg: '刷新 token 成功',
+    data: {
+      token: generateToken(tokenPayload),
+      refreshToken: generateToken({ ...tokenPayload, tokenType: 'refresh' })
+    }
+  }
+}
+
+/**
  * @summary 获取用户信息（兼容前端旧接口）
  * @description 对齐 `/auth/getCurrentUserInfo` 响应结构，返回 userId/userName/roles/buttons
  * @api GET /auth/getCurrentUserInfo
@@ -318,7 +362,7 @@ const getUserInfo = async (ctx) => {
   ctx.body = {
     code: SUCCESS_CODE,
     msg: '获取用户信息成功',
-    data: formatLegacyUserInfo(currentUser, permissionSnapshot)
+    data: formatUserInfo(currentUser, permissionSnapshot)
   }
 }
 
@@ -329,5 +373,6 @@ export default {
   getUserPermissions,
   logout,
   login,
+  refreshToken,
   getUserInfo
 }
