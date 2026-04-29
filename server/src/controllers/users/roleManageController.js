@@ -4,6 +4,8 @@
  */
 
 import userRoleDao from '../../models/dao/userRoleDao.js'
+import userPermissionDao from '../../models/dao/userPermissionDao.js'
+import userMenuDao from '../../models/dao/userMenuDao.js'
 import { businessCode, businessMsg } from '../../config/businessCode.js'
 import { httpCode } from '../../config/httpError.js'
 import { toRoleCode, toRoleRecord } from '../../utils/systemManageFormatter.js'
@@ -63,6 +65,120 @@ const getAllRoles = async (ctx) => {
   }
 }
 
+const getRoleRouteIds = async (ctx) => {
+  const { roleId } = ctx.query
+  const currentRole = await userRoleDao.findRoleById(roleId)
+
+  if (!currentRole) {
+    ctx.status = httpCode.ok
+    ctx.body = { code: businessCode.roleNotFound, msg: businessMsg[businessCode.roleNotFound] }
+    return
+  }
+
+  const routeIds = await userRoleDao.getRouteIdsByRoleId(roleId)
+
+  ctx.status = httpCode.ok
+  ctx.body = {
+    code: '0000',
+    msg: '获取角色菜单成功',
+    data: routeIds
+  }
+}
+
+const getRoleButtonIds = async (ctx) => {
+  const { roleId } = ctx.query
+  const currentRole = await userRoleDao.findRoleById(roleId)
+
+  if (!currentRole) {
+    ctx.status = httpCode.ok
+    ctx.body = { code: businessCode.roleNotFound, msg: businessMsg[businessCode.roleNotFound] }
+    return
+  }
+
+  const buttonIds = await userPermissionDao.getButtonIdsByRoleId(roleId)
+
+  ctx.status = httpCode.ok
+  ctx.body = {
+    code: '0000',
+    msg: '获取角色按钮成功',
+    data: buttonIds
+  }
+}
+
+const updateRoleRouteIds = async (ctx) => {
+  const { roleId, routeIds } = ctx.request.body
+  const currentRole = await userRoleDao.findRoleById(roleId)
+
+  if (!currentRole) {
+    ctx.status = httpCode.ok
+    ctx.body = { code: businessCode.roleNotFound, msg: businessMsg[businessCode.roleNotFound] }
+    return
+  }
+
+  await userRoleDao.replaceRoleRoutes({
+    roleId,
+    routeIds: [...new Set(routeIds)]
+  })
+
+  ctx.status = httpCode.ok
+  ctx.body = {
+    code: '0000',
+    msg: '更新角色菜单成功'
+  }
+}
+
+const updateRoleButtonIds = async (ctx) => {
+  const { roleId, buttonIds } = ctx.request.body
+  const currentRole = await userRoleDao.findRoleById(roleId)
+
+  if (!currentRole) {
+    ctx.status = httpCode.ok
+    ctx.body = { code: businessCode.roleNotFound, msg: businessMsg[businessCode.roleNotFound] }
+    return
+  }
+
+  await userPermissionDao.replaceRoleButtons({
+    roleId,
+    buttonIds: [...new Set(buttonIds)]
+  })
+
+  ctx.status = httpCode.ok
+  ctx.body = {
+    code: '0000',
+    msg: '更新角色按钮成功'
+  }
+}
+
+const getAllButtons = async (ctx) => {
+  await userMenuDao.syncButtonsFromMenus()
+  const buttons = await userPermissionDao.listAllButtons()
+  const grouped = new Map()
+
+  for (const button of buttons) {
+    const routeKey = String(button.routeId)
+    if (!grouped.has(routeKey)) {
+      grouped.set(routeKey, {
+        key: routeKey,
+        title: button.routeName || `route-${button.routeId}`,
+        children: []
+      })
+    }
+
+    grouped.get(routeKey).children.push({
+      key: String(button.buttonId),
+      title: button.buttonName,
+      code: button.buttonName
+    })
+  }
+
+  ctx.status = httpCode.ok
+  ctx.body = {
+    code: '0000',
+    msg: '获取全部按钮成功',
+    data: [...grouped.values()]
+  }
+}
+
 /**
  * @summary 创建角色
  * @description 创建新角色并绑定菜单权限
@@ -73,7 +189,7 @@ const getAllRoles = async (ctx) => {
  * @returns {object} 200 - 创建成功
  */
 const createRole = async (ctx) => {
-  const { roleName, description, routeIds } = ctx.request.body
+  const { roleName, roleCode, roleDesc, routeIds = [] } = ctx.request.body
   const existedRole = await userRoleDao.findRoleByName(roleName)
 
   if (existedRole) {
@@ -84,7 +200,10 @@ const createRole = async (ctx) => {
 
   const result = await userRoleDao.createRoleWithRoutes({
     roleName,
-    description,
+    description: JSON.stringify({
+      roleCode,
+      roleDesc
+    }),
     routeIds: [...new Set(routeIds)]
   })
 
@@ -93,7 +212,7 @@ const createRole = async (ctx) => {
     code: businessCode.success,
     msg: '创建角色成功',
     data: {
-      roleId: result.roleId
+      id: result.roleId
     }
   }
 }
@@ -109,7 +228,8 @@ const createRole = async (ctx) => {
  * @returns {object} 200 - 更新成功
  */
 const updateRole = async (ctx) => {
-  const { roleId, roleName, description, routeIds } = ctx.request.body
+  const { id, roleName, roleCode, roleDesc, routeIds = [] } = ctx.request.body
+  const roleId = id
   const currentRole = await userRoleDao.findRoleById(roleId)
 
   if (!currentRole) {
@@ -128,7 +248,10 @@ const updateRole = async (ctx) => {
   await userRoleDao.updateRoleWithRoutes({
     roleId,
     roleName,
-    description,
+    description: JSON.stringify({
+      roleCode,
+      roleDesc
+    }),
     routeIds: [...new Set(routeIds)]
   })
 
@@ -147,7 +270,7 @@ const updateRole = async (ctx) => {
  * @returns {object} 200 - 删除成功
  */
 const deleteRole = async (ctx) => {
-  const { roleId } = ctx.request.body
+  const roleId = ctx.request.body.roleId ?? ctx.request.body.id
   const currentRole = await userRoleDao.findRoleById(roleId)
 
   if (!currentRole) {
@@ -175,6 +298,11 @@ const deleteRole = async (ctx) => {
 export default {
   listRoles,
   getAllRoles,
+  getRoleRouteIds,
+  getRoleButtonIds,
+  updateRoleRouteIds,
+  updateRoleButtonIds,
+  getAllButtons,
   createRole,
   updateRole,
   deleteRole

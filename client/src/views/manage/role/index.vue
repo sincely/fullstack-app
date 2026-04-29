@@ -5,7 +5,7 @@ import { computed, shallowRef } from 'vue'
 
 import { enableStatusRecord } from '@/constants/business'
 import { useTable, useTableOperate } from '@/hooks/common/table'
-import { fetchGetRoleList } from '@/service/api'
+import { fetchDeleteRole, fetchGetRoleList } from '@/service/api'
 
 import RoleOperateDrawer from './modules/role-operate-drawer.vue'
 import RoleSearch from './modules/role-search.vue'
@@ -99,21 +99,33 @@ const { columns, columnChecks, data, loading, getData, mobilePagination, searchP
   ]
 })
 
-const { drawerVisible, operateType, editingData, handleAdd, handleEdit, checkedRowKeys, onBatchDeleted, onDeleted } =
-  useTableOperate(data, getData)
+const {
+  drawerVisible,
+  operateType,
+  editingData,
+  handleAdd,
+  handleEdit,
+  checkedRowKeys,
+  rowSelection,
+  onBatchDeleted,
+  onDeleted
+} = useTableOperate(data, getData)
 
 async function handleBatchDelete() {
-  // 请求
-  console.log(checkedRowKeys.value)
+  const deleteTasks = checkedRowKeys.value.map((id) => fetchDeleteRole({ id }))
+  const results = await Promise.all(deleteTasks)
 
-  onBatchDeleted()
+  if (results.every((item) => !item.error)) {
+    onBatchDeleted()
+  }
 }
 
-function handleDelete(id) {
-  // 请求
-  console.log(id)
+async function handleDelete(id) {
+  const { error } = await fetchDeleteRole({ id })
 
-  onDeleted()
+  if (!error) {
+    onDeleted()
+  }
 }
 
 function edit(id) {
@@ -145,6 +157,7 @@ function edit(id) {
         :columns="columns"
         :data-source="data"
         :loading="loading"
+        :row-selection="rowSelection"
         row-key="id"
         size="small"
         :pagination="mobilePagination"

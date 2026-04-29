@@ -21,6 +21,18 @@ const listMenus = async () => {
   return query(sql)
 }
 
+const listPageComponents = async () => {
+  const sql = `
+    select distinct component
+    from RouteAuth
+    where component is not null
+      and component <> ''
+    order by component asc
+  `
+
+  return query(sql)
+}
+
 /**
  * 根据菜单 ID 查询单条菜单。
  * @param {number} id
@@ -73,6 +85,115 @@ const createMenu = async ({ path, name, component, redirect, meta, parentId }) =
   return query(sql, [path, name, component, redirect, meta, parentId])
 }
 
+const listButtonsByRouteIds = async (routeIds) => {
+  if (!routeIds.length) {
+    return []
+  }
+
+  const placeholders = routeIds.map(() => '?').join(', ')
+  const sql = `
+    select buttonId, routeId, routeName, buttonName
+    from ButtonAuth
+    where routeId in (${placeholders})
+    order by routeId asc, buttonId asc
+  `
+
+  return query(sql, routeIds)
+}
+
+const syncButtonsFromMenus = async () => {
+  const connection = await getConnection()
+
+  try {
+    await connection.beginTransaction()
+    const [menus] = await connection.execute(`
+      select id, name, meta
+      from RouteAuth
+      where meta is not null
+      order by id asc
+    `)
+
+    await connection.execute('delete from ButtonAuth')
+
+    const insertSql = 'insert into ButtonAuth (routeId, routeName, buttonName) values (?, ?, ?)'
+    for (const menu of menus) {
+      let meta = {}
+      try {
+        meta = typeof menu.meta === 'object' ? menu.meta : JSON.parse(menu.meta)
+      } catch {
+        meta = {}
+      }
+
+      const buttons = Array.isArray(meta.buttons) ? meta.buttons : []
+      for (const button of buttons) {
+        const buttonName = button?.code || button?.desc
+        if (!buttonName) {
+          continue
+        }
+        await connection.execute(insertSql, [menu.id, menu.name, buttonName])
+      }
+    }
+
+    await connection.commit()
+  } catch (error) {
+    await connection.rollback()
+    throw error
+  } finally {
+    connection.release()
+  }
+}
+
+const replaceButtons = async (routeId, routeName, buttons = []) => {
+  const connection = await getConnection()
+
+  try {
+    await connection.beginTransaction()
+    await connection.execute('delete from ButtonAuth where routeId = ?', [routeId])
+
+    if (buttons.length) {
+      const sql = 'insert into ButtonAuth (routeId, routeName, buttonName) values (?, ?, ?)'
+      for (const button of buttons) {
+        await connection.execute(sql, [routeId, routeName, button.code])
+      }
+    }
+
+    await connection.commit()
+  } catch (error) {
+    await connection.rollback()
+    throw error
+  } finally {
+    connection.release()
+  }
+}
+
+const createMenuWithButtons = async ({ path, name, component, redirect, meta, parentId, buttons = [] }) => {
+  const connection = await getConnection()
+
+  try {
+    await connection.beginTransaction()
+    const insertSql = `
+      insert into RouteAuth (path, name, component, redirect, meta, parent_id)
+      values (?, ?, ?, ?, ?, ?)
+    `
+    const [menuResult] = await connection.execute(insertSql, [path, name, component, redirect, meta, parentId])
+
+    if (buttons.length) {
+      const buttonSql = 'insert into ButtonAuth (routeId, routeName, buttonName) values (?, ?, ?)'
+      for (const button of buttons) {
+        await connection.execute(buttonSql, [menuResult.insertId, name, button.code])
+      }
+    }
+
+    await connection.commit()
+    return menuResult
+  } catch (error) {
+    await connection.rollback()
+    throw error
+  } finally {
+    connection.release()
+  }
+}
+
 /**
  * 动态更新菜单字段，仅更新 payload 中出现的列。
  * @param {number} id
@@ -94,6 +215,42 @@ const updateMenu = async (id, payload) => {
 
   const sql = `update RouteAuth set ${fields.join(', ')} where id = ?`
   return query(sql, [...params, id])
+}
+
+const updateMenuWithButtons = async (id, payload, routeName, buttons = []) => {
+  const connection = await getConnection()
+
+  try {
+    await connection.beginTransaction()
+
+    const fields = []
+    const params = []
+    for (const [key, value] of Object.entries(payload)) {
+      fields.push(`${key} = ?`)
+      params.push(value)
+    }
+
+    if (fields.length) {
+      const sql = `update RouteAuth set ${fields.join(', ')} where id = ?`
+      await connection.execute(sql, [...params, id])
+    }
+
+    await connection.execute('delete from ButtonAuth where routeId = ?', [id])
+    if (buttons.length) {
+      const buttonSql = 'insert into ButtonAuth (routeId, routeName, buttonName) values (?, ?, ?)'
+      for (const button of buttons) {
+        await connection.execute(buttonSql, [id, routeName, button.code])
+      }
+    }
+
+    await connection.commit()
+    return { affectedRows: 1 }
+  } catch (error) {
+    await connection.rollback()
+    throw error
+  } finally {
+    connection.release()
+  }
 }
 
 /**
@@ -134,11 +291,17 @@ const deleteMenu = async (id) => {
 
 export default {
   listMenus,
+  listPageComponents,
   findMenuById,
   findMenuByPath,
   findMenuByName,
   createMenu,
+  createMenuWithButtons,
+  listButtonsByRouteIds,
+  syncButtonsFromMenus,
+  replaceButtons,
   updateMenu,
+  updateMenuWithButtons,
   countChildren,
   deleteMenu
 }

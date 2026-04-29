@@ -29,12 +29,28 @@ CREATE TABLE `ButtonAuth` (
   PRIMARY KEY (`buttonId`),
   KEY `routeId` (`routeId`),
   CONSTRAINT `buttonauth_ibfk_1` FOREIGN KEY (`routeId`) REFERENCES `RouteAuth` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb3;
 
 -- ----------------------------
 -- Records of ButtonAuth
 -- ----------------------------
 BEGIN;
+INSERT INTO `ButtonAuth` (`buttonId`, `routeId`, `routeName`, `buttonName`) VALUES (1, 8, 'function_request', 'request:get');
+INSERT INTO `ButtonAuth` (`buttonId`, `routeId`, `routeName`, `buttonName`) VALUES (2, 8, 'function_request', 'request:post');
+INSERT INTO `ButtonAuth` (`buttonId`, `routeId`, `routeName`, `buttonName`) VALUES (3, 10, 'function_tab', 'tab:add');
+INSERT INTO `ButtonAuth` (`buttonId`, `routeId`, `routeName`, `buttonName`) VALUES (4, 10, 'function_tab', 'tab:update');
+INSERT INTO `ButtonAuth` (`buttonId`, `routeId`, `routeName`, `buttonName`) VALUES (5, 10, 'function_tab', 'tab:remove');
+INSERT INTO `ButtonAuth` (`buttonId`, `routeId`, `routeName`, `buttonName`) VALUES (6, 14, 'manage_menu', 'menu:add');
+INSERT INTO `ButtonAuth` (`buttonId`, `routeId`, `routeName`, `buttonName`) VALUES (7, 14, 'manage_menu', 'menu:edit');
+INSERT INTO `ButtonAuth` (`buttonId`, `routeId`, `routeName`, `buttonName`) VALUES (8, 14, 'manage_menu', 'menu:delete');
+INSERT INTO `ButtonAuth` (`buttonId`, `routeId`, `routeName`, `buttonName`) VALUES (9, 15, 'manage_role', 'role:add');
+INSERT INTO `ButtonAuth` (`buttonId`, `routeId`, `routeName`, `buttonName`) VALUES (10, 15, 'manage_role', 'role:edit');
+INSERT INTO `ButtonAuth` (`buttonId`, `routeId`, `routeName`, `buttonName`) VALUES (11, 15, 'manage_role', 'role:delete');
+INSERT INTO `ButtonAuth` (`buttonId`, `routeId`, `routeName`, `buttonName`) VALUES (12, 15, 'manage_role', 'role:menu');
+INSERT INTO `ButtonAuth` (`buttonId`, `routeId`, `routeName`, `buttonName`) VALUES (13, 15, 'manage_role', 'role:button');
+INSERT INTO `ButtonAuth` (`buttonId`, `routeId`, `routeName`, `buttonName`) VALUES (14, 16, 'manage_user', 'user:add');
+INSERT INTO `ButtonAuth` (`buttonId`, `routeId`, `routeName`, `buttonName`) VALUES (15, 16, 'manage_user', 'user:edit');
+INSERT INTO `ButtonAuth` (`buttonId`, `routeId`, `routeName`, `buttonName`) VALUES (16, 16, 'manage_user', 'user:delete');
 COMMIT;
 
 -- ----------------------------
@@ -50,115 +66,76 @@ CREATE TABLE `RoleRoute` (
   KEY `routeId` (`routeId`),
   CONSTRAINT `roleroute_ibfk_1` FOREIGN KEY (`roleId`) REFERENCES `Roles` (`roleId`),
   CONSTRAINT `roleroute_ibfk_2` FOREIGN KEY (`routeId`) REFERENCES `RouteAuth` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=390 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=65 DEFAULT CHARSET=utf8mb3;
 
 -- ----------------------------
 -- Records of RoleRoute
 -- ----------------------------
 BEGIN;
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (151, 1, 1);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (283, 1, 2);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (284, 1, 3);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (285, 1, 4);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (286, 1, 5);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (287, 1, 6);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (288, 1, 7);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (289, 1, 8);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (290, 1, 9);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (291, 1, 10);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (297, 1, 11);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (298, 1, 12);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (299, 1, 13);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (300, 1, 15);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (301, 1, 16);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (302, 1, 17);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (303, 1, 18);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (304, 1, 19);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (305, 1, 20);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (306, 1, 21);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (307, 1, 22);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (308, 1, 23);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (309, 1, 24);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (310, 1, 25);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (311, 1, 26);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (312, 1, 27);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (313, 1, 28);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (314, 1, 29);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (315, 1, 30);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (316, 1, 31);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (317, 1, 32);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (318, 1, 33);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (319, 1, 34);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (320, 1, 35);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (321, 1, 36);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (322, 1, 37);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (323, 1, 38);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (324, 1, 39);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (325, 1, 40);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (326, 1, 41);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (327, 1, 42);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (328, 1, 43);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (329, 1, 44);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (330, 1, 45);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (331, 1, 46);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (332, 1, 47);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (333, 1, 48);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (334, 1, 49);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (335, 1, 50);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (336, 1, 51);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (337, 1, 52);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (338, 1, 53);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (339, 1, 54);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (340, 1, 55);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (341, 1, 56);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (342, 1, 57);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (343, 1, 58);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (344, 1, 59);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (345, 1, 60);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (346, 1, 61);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (347, 1, 62);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (348, 1, 63);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (349, 1, 64);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (350, 1, 65);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (351, 1, 66);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (352, 1, 67);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (353, 1, 68);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (354, 1, 69);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (355, 1, 70);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (356, 1, 71);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (357, 1, 72);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (358, 1, 73);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (359, 1, 74);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (360, 1, 75);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (361, 2, 1);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (362, 2, 2);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (363, 2, 3);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (364, 2, 4);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (365, 2, 5);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (366, 2, 6);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (367, 2, 7);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (368, 2, 8);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (369, 2, 9);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (370, 2, 10);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (371, 2, 11);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (372, 2, 12);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (373, 2, 13);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (374, 2, 15);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (375, 2, 16);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (376, 2, 17);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (377, 2, 18);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (378, 2, 19);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (379, 2, 20);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (380, 2, 21);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (381, 2, 22);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (382, 2, 23);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (383, 2, 24);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (384, 2, 25);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (385, 2, 26);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (386, 2, 27);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (387, 2, 28);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (388, 2, 29);
-INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (389, 2, 30);
+INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (1, 1, 1);
+INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (2, 1, 2);
+INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (3, 1, 3);
+INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (4, 1, 4);
+INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (5, 1, 5);
+INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (6, 1, 6);
+INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (7, 1, 7);
+INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (8, 1, 8);
+INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (9, 1, 10);
+INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (10, 1, 11);
+INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (11, 1, 12);
+INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (12, 1, 13);
+INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (13, 1, 14);
+INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (14, 1, 16);
+INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (15, 1, 17);
+INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (16, 1, 18);
+INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (17, 1, 19);
+INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (18, 1, 20);
+INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (19, 1, 21);
+INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (20, 1, 22);
+INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (21, 1, 23);
+INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (22, 1, 24);
+INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (23, 2, 1);
+INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (24, 2, 2);
+INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (25, 2, 3);
+INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (26, 2, 4);
+INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (27, 2, 5);
+INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (28, 2, 6);
+INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (29, 2, 7);
+INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (30, 2, 8);
+INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (31, 2, 10);
+INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (32, 2, 11);
+INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (33, 2, 12);
+INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (34, 2, 18);
+INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (35, 2, 19);
+INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (36, 2, 20);
+INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (37, 2, 21);
+INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (38, 2, 22);
+INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (39, 2, 23);
+INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (40, 2, 24);
+INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (41, 3, 1);
+INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (42, 3, 2);
+INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (43, 3, 3);
+INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (44, 3, 4);
+INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (45, 3, 5);
+INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (46, 3, 6);
+INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (47, 3, 7);
+INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (48, 3, 8);
+INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (49, 3, 9);
+INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (50, 3, 10);
+INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (51, 3, 11);
+INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (52, 3, 12);
+INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (53, 3, 13);
+INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (54, 3, 14);
+INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (55, 3, 15);
+INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (56, 3, 16);
+INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (57, 3, 17);
+INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (58, 3, 18);
+INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (59, 3, 19);
+INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (60, 3, 20);
+INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (61, 3, 21);
+INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (62, 3, 22);
+INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (63, 3, 23);
+INSERT INTO `RoleRoute` (`roleRouteId`, `roleId`, `routeId`) VALUES (64, 3, 24);
 COMMIT;
 
 -- ----------------------------
@@ -195,88 +172,40 @@ CREATE TABLE `RouteAuth` (
   `meta` json DEFAULT NULL,
   `parent_id` int DEFAULT NULL,
   PRIMARY KEY (`id`),
+  UNIQUE KEY `path` (`path`),
+  UNIQUE KEY `name` (`name`),
   KEY `parent_id` (`parent_id`),
   CONSTRAINT `routeauth_ibfk_1` FOREIGN KEY (`parent_id`) REFERENCES `RouteAuth` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=76 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb3;
 
 -- ----------------------------
 -- Records of RouteAuth
 -- ----------------------------
 BEGIN;
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (1, '/home/index', 'home', '/home/index', NULL, '{\"icon\": \"HomeFilled\", \"title\": \"首页\", \"isFull\": false, \"isHide\": false, \"isLink\": \"\", \"isAffix\": true, \"isKeepAlive\": true}', NULL);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (2, '/dataScreen', 'dataScreen', '/dataScreen/index', NULL, '{\"icon\": \"Histogram\", \"title\": \"数据大屏\", \"isFull\": true, \"isHide\": false, \"isLink\": \"\", \"isAffix\": false, \"isKeepAlive\": true}', NULL);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (3, '/content', 'content', NULL, '/content/article', '{\"icon\": \"MessageBox\", \"title\": \"内容管理\", \"isFull\": false, \"isHide\": false, \"isLink\": \"\", \"isAffix\": false, \"isKeepAlive\": true}', NULL);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (4, '/content/article', 'article', '/content/article/index', NULL, '{\"icon\": \"Menu\", \"title\": \"文章\", \"isFull\": false, \"isHide\": false, \"isLink\": \"\", \"isAffix\": false, \"isKeepAlive\": true}', 1);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (5, '/content/category', 'category', '/content/category/index', NULL, '{\"icon\": \"Menu\", \"title\": \"分类\", \"isFull\": false, \"isHide\": false, \"isLink\": \"\", \"isAffix\": false, \"isKeepAlive\": true}', 1);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (6, '/content/tag', 'tag', '/content/tag/index', NULL, '{\"icon\": \"Menu\", \"title\": \"标签\", \"isFull\": false, \"isHide\": false, \"isLink\": \"\", \"isAffix\": false, \"isKeepAlive\": true}', 1);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (7, '/content/article/edit/:id', 'articleEdit', '/content/article/detail', NULL, '{\"icon\": \"Menu\", \"title\": \"文章编辑\", \"isFull\": false, \"isHide\": true, \"isLink\": \"\", \"isAffix\": false, \"activeMenu\": \"/content/article\", \"isKeepAlive\": true}', 4);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (8, '/content/article/create', 'articleCreate', '/content/article/detail', NULL, '{\"icon\": \"Menu\", \"title\": \"文章新建\", \"isFull\": false, \"isHide\": true, \"isLink\": \"\", \"isAffix\": false, \"activeMenu\": \"/content/article\", \"isKeepAlive\": true}', 4);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (9, '/proTable', 'proTable', NULL, '/proTable/useProTable', '{\"icon\": \"MessageBox\", \"title\": \"超级表格\", \"isFull\": false, \"isHide\": false, \"isLink\": \"\", \"isAffix\": false, \"isKeepAlive\": true}', NULL);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (10, '/proTable/useProTable', 'useProTable', '/proTable/useProTable/index', NULL, '{\"icon\": \"Menu\", \"title\": \"使用 ProTable\", \"isFull\": false, \"isHide\": false, \"isLink\": \"\", \"isAffix\": false, \"isKeepAlive\": true}', 9);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (11, '/proTable/useProTable', 'useProTable', '/proTable/useProTable/index', NULL, '{\"icon\": \"Menu\", \"title\": \"使用 ProTable\", \"isFull\": false, \"isHide\": false, \"isLink\": \"\", \"isAffix\": false, \"isKeepAlive\": true}', 9);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (12, '/proTable/useTreeFilter', 'useTreeFilter', '/proTable/useTreeFilter/index', NULL, '{\"icon\": \"Menu\", \"title\": \"使用 TreeFilter\", \"isFull\": false, \"isHide\": false, \"isLink\": \"\", \"isAffix\": false, \"isKeepAlive\": true}', 9);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (13, '/proTable/useTreeFilter/detail/:id', 'useTreeFilterDetail', '/proTable/useTreeFilter/detail', NULL, '{\"icon\": \"Menu\", \"title\": \"TreeFilter 详情\", \"isFull\": false, \"isHide\": true, \"isLink\": \"\", \"isAffix\": false, \"activeMenu\": \"/proTable/useTreeFilter\", \"isKeepAlive\": true}', 9);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (15, '/proTable/useProTable/detail/:id', 'useProTableDetail', '/proTable/useProTable/detail', NULL, '{\"icon\": \"Menu\", \"title\": \"ProTable 详情\", \"isFull\": false, \"isHide\": true, \"isLink\": \"\", \"isAffix\": false, \"activeMenu\": \"/proTable/useProTable\", \"isKeepAlive\": true}', 10);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (16, '/auth', 'auth', NULL, '/auth/menu', '{\"icon\": \"Lock\", \"title\": \"权限管理\", \"isFull\": false, \"isHide\": false, \"isLink\": \"\", \"isAffix\": false, \"isKeepAlive\": true}', NULL);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (17, '/auth/menu', 'authMenu', '/auth/menu/index', NULL, '{\"icon\": \"Menu\", \"title\": \"菜单权限\", \"isFull\": false, \"isHide\": false, \"isLink\": \"\", \"isAffix\": false, \"isKeepAlive\": true}', 16);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (18, '/auth/button', 'authButton', '/auth/button/index', NULL, '{\"icon\": \"Menu\", \"title\": \"按钮权限\", \"isFull\": false, \"isHide\": false, \"isLink\": \"\", \"isAffix\": false, \"isKeepAlive\": true}', 16);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (19, '/assembly', 'assembly', NULL, '/assembly/guide', '{\"icon\": \"Briefcase\", \"title\": \"常用组件\", \"isFull\": false, \"isHide\": false, \"isLink\": \"\", \"isAffix\": false, \"isKeepAlive\": true}', NULL);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (20, '/dashboard', 'dashboard', NULL, '/dashboard/dataVisualize', '{\"icon\": \"Odometer\", \"title\": \"Dashboard\", \"isFull\": false, \"isHide\": false, \"isLink\": \"\", \"isAffix\": false, \"isKeepAlive\": true}', NULL);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (21, '/assembly/guide', 'guide', '/assembly/guide/index', NULL, '{\"icon\": \"Menu\", \"title\": \"引导页\", \"isFull\": false, \"isHide\": false, \"isLink\": \"\", \"isAffix\": false, \"isKeepAlive\": true}', 19);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (22, '/assembly/tabs', 'tabs', '/assembly/tabs/index', NULL, '{\"icon\": \"Menu\", \"title\": \"标签页操作\", \"isFull\": false, \"isHide\": false, \"isLink\": \"\", \"isAffix\": false, \"isKeepAlive\": true}', 19);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (23, '/assembly/selectIcon', 'selectIcon', '/assembly/selectIcon/index', NULL, '{\"icon\": \"Menu\", \"title\": \"图标选择器\", \"isFull\": false, \"isHide\": false, \"isLink\": \"\", \"isAffix\": false, \"isKeepAlive\": true}', 19);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (24, '/assembly/selectFilter', 'selectFilter', '/assembly/selectFilter/index', NULL, '{\"icon\": \"Menu\", \"title\": \"分类筛选器\", \"isFull\": false, \"isHide\": false, \"isLink\": \"\", \"isAffix\": false, \"isKeepAlive\": true}', 19);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (25, '/assembly/treeFilter', 'treeFilter', '/assembly/treeFilter/index', NULL, '{\"icon\": \"Menu\", \"title\": \"树形筛选器\", \"isFull\": false, \"isHide\": false, \"isLink\": \"\", \"isAffix\": false, \"isKeepAlive\": true}', 19);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (26, '/assembly/svgIcon', 'svgIcon', '/assembly/svgIcon/index', NULL, '{\"icon\": \"Menu\", \"title\": \"SVG 图标\", \"isFull\": false, \"isHide\": false, \"isLink\": \"\", \"isAffix\": false, \"isKeepAlive\": true}', 19);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (27, '/assembly/uploadFile', 'uploadFile', '/assembly/uploadFile/index', NULL, '{\"icon\": \"Menu\", \"title\": \"文件上传\", \"isFull\": false, \"isHide\": false, \"isLink\": \"\", \"isAffix\": false, \"isKeepAlive\": true}', 19);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (28, '/assembly/batchImport', 'batchImport', '/assembly/batchImport/index', NULL, '{\"icon\": \"Menu\", \"title\": \"批量添加数据\", \"isFull\": false, \"isHide\": false, \"isLink\": \"\", \"isAffix\": false, \"isKeepAlive\": true}', 19);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (29, '/assembly/wangEditor', 'wangEditor', '/assembly/wangEditor/index', NULL, '{\"icon\": \"Menu\", \"title\": \"富文本编辑器\", \"isFull\": false, \"isHide\": false, \"isLink\": \"\", \"isAffix\": false, \"isKeepAlive\": true}', 19);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (30, '/assembly/draggable', 'draggable', '/assembly/draggable/index', NULL, '{\"icon\": \"Menu\", \"title\": \"拖拽组件\", \"isFull\": false, \"isHide\": false, \"isLink\": \"\", \"isAffix\": false, \"isKeepAlive\": true}', 19);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (31, '/dashboard/dataVisualize', 'dataVisualize', '/dashboard/dataVisualize/index', NULL, '{\"icon\": \"Menu\", \"title\": \"数据可视化\", \"isFull\": false, \"isHide\": false, \"isLink\": \"\", \"isAffix\": false, \"isKeepAlive\": true}', 20);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (32, '/assembly/tabs/detail/:id', 'tabsDetail', '/assembly/tabs/detail', NULL, '{\"icon\": \"Menu\", \"title\": \"Tab 详情\", \"isFull\": false, \"isHide\": true, \"isLink\": \"\", \"isAffix\": false, \"activeMenu\": \"/assembly/tabs\", \"isKeepAlive\": true}', 22);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (33, '/form', 'form', NULL, '/form/proForm', '{\"icon\": \"Tickets\", \"title\": \"表单 Form\", \"isFull\": false, \"isHide\": false, \"isLink\": \"\", \"isAffix\": false, \"isKeepAlive\": true}', NULL);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (34, '/echarts', 'echarts', NULL, '/echarts/waterChart', '{\"icon\": \"TrendCharts\", \"title\": \"ECharts\", \"isFull\": false, \"isHide\": false, \"isLink\": \"\", \"isAffix\": false, \"isKeepAlive\": true}', NULL);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (35, '/form/proForm', 'proForm', '/form/proForm/index', NULL, '{\"icon\": \"Menu\", \"title\": \"超级 Form\", \"isFull\": false, \"isHide\": false, \"isLink\": \"\", \"isAffix\": false, \"isKeepAlive\": true}', 33);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (36, '/form/basicForm', 'basicForm', '/form/basicForm/index', NULL, '{\"icon\": \"Menu\", \"title\": \"基础 Form\", \"isFull\": false, \"isHide\": false, \"isLink\": \"\", \"isAffix\": false, \"isKeepAlive\": true}', 33);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (37, '/form/validateForm', 'validateForm', '/form/validateForm/index', NULL, '{\"icon\": \"Menu\", \"title\": \"校验 Form\", \"isFull\": false, \"isHide\": false, \"isLink\": \"\", \"isAffix\": false, \"isKeepAlive\": true}', 33);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (38, '/form/dynamicForm', 'dynamicForm', '/form/dynamicForm/index', NULL, '{\"icon\": \"Menu\", \"title\": \"动态 Form\", \"isFull\": false, \"isHide\": false, \"isLink\": \"\", \"isAffix\": false, \"isKeepAlive\": true}', 33);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (39, '/echarts/waterChart', 'waterChart', '/echarts/waterChart/index', NULL, '{\"icon\": \"Menu\", \"title\": \"水型图\", \"isFull\": false, \"isHide\": false, \"isLink\": \"\", \"isAffix\": false, \"isKeepAlive\": true}', 34);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (40, '/echarts/columnChart', 'columnChart', '/echarts/columnChart/index', NULL, '{\"icon\": \"Menu\", \"title\": \"柱状图\", \"isFull\": false, \"isHide\": false, \"isLink\": \"\", \"isAffix\": false, \"isKeepAlive\": true}', 34);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (41, '/echarts/lineChart', 'lineChart', '/echarts/lineChart/index', NULL, '{\"icon\": \"Menu\", \"title\": \"折线图\", \"isFull\": false, \"isHide\": false, \"isLink\": \"\", \"isAffix\": false, \"isKeepAlive\": true}', 34);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (42, '/echarts/pieChart', 'pieChart', '/echarts/pieChart/index', NULL, '{\"icon\": \"Menu\", \"title\": \"饼图\", \"isFull\": false, \"isHide\": false, \"isLink\": \"\", \"isAffix\": false, \"isKeepAlive\": true}', 34);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (43, '/echarts/radarChart', 'radarChart', '/echarts/radarChart/index', NULL, '{\"icon\": \"Menu\", \"title\": \"雷达图\", \"isFull\": false, \"isHide\": false, \"isLink\": \"\", \"isAffix\": false, \"isKeepAlive\": true}', 34);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (44, '/echarts/nestedChart', 'nestedChart', '/echarts/nestedChart/index', NULL, '{\"icon\": \"Menu\", \"title\": \"嵌套环形图\", \"isFull\": false, \"isHide\": false, \"isLink\": \"\", \"isAffix\": false, \"isKeepAlive\": true}', 34);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (45, '/directives', 'directives', NULL, '/directives/copyDirect', '{\"icon\": \"Stamp\", \"title\": \"自定义指令\", \"isFull\": false, \"isHide\": false, \"isLink\": \"\", \"isAffix\": false, \"isKeepAlive\": true}', NULL);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (46, '/menu', 'menu', NULL, '/menu/menu1', '{\"icon\": \"List\", \"title\": \"菜单嵌套\", \"isFull\": false, \"isHide\": false, \"isLink\": \"\", \"isAffix\": false, \"isKeepAlive\": true}', NULL);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (47, '/directives/copyDirect', 'copyDirect', '/directives/copyDirect/index', NULL, '{\"icon\": \"Menu\", \"title\": \"复制指令\", \"isFull\": false, \"isHide\": false, \"isLink\": \"\", \"isAffix\": false, \"isKeepAlive\": true}', 45);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (48, '/directives/watermarkDirect', 'watermarkDirect', '/directives/watermarkDirect/index', NULL, '{\"icon\": \"Menu\", \"title\": \"水印指令\", \"isFull\": false, \"isHide\": false, \"isLink\": \"\", \"isAffix\": false, \"isKeepAlive\": true}', 45);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (49, '/directives/dragDirect', 'dragDirect', '/directives/dragDirect/index', NULL, '{\"icon\": \"Menu\", \"title\": \"拖拽指令\", \"isFull\": false, \"isHide\": false, \"isLink\": \"\", \"isAffix\": false, \"isKeepAlive\": true}', 45);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (50, '/directives/debounceDirect', 'debounceDirect', '/directives/debounceDirect/index', NULL, '{\"icon\": \"Menu\", \"title\": \"防抖指令\", \"isFull\": false, \"isHide\": false, \"isLink\": \"\", \"isAffix\": false, \"isKeepAlive\": true}', 45);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (51, '/directives/throttleDirect', 'throttleDirect', '/directives/throttleDirect/index', NULL, '{\"icon\": \"Menu\", \"title\": \"节流指令\", \"isFull\": false, \"isHide\": false, \"isLink\": \"\", \"isAffix\": false, \"isKeepAlive\": true}', 45);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (52, '/directives/longpressDirect', 'longpressDirect', '/directives/longpressDirect/index', NULL, '{\"icon\": \"Menu\", \"title\": \"长按指令\", \"isFull\": false, \"isHide\": false, \"isLink\": \"\", \"isAffix\": false, \"isKeepAlive\": true}', 45);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (53, '/menu/menu1', 'menu1', '/menu/menu1/index', NULL, '{\"icon\": \"Menu\", \"title\": \"菜单1\", \"isFull\": false, \"isHide\": false, \"isLink\": \"\", \"isAffix\": false, \"isKeepAlive\": true}', 46);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (54, '/menu/menu2', 'menu2', NULL, '/menu/menu2/menu21', '{\"icon\": \"Menu\", \"title\": \"菜单2\", \"isFull\": false, \"isHide\": false, \"isLink\": \"\", \"isAffix\": false, \"isKeepAlive\": true}', 46);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (55, '/menu/menu3', 'menu3', '/menu/menu3/index', NULL, '{\"icon\": \"Menu\", \"title\": \"菜单3\", \"isFull\": false, \"isHide\": false, \"isLink\": \"\", \"isAffix\": false, \"isKeepAlive\": true}', 46);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (56, '/menu/menu2/menu21', 'menu21', '/menu/menu2/menu21/index', NULL, '{\"icon\": \"Menu\", \"title\": \"菜单2-1\", \"isFull\": false, \"isHide\": false, \"isLink\": \"\", \"isAffix\": false, \"isKeepAlive\": true}', 54);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (57, '/menu/menu2/menu22', 'menu22', NULL, '/menu/menu2/menu22/menu221', '{\"icon\": \"Menu\", \"title\": \"菜单2-2\", \"isFull\": false, \"isHide\": false, \"isLink\": \"\", \"isAffix\": false, \"isKeepAlive\": true}', 54);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (58, '/menu/menu2/menu23', 'menu23', '/menu/menu2/menu23/index', NULL, '{\"icon\": \"Menu\", \"title\": \"菜单2-3\", \"isFull\": false, \"isHide\": false, \"isLink\": \"\", \"isAffix\": false, \"isKeepAlive\": true}', 54);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (59, '/menu/menu2/menu22/menu221', 'menu221', '/menu/menu2/menu22/menu221/index', NULL, '{\"icon\": \"Menu\", \"title\": \"菜单2-2-1\", \"isFull\": false, \"isHide\": false, \"isLink\": \"\", \"isAffix\": false, \"isKeepAlive\": true}', 57);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (60, '/menu/menu2/menu22/menu222', 'menu222', '/menu/menu2/menu22/menu222/index', NULL, '{\"icon\": \"Menu\", \"title\": \"菜单2-2-2\", \"isFull\": false, \"isHide\": false, \"isLink\": \"\", \"isAffix\": false, \"isKeepAlive\": true}', 57);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (61, '/system', 'system', NULL, '/system/accountManage', '{\"icon\": \"Tools\", \"title\": \"系统管理\", \"isFull\": false, \"isHide\": false, \"isLink\": \"\", \"isAffix\": false, \"isKeepAlive\": true}', NULL);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (62, '/link', 'link', NULL, '/link/bing', '{\"icon\": \"Paperclip\", \"title\": \"外部链接\", \"isFull\": false, \"isHide\": false, \"isLink\": \"\", \"isAffix\": false, \"isKeepAlive\": true}', NULL);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (63, '/about/index', 'about', NULL, NULL, '{\"icon\": \"InfoFilled\", \"title\": \"关于项目\", \"isFull\": false, \"isHide\": false, \"isLink\": \"\", \"isAffix\": false, \"isKeepAlive\": true}', NULL);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (64, '/system/accountManage', 'accountManage', '/system/accountManage/index', NULL, '{\"icon\": \"Menu\", \"title\": \"账号管理\", \"isFull\": false, \"isHide\": false, \"isLink\": \"\", \"isAffix\": false, \"isKeepAlive\": true}', 61);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (65, '/system/roleManage', 'roleManage', '/system/roleManage/index', NULL, '{\"icon\": \"Menu\", \"title\": \"角色管理\", \"isFull\": false, \"isHide\": false, \"isLink\": \"\", \"isAffix\": false, \"isKeepAlive\": true}', 61);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (66, '/system/menuMange', 'menuMange', '/system/menuMange/index', NULL, '{\"icon\": \"Menu\", \"title\": \"菜单管理\", \"isFull\": false, \"isHide\": false, \"isLink\": \"\", \"isAffix\": false, \"isKeepAlive\": true}', 61);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (67, '/system/departmentManage', 'departmentManage', '/system/departmentManage/index', NULL, '{\"icon\": \"Menu\", \"title\": \"部门管理\", \"isFull\": false, \"isHide\": false, \"isLink\": \"\", \"isAffix\": false, \"isKeepAlive\": true}', 61);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (68, '/system/dictManage', 'dictManage', '/system/dictManage/index', NULL, '{\"icon\": \"Menu\", \"title\": \"字典管理\", \"isFull\": false, \"isHide\": false, \"isLink\": \"\", \"isAffix\": false, \"isKeepAlive\": true}', 61);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (69, '/system/timingTask', 'timingTask', '/system/timingTask/index', NULL, '{\"icon\": \"Menu\", \"title\": \"定时任务\", \"isFull\": false, \"isHide\": false, \"isLink\": \"\", \"isAffix\": false, \"isKeepAlive\": true}', 61);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (70, '/system/systemLog', 'systemLog', '/system/systemLog/index', NULL, '{\"icon\": \"Menu\", \"title\": \"系统日志\", \"isFull\": false, \"isHide\": false, \"isLink\": \"\", \"isAffix\": false, \"isKeepAlive\": true}', 61);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (71, '/link/bing', 'bing', '/link/bing/index', NULL, '{\"icon\": \"Menu\", \"title\": \"Bing 内嵌\", \"isFull\": false, \"isHide\": false, \"isLink\": \"\", \"isAffix\": false, \"isKeepAlive\": true}', 62);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (72, '/link/gitee', 'gitee', '/link/gitee/index', NULL, '{\"icon\": \"Menu\", \"title\": \"Gitee 仓库\", \"isFull\": false, \"isHide\": false, \"isLink\": \"https://gitee.com/HalseySpicy/Geeker-Admin\", \"isAffix\": false, \"isKeepAlive\": true}', 62);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (73, '/link/github', 'github', '/link/github/index', NULL, '{\"icon\": \"Menu\", \"title\": \"GitHub 仓库\", \"isFull\": false, \"isHide\": false, \"isLink\": \"https://github.com/HalseySpicy/Geeker-Admin\", \"isAffix\": false, \"isKeepAlive\": true}', 62);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (74, '/link/docs', 'docs', '/link/docs/index', NULL, '{\"icon\": \"Menu\", \"title\": \"项目文档\", \"isFull\": false, \"isHide\": false, \"isLink\": \"https://docs.spicyboy.cn\", \"isAffix\": false, \"isKeepAlive\": true}', 62);
-INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (75, '/link/juejin', 'juejin', '/link/juejin/index', NULL, '{\"icon\": \"Menu\", \"title\": \"掘金主页\", \"isFull\": false, \"isHide\": false, \"isLink\": \"https://juejin.cn/user/3263814531551816/posts\", \"isAffix\": false, \"isKeepAlive\": true}', 62);
+INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (1, '/about', 'about', 'layout.base$view.about', NULL, '{\"title\": \"关于\", \"icon\": \"fluent:book-information-24-regular\", \"order\": 10}', NULL);
+INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (2, '/function', 'function', 'layout.base', NULL, '{\"title\": \"系统功能\", \"icon\": \"icon-park-outline:all-application\", \"order\": 6}', NULL);
+INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (3, '/function/hide-child', 'function_hide-child', NULL, '/function/hide-child/one', '{\"title\": \"隐藏子菜单\", \"icon\": \"material-symbols:filter-list-off\", \"order\": 2}', 2);
+INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (4, '/function/hide-child/one', 'function_hide-child_one', 'view.function_hide-child_one', NULL, '{\"title\": \"子菜单一\", \"icon\": \"material-symbols:filter-list-off\", \"hideInMenu\": true, \"activeMenu\": \"function_hide-child\"}', 3);
+INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (5, '/function/hide-child/three', 'function_hide-child_three', 'view.function_hide-child_three', NULL, '{\"title\": \"子菜单三\", \"hideInMenu\": true, \"activeMenu\": \"function_hide-child\"}', 3);
+INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (6, '/function/hide-child/two', 'function_hide-child_two', 'view.function_hide-child_two', NULL, '{\"title\": \"子菜单二\", \"hideInMenu\": true, \"activeMenu\": \"function_hide-child\"}', 3);
+INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (7, '/function/multi-tab', 'function_multi-tab', 'view.function_multi-tab', NULL, '{\"title\": \"多标签页\", \"icon\": \"ic:round-tab\", \"multiTab\": true, \"hideInMenu\": true, \"activeMenu\": \"function_tab\"}', 2);
+INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (8, '/function/request', 'function_request', 'view.function_request', NULL, '{\"title\": \"请求示例\", \"icon\": \"carbon:network-overlay\", \"order\": 3, \"buttons\": [{\"code\": \"request:get\", \"desc\": \"获取请求\"}, {\"code\": \"request:post\", \"desc\": \"提交请求\"}]}', 2);
+INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (9, '/function/super-page', 'function_super-page', 'view.function_super-page', NULL, '{\"title\": \"超级管理员页\", \"icon\": \"ic:round-supervisor-account\", \"order\": 5}', 2);
+INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (10, '/function/tab', 'function_tab', 'view.function_tab', NULL, '{\"title\": \"标签页\", \"icon\": \"ic:round-tab\", \"order\": 1, \"buttons\": [{\"code\": \"tab:add\", \"desc\": \"新增标签页\"}, {\"code\": \"tab:update\", \"desc\": \"修改标签页\"}, {\"code\": \"tab:remove\", \"desc\": \"删除标签页\"}]}', 2);
+INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (11, '/function/toggle-auth', 'function_toggle-auth', 'view.function_toggle-auth', NULL, '{\"title\": \"切换权限\", \"icon\": \"ic:round-construction\", \"order\": 4}', 2);
+INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (12, '/home', 'home', 'layout.base$view.home', NULL, '{\"title\": \"首页\", \"icon\": \"mdi:monitor-dashboard\", \"order\": 1}', NULL);
+INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (13, '/manage', 'manage', 'layout.base', NULL, '{\"title\": \"系统管理\", \"icon\": \"carbon:cloud-service-management\", \"order\": 9}', NULL);
+INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (14, '/manage/menu', 'manage_menu', 'view.manage_menu', NULL, '{\"title\": \"菜单管理\", \"icon\": \"material-symbols:route\", \"order\": 3, \"keepAlive\": true, \"buttons\": [{\"code\": \"menu:add\", \"desc\": \"新增菜单\"}, {\"code\": \"menu:edit\", \"desc\": \"编辑菜单\"}, {\"code\": \"menu:delete\", \"desc\": \"删除菜单\"}]}', 13);
+INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (15, '/manage/role', 'manage_role', 'view.manage_role', NULL, '{\"title\": \"角色管理\", \"icon\": \"carbon:user-role\", \"order\": 2, \"buttons\": [{\"code\": \"role:add\", \"desc\": \"新增角色\"}, {\"code\": \"role:edit\", \"desc\": \"编辑角色\"}, {\"code\": \"role:delete\", \"desc\": \"删除角色\"}, {\"code\": \"role:menu\", \"desc\": \"菜单权限\"}, {\"code\": \"role:button\", \"desc\": \"按钮权限\"}]}', 13);
+INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (16, '/manage/user', 'manage_user', 'view.manage_user', NULL, '{\"title\": \"用户管理\", \"icon\": \"ic:round-manage-accounts\", \"order\": 1, \"buttons\": [{\"code\": \"user:add\", \"desc\": \"新增用户\"}, {\"code\": \"user:edit\", \"desc\": \"编辑用户\"}, {\"code\": \"user:delete\", \"desc\": \"删除用户\"}]}', 13);
+INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (17, '/manage/user-detail/:id', 'manage_user-detail', 'view.manage_user-detail', NULL, '{\"title\": \"用户详情\", \"hideInMenu\": true, \"activeMenu\": \"manage_user\"}', 13);
+INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (18, '/multi-menu', 'multi-menu', 'layout.base', NULL, '{\"title\": \"多级菜单\", \"order\": 8}', NULL);
+INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (19, '/multi-menu/first', 'multi-menu_first', NULL, NULL, '{\"title\": \"菜单一\", \"order\": 1}', 18);
+INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (20, '/multi-menu/first/child', 'multi-menu_first_child', 'view.multi-menu_first_child', NULL, '{\"title\": \"菜单一子菜单\"}', 19);
+INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (21, '/multi-menu/second', 'multi-menu_second', NULL, NULL, '{\"title\": \"菜单二\", \"order\": 2}', 18);
+INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (22, '/multi-menu/second/child', 'multi-menu_second_child', NULL, NULL, '{\"title\": \"菜单二子菜单\"}', 21);
+INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (23, '/multi-menu/second/child/home', 'multi-menu_second_child_home', 'view.multi-menu_second_child_home', NULL, '{\"title\": \"菜单二子菜单首页\"}', 22);
+INSERT INTO `RouteAuth` (`id`, `path`, `name`, `component`, `redirect`, `meta`, `parent_id`) VALUES (24, '/user-center', 'user-center', 'layout.base$view.user-center', NULL, '{\"title\": \"个人中心\", \"hideInMenu\": true}', NULL);
 COMMIT;
 
 -- ----------------------------

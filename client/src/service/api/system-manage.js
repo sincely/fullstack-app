@@ -21,6 +21,77 @@ export function fetchGetAllRoles() {
   })
 }
 
+/** 获取角色菜单ID */
+export function fetchGetRoleRouteIds(params) {
+  return request({
+    url: '/systemManage/getRoleRouteIds',
+    method: 'get',
+    params
+  })
+}
+
+/** 更新角色菜单ID */
+export function fetchUpdateRoleRouteIds(data) {
+  return request({
+    url: '/systemManage/updateRoleRouteIds',
+    method: 'post',
+    data
+  })
+}
+
+/** 获取角色按钮ID */
+export function fetchGetRoleButtonIds(params) {
+  return request({
+    url: '/systemManage/getRoleButtonIds',
+    method: 'get',
+    params
+  })
+}
+
+/** 更新角色按钮ID */
+export function fetchUpdateRoleButtonIds(data) {
+  return request({
+    url: '/systemManage/updateRoleButtonIds',
+    method: 'post',
+    data
+  })
+}
+
+/** 获取全部按钮 */
+export function fetchGetAllButtons() {
+  return request({
+    url: '/systemManage/getAllButtons',
+    method: 'get'
+  })
+}
+
+/** 新增角色 */
+export function fetchCreateRole(data) {
+  return request({
+    url: '/systemManage/saveRole',
+    method: 'post',
+    data
+  })
+}
+
+/** 更新角色 */
+export function fetchUpdateRole(data) {
+  return request({
+    url: '/systemManage/updateRole',
+    method: 'post',
+    data
+  })
+}
+
+/** 删除角色 */
+export function fetchDeleteRole(data) {
+  return request({
+    url: '/systemManage/deleteRole',
+    method: 'post',
+    data
+  })
+}
+
 /** 获取用户列表 */
 export function fetchGetUserList(params) {
   return request({
@@ -63,5 +134,32 @@ export function fetchGetMenuTree() {
   return request({
     url: '/systemManage/getMenuTree',
     method: 'get'
+  })
+}
+
+/** 新增菜单 */
+export function fetchCreateMenu(data) {
+  return request({
+    url: '/systemManage/saveMenu',
+    method: 'post',
+    data
+  })
+}
+
+/** 更新菜单 */
+export function fetchUpdateMenu(data) {
+  return request({
+    url: '/systemManage/updateMenu',
+    method: 'post',
+    data
+  })
+}
+
+/** 删除菜单 */
+export function fetchDeleteMenu(data) {
+  return request({
+    url: '/systemManage/deleteMenu',
+    method: 'post',
+    data
   })
 }

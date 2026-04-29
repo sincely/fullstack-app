@@ -1,5 +1,7 @@
 <script setup>
-import { computed, shallowRef } from 'vue'
+import { computed, shallowRef, watch } from 'vue'
+
+import { fetchGetAllButtons, fetchGetRoleButtonIds, fetchUpdateRoleButtonIds } from '@/service/api'
 
 defineOptions({
   name: 'ButtonAuthModal'
@@ -25,32 +27,33 @@ const title = computed(() => '编辑' + '按钮权限')
 const tree = shallowRef([])
 
 async function getAllButtons() {
-  // 请求
-  tree.value = [
-    { key: 1, title: '按钮1', code: 'code1' },
-    { key: 2, title: '按钮2', code: 'code2' },
-    { key: 3, title: '按钮3', code: 'code3' },
-    { key: 4, title: '按钮4', code: 'code4' },
-    { key: 5, title: '按钮5', code: 'code5' },
-    { key: 6, title: '按钮6', code: 'code6' },
-    { key: 7, title: '按钮7', code: 'code7' },
-    { key: 8, title: '按钮8', code: 'code8' },
-    { key: 9, title: '按钮9', code: 'code9' },
-    { key: 10, title: '按钮10', code: 'code10' }
-  ]
+  const { error, data } = await fetchGetAllButtons()
+
+  if (!error) {
+    tree.value = data || []
+  }
 }
 
 const checks = shallowRef([])
 
 async function getChecks() {
-  console.log(props.roleId)
-  // 请求
-  checks.value = [1, 2, 3, 4, 5]
+  const { error, data } = await fetchGetRoleButtonIds({ roleId: props.roleId })
+
+  if (!error) {
+    checks.value = (data || []).map((item) => String(item))
+  }
 }
 
-function handleSubmit() {
-  console.log(checks.value, props.roleId)
-  // 请求
+async function handleSubmit() {
+  const buttonIds = checks.value.map((item) => Number(item)).filter(Boolean)
+  const { error } = await fetchUpdateRoleButtonIds({
+    roleId: props.roleId,
+    buttonIds
+  })
+
+  if (error) {
+    return
+  }
 
   window.$message?.success?.('修改成功')
 
@@ -62,8 +65,11 @@ function init() {
   getChecks()
 }
 
-// 初始化
-init()
+watch(visible, () => {
+  if (visible.value) {
+    init()
+  }
+})
 </script>
 
 <template>

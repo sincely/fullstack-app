@@ -37,7 +37,7 @@ const findRoleById = async (roleId) => {
  * @returns {Promise<any | null>}
  */
 const findRoleByName = async (roleName) => {
-  const sql = 'select roleId, roleName from Roles where roleName = ? limit 1'
+  const sql = 'select roleId, roleName, description from Roles where roleName = ? limit 1'
   const rows = await query(sql, [roleName])
   return rows[0] || null
 }
@@ -116,6 +116,28 @@ const updateRoleWithRoutes = async ({ roleId, roleName, description, routeIds })
   }
 }
 
+const replaceRoleRoutes = async ({ roleId, routeIds }) => {
+  const connection = await getConnection()
+  try {
+    await connection.beginTransaction()
+    await connection.execute('delete from RoleRoute where roleId = ?', [roleId])
+
+    if (routeIds.length > 0) {
+      const valuesSql = routeIds.map(() => '(?, ?)').join(', ')
+      const values = routeIds.flatMap((routeId) => [roleId, routeId])
+      await connection.execute(`insert into RoleRoute (roleId, routeId) values ${valuesSql}`, values)
+    }
+
+    await connection.commit()
+    return { affectedRows: 1 }
+  } catch (error) {
+    await connection.rollback()
+    throw error
+  } finally {
+    connection.release()
+  }
+}
+
 /**
  * 删除角色并清理角色路由关系（事务）。
  * @param {number} roleId
@@ -155,6 +177,7 @@ export default {
   getRouteIdsByRoleId,
   createRoleWithRoutes,
   updateRoleWithRoutes,
+  replaceRoleRoutes,
   deleteRole,
   countUsersByRoleId
 }

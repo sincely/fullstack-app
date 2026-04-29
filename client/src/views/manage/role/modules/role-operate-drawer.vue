@@ -4,6 +4,7 @@ import { computed, reactive, watch } from 'vue'
 
 import { enableStatusOptions } from '@/constants/business'
 import { useAntdForm, useFormRules } from '@/hooks/common/form'
+import { fetchCreateRole, fetchUpdateRole } from '@/service/api'
 
 import ButtonAuthModal from './button-auth-modal.vue'
 import MenuAuthModal from './menu-auth-modal.vue'
@@ -80,8 +81,22 @@ function closeDrawer() {
 
 async function handleSubmit() {
   await validate()
-  // 请求
-  window.$message?.success('更新成功')
+  const submitApi = props.operateType === 'edit' ? fetchUpdateRole : fetchCreateRole
+  const payload = {
+    ...model
+  }
+
+  if (props.operateType === 'edit') {
+    payload.id = props.rowData.id
+  }
+
+  const { error } = await submitApi(payload)
+
+  if (error) {
+    return
+  }
+
+  window.$message?.success(props.operateType === 'edit' ? '更新成功' : '创建成功')
   closeDrawer()
   emit('submitted')
 }

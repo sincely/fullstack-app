@@ -1,7 +1,7 @@
 <script setup>
 import { computed, shallowRef, watch } from 'vue'
 
-import { fetchGetAllPages, fetchGetMenuTree } from '@/service/api'
+import { fetchGetAllPages, fetchGetMenuTree, fetchGetRoleRouteIds, fetchUpdateRoleRouteIds } from '@/service/api'
 
 defineOptions({
   name: 'MenuAuthModal'
@@ -63,40 +63,59 @@ async function getTree() {
   const { error, data } = await fetchGetMenuTree()
 
   if (!error) {
-    tree.value = recursiveTransform(data)
+    tree.value = transformFlatMenuTree(data)
   }
 }
 
-function recursiveTransform(data) {
-  return data.map((item) => {
-    const { id: key, label } = item
-
-    if (item.children) {
-      return {
-        key,
-        title: label,
-        children: recursiveTransform(item.children)
+function transformFlatMenuTree(data) {
+  const nodeMap = new Map(
+    data.map((item) => [
+      String(item.id),
+      {
+        key: String(item.id),
+        title: item.label,
+        children: []
       }
+    ])
+  )
+
+  const roots = []
+
+  data.forEach((item) => {
+    const currentNode = nodeMap.get(String(item.id))
+    const parentId = String(item.pId)
+
+    if (parentId !== '0' && nodeMap.has(parentId)) {
+      nodeMap.get(parentId).children.push(currentNode)
+      return
     }
 
-    return {
-      key,
-      title: label
-    }
+    roots.push(currentNode)
   })
+
+  return roots
 }
 
 const checks = shallowRef([])
 
 async function getChecks() {
-  console.log(props.roleId)
-  // 请求
-  checks.value = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 15, 16, 17, 18, 19, 20, 21]
+  const { error, data } = await fetchGetRoleRouteIds({ roleId: props.roleId })
+
+  if (!error) {
+    checks.value = (data || []).map((item) => String(item))
+  }
 }
 
-function handleSubmit() {
-  console.log(checks.value, props.roleId)
-  // 请求
+async function handleSubmit() {
+  const routeIds = checks.value.map((item) => Number(item)).filter(Boolean)
+  const { error } = await fetchUpdateRoleRouteIds({
+    roleId: props.roleId,
+    routeIds
+  })
+
+  if (error) {
+    return
+  }
 
   window.$message?.success?.('修改成功')
 

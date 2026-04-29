@@ -35,6 +35,19 @@ export const toRoleCode = (roleName = '') => {
   return 'R_USER'
 }
 
+const parseRoleDescription = (description) => {
+  if (!description) {
+    return {}
+  }
+
+  try {
+    const parsed = JSON.parse(description)
+    return typeof parsed === 'object' && parsed ? parsed : {}
+  } catch {
+    return {}
+  }
+}
+
 export const toDocStatus = (status) => {
   return status === 'active' ? '1' : '2'
 }
@@ -51,6 +64,10 @@ export const toDocGender = (gender) => {
 }
 
 export const toRoleRecord = (role) => {
+  const descriptionMeta = parseRoleDescription(role.description)
+  const roleDesc = descriptionMeta.roleDesc ?? role.description ?? ''
+  const roleCode = descriptionMeta.roleCode ?? toRoleCode(role.roleName)
+
   return {
     id: role.roleId,
     createBy: '',
@@ -59,8 +76,8 @@ export const toRoleRecord = (role) => {
     updateTime: formatDateTime(role.updateTime),
     status: '1',
     roleName: role.roleName ?? '',
-    roleCode: toRoleCode(role.roleName),
-    roleDesc: role.description ?? ''
+    roleCode,
+    roleDesc
   }
 }
 

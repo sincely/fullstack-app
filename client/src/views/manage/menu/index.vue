@@ -7,7 +7,7 @@ import SvgIcon from '@/components/custom/svg-icon.vue'
 import { enableStatusRecord, menuTypeRecord } from '@/constants/business'
 import { yesOrNoRecord } from '@/constants/common'
 import { useTable, useTableOperate, useTableScroll } from '@/hooks/common/table'
-import { fetchGetAllPages, fetchGetMenuList } from '@/service/api'
+import { fetchDeleteMenu, fetchGetAllPages, fetchGetMenuList } from '@/service/api'
 
 import MenuOperateModal from './modules/menu-operate-modal.vue'
 
@@ -168,16 +168,19 @@ function handleAdd() {
 }
 
 async function handleBatchDelete() {
-  // 请求
+  const { error } = await fetchDeleteMenu({ ids: checkedRowKeys.value })
 
-  onBatchDeleted()
+  if (!error) {
+    onBatchDeleted()
+  }
 }
 
-function handleDelete(id) {
-  // 请求
-  console.log(id)
+async function handleDelete(id) {
+  const { error } = await fetchDeleteMenu({ id })
 
-  onDeleted()
+  if (!error) {
+    onDeleted()
+  }
 }
 /** 编辑菜单数据或新增子菜单时的父菜单数据 */
 const editingData = ref(null)

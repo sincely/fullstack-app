@@ -5,7 +5,7 @@ import { computed, nextTick, reactive, ref, watch } from 'vue'
 import SvgIcon from '@/components/custom/svg-icon.vue'
 import { enableStatusOptions, menuIconTypeOptions, menuTypeOptions } from '@/constants/business'
 import { useAntdForm, useFormRules } from '@/hooks/common/form'
-import { fetchGetAllRoles } from '@/service/api'
+import { fetchCreateMenu, fetchGetAllRoles, fetchUpdateMenu } from '@/service/api'
 import { getLocalIcons } from '@/utils/icon'
 
 import {
@@ -237,11 +237,15 @@ async function handleSubmit() {
   await validate()
 
   const params = getSubmitParams()
+  const submitApi = props.operateType === 'edit' ? fetchUpdateMenu : fetchCreateMenu
+  const submitParams = props.operateType === 'edit' ? { ...params, id: props.rowData.id } : params
+  const { error } = await submitApi(submitParams)
 
-  console.log('提交参数: ', params)
+  if (error) {
+    return
+  }
 
-  // 请求
-  window.$message?.success('更新成功')
+  window.$message?.success(props.operateType === 'edit' ? '更新成功' : '创建成功')
   closeDrawer()
   emit('submitted')
 }
