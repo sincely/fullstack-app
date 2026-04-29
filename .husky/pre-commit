@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+# 执行lint-staged，用于在代码提交前进行格式和风格检查
+# 分别检查子项目
+pnpm -F client run lint-staged || exit 1
+pnpm -F server run lint-staged || exit 1

@@ -1,0 +1,26 @@
+{
+  "name": "turborepo-app",
+  "version": "1.0.0",
+  "description": "",
+  "packageManager": "pnpm@8.15.7",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "deps:check": "pnpm outdated -r",
+    "deps:update": "pnpm update --latest",
+    "format": "prettier . --write",
+    "format:check": "prettier . --check",
+    "prepare": "husky install",
+    "preinstall": "npx only-allow pnpm"
+  },
+  "license": "ISC",
+  "devDependencies": {
+    "husky": "8.0.3",
+    "@commitlint/cli": "17.8.1",
+    "@commitlint/config-conventional": "17.8.1",
+    "@release-it/conventional-changelog": "10.0.4",
+    "conventional-changelog-angular": "8.1.0",
+    "conventional-changelog-conventionalcommits": "9.1.0",
+    "release-it": "19.2.4"
+  }
+}
