@@ -3,8 +3,8 @@
  * @description 处理后台角色及角色菜单权限的增删改查
  */
 
-import adminRoleDao from '../../models/dao/adminRoleDao.js'
-import adminMenuDao from '../../models/dao/adminMenuDao.js'
+import userRoleDao from '../../models/dao/userRoleDao.js'
+import userMenuDao from '../../models/dao/userMenuDao.js'
 import { businessCode, businessMsg } from '../../config/businessCode.js'
 import { httpCode } from '../../config/httpError.js'
 
@@ -15,10 +15,10 @@ import { httpCode } from '../../config/httpError.js'
  * @returns {object} 200 - 获取成功
  */
 const listRoles = async (ctx) => {
-  const [roles, menus] = await Promise.all([adminRoleDao.listRoles(), adminMenuDao.listMenus()])
+  const [roles, menus] = await Promise.all([userRoleDao.listRoles(), userMenuDao.listMenus()])
   const roleList = await Promise.all(
     roles.map(async (role) => {
-      const routeIds = await adminRoleDao.getRouteIdsByRoleId(role.roleId)
+      const routeIds = await userRoleDao.getRouteIdsByRoleId(role.roleId)
       return {
         ...role,
         routeIds
@@ -48,7 +48,7 @@ const listRoles = async (ctx) => {
  */
 const createRole = async (ctx) => {
   const { roleName, description, routeIds } = ctx.request.body
-  const existedRole = await adminRoleDao.findRoleByName(roleName)
+  const existedRole = await userRoleDao.findRoleByName(roleName)
 
   if (existedRole) {
     ctx.status = httpCode.ok
@@ -56,7 +56,7 @@ const createRole = async (ctx) => {
     return
   }
 
-  const result = await adminRoleDao.createRoleWithRoutes({
+  const result = await userRoleDao.createRoleWithRoutes({
     roleName,
     description,
     routeIds: [...new Set(routeIds)]
@@ -84,7 +84,7 @@ const createRole = async (ctx) => {
  */
 const updateRole = async (ctx) => {
   const { roleId, roleName, description, routeIds } = ctx.request.body
-  const currentRole = await adminRoleDao.findRoleById(roleId)
+  const currentRole = await userRoleDao.findRoleById(roleId)
 
   if (!currentRole) {
     ctx.status = httpCode.ok
@@ -92,14 +92,14 @@ const updateRole = async (ctx) => {
     return
   }
 
-  const existedRole = await adminRoleDao.findRoleByName(roleName)
+  const existedRole = await userRoleDao.findRoleByName(roleName)
   if (existedRole && existedRole.roleId !== roleId) {
     ctx.status = httpCode.ok
     ctx.body = { code: businessCode.roleExist, msg: businessMsg[businessCode.roleExist] }
     return
   }
 
-  await adminRoleDao.updateRoleWithRoutes({
+  await userRoleDao.updateRoleWithRoutes({
     roleId,
     roleName,
     description,
@@ -122,7 +122,7 @@ const updateRole = async (ctx) => {
  */
 const deleteRole = async (ctx) => {
   const { roleId } = ctx.request.body
-  const currentRole = await adminRoleDao.findRoleById(roleId)
+  const currentRole = await userRoleDao.findRoleById(roleId)
 
   if (!currentRole) {
     ctx.status = httpCode.ok
@@ -130,14 +130,14 @@ const deleteRole = async (ctx) => {
     return
   }
 
-  const userCount = await adminRoleDao.countUsersByRoleId(roleId)
+  const userCount = await userRoleDao.countUsersByRoleId(roleId)
   if (userCount > 0) {
     ctx.status = httpCode.ok
     ctx.body = { code: businessCode.roleInUse, msg: businessMsg[businessCode.roleInUse] }
     return
   }
 
-  await adminRoleDao.deleteRole(roleId)
+  await userRoleDao.deleteRole(roleId)
 
   ctx.status = httpCode.ok
   ctx.body = {

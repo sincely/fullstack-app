@@ -15,7 +15,7 @@ const { toggleLoginModule } = useRouterPush()
 const { formRef, validate } = useAntdForm()
 
 const model = reactive({
-  userName: 'Soybean',
+  userName: 'admin',
   password: '123456'
 })
 

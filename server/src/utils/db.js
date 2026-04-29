@@ -12,6 +12,8 @@ const pool = mysql.createPool(dbConfig)
  */
 // 封装查询函数
 const query = async (sql, params = []) => {
+  const fullSql = mysql.format(sql, params)
+  process.stdout.write(`[SQL]执行: ${fullSql}\n`)
   const [result] = await pool.execute(sql, params)
   return result
 }

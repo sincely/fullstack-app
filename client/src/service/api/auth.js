@@ -8,7 +8,7 @@ import { request } from '../request'
  */
 export function fetchLogin(userName, password) {
   return request({
-    url: '/auth/login',
+    url: '/user/auth/login',
     method: 'post',
     data: {
       userName,
@@ -19,7 +19,7 @@ export function fetchLogin(userName, password) {
 
 /** 获取用户信息 */
 export function fetchGetUserInfo() {
-  return request({ url: '/auth/getUserInfo' })
+  return request({ url: '/user/getUserInfo' })
 }
 
 /**
@@ -29,7 +29,7 @@ export function fetchGetUserInfo() {
  */
 export function fetchRefreshToken(refreshToken) {
   return request({
-    url: '/auth/refreshToken',
+    url: '/user/auth/refreshToken',
     method: 'post',
     data: {
       refreshToken
@@ -44,5 +44,5 @@ export function fetchRefreshToken(refreshToken) {
  * @param msg 错误信息
  */
 export function fetchCustomBackendError(code, msg) {
-  return request({ url: '/auth/error', params: { code, msg } })
+  return request({ url: '/user/auth/error', params: { code, msg } })
 }

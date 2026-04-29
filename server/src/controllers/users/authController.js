@@ -3,8 +3,8 @@
  * @description 处理后台登录、注册、退出和权限信息获取
  */
 
-import adminAuthDao from '../../models/dao/adminAuthDao.js'
-import adminPermissionDao from '../../models/dao/adminPermissionDao.js'
+import userAuthDao from '../../models/dao/userAuthDao.js'
+import userPermissionDao from '../../models/dao/userPermissionDao.js'
 import { httpCode } from '../../config/httpError.js'
 import { businessCode, businessMsg } from '../../config/businessCode.js'
 import { defaultAdminRoleName } from '../../config/admin.js'
@@ -51,7 +51,7 @@ const toRoleCode = (roleName = '') => {
   return 'R_USER'
 }
 
-// `/auth/getUserInfo` 兼容接口返回结构
+// `/auth/getCurrentUserInfo` 兼容接口返回结构
 const formatLegacyUserInfo = (user, permissionSnapshot) => {
   return {
     userId: String(user.id),
@@ -63,8 +63,8 @@ const formatLegacyUserInfo = (user, permissionSnapshot) => {
 
 // 聚合角色对应的菜单与按钮权限，便于登录后一次性返回
 const buildPermissionSnapshot = async (roleId) => {
-  const menus = await adminPermissionDao.findMenusByRoleId(roleId)
-  const buttons = await adminPermissionDao.findButtonsByRoleId(roleId)
+  const menus = await userPermissionDao.findMenusByRoleId(roleId)
+  const buttons = await userPermissionDao.findButtonsByRoleId(roleId)
 
   return {
     menuTree: buildMenuTree(menus),
@@ -86,7 +86,7 @@ const buildPermissionSnapshot = async (roleId) => {
 const register = async (ctx) => {
   const { username, password, email } = ctx.request.body
 
-  const existedUser = await adminAuthDao.findAdminUserByUsername(username)
+  const existedUser = await userAuthDao.findAdminUserByUsername(username)
   if (existedUser) {
     ctx.status = httpCode.ok
     ctx.body = {
@@ -96,7 +96,7 @@ const register = async (ctx) => {
     return
   }
 
-  const existedEmail = await adminAuthDao.findAdminUserByEmail(email)
+  const existedEmail = await userAuthDao.findAdminUserByEmail(email)
   if (existedEmail) {
     ctx.status = httpCode.ok
     ctx.body = {
@@ -106,7 +106,7 @@ const register = async (ctx) => {
     return
   }
 
-  const defaultRole = await adminAuthDao.findRoleByName(defaultAdminRoleName)
+  const defaultRole = await userAuthDao.findRoleByName(defaultAdminRoleName)
   if (!defaultRole) {
     ctx.status = httpCode.internalServerError
     ctx.body = {
@@ -117,7 +117,7 @@ const register = async (ctx) => {
   }
 
   const passwordHash = await hashPassword(password)
-  const registerResult = await adminAuthDao.createAdminUser({
+  const registerResult = await userAuthDao.createAdminUser({
     username,
     email,
     passwordHash,
@@ -146,75 +146,13 @@ const register = async (ctx) => {
 }
 
 /**
- * @summary 后台登录
- * @description 使用用户名和密码登录后台，返回 token、用户信息、菜单和权限数据
- * @api POST /admin/auth/login
- * @param {string} username - 登录用户名
- * @param {string} password - 登录密码
- * @returns {object} 200 - 登录成功
- */
-const login = async (ctx) => {
-  const { username, password } = ctx.request.body
-
-  const user = await adminAuthDao.findAdminUserByUsername(username)
-  if (!user) {
-    ctx.status = httpCode.ok
-    ctx.body = {
-      code: businessCode.userLoginFail,
-      msg: businessMsg[businessCode.userLoginFail]
-    }
-    return
-  }
-
-  if (user.status !== 'active') {
-    ctx.status = httpCode.ok
-    ctx.body = {
-      code: businessCode.adminUserDisabled,
-      msg: businessMsg[businessCode.adminUserDisabled]
-    }
-    return
-  }
-
-  const passwordMatched = await comparePassword(password, user.password)
-  if (!passwordMatched) {
-    ctx.status = httpCode.ok
-    ctx.body = {
-      code: businessCode.userLoginFail,
-      msg: businessMsg[businessCode.userLoginFail]
-    }
-    return
-  }
-
-  const permissionSnapshot = await buildPermissionSnapshot(user.roleId)
-  const token = generateToken({
-    userId: user.id,
-    username: user.username,
-    roleId: user.roleId,
-    roleName: user.roleName
-  })
-
-  ctx.status = httpCode.ok
-  ctx.body = {
-    code: businessCode.success,
-    msg: '登录成功',
-    data: {
-      token,
-      user: formatUserInfo(user),
-      menus: permissionSnapshot.menuTree,
-      permissions: permissionSnapshot.permissionCodes,
-      buttons: permissionSnapshot.buttons
-    }
-  }
-}
-
-/**
  * @summary 获取当前用户信息
  * @description 获取当前登录后台用户的基础资料
  * @api GET /admin/auth/profile
  * @returns {object} 200 - 获取成功
  */
-const getProfile = async (ctx) => {
-  const currentUser = await adminAuthDao.findAdminUserById(ctx.state.user.userId)
+const getCurrentUserInfo = async (ctx) => {
+  const currentUser = await userAuthDao.findAdminUserById(ctx.state.user.userId)
   if (!currentUser) {
     ctx.status = httpCode.unauthorized
     ctx.body = {
@@ -238,7 +176,7 @@ const getProfile = async (ctx) => {
  * @api GET /admin/auth/menus
  * @returns {object} 200 - 获取成功
  */
-const getMenus = async (ctx) => {
+const getUserMenus = async (ctx) => {
   const permissionSnapshot = await buildPermissionSnapshot(ctx.state.user.roleId)
 
   ctx.status = httpCode.ok
@@ -255,7 +193,7 @@ const getMenus = async (ctx) => {
  * @api GET /admin/auth/permissions
  * @returns {object} 200 - 获取成功
  */
-const getPermissions = async (ctx) => {
+const getUserPermissions = async (ctx) => {
   const permissionSnapshot = await buildPermissionSnapshot(ctx.state.user.roleId)
 
   ctx.status = httpCode.ok
@@ -300,14 +238,17 @@ const logout = async (ctx) => {
 }
 
 /**
- * @summary 用户名+密码登录（兼容前端旧接口）
- * @description 对齐 `/auth/login` 响应结构，返回 token 与 refreshToken
- * @api POST /auth/login
+ * @summary 后台登录
+ * @description 使用用户名和密码登录后台，返回 token、用户信息、菜单和权限数据
+ * @api POST /user/auth/login
+ * @param {string} username - 登录用户名
+ * @param {string} password - 登录密码
+ * @returns {object} 200 - 登录成功
  */
-const legacyLogin = async (ctx) => {
+const login = async (ctx) => {
   const { userName, password } = ctx.request.body
 
-  const user = await adminAuthDao.findAdminUserByUsername(userName)
+  const user = await userAuthDao.findAdminUserByUsername(userName)
   if (!user || user.status !== 'active') {
     ctx.status = httpCode.ok
     ctx.body = {
@@ -347,10 +288,10 @@ const legacyLogin = async (ctx) => {
 
 /**
  * @summary 获取用户信息（兼容前端旧接口）
- * @description 对齐 `/auth/getUserInfo` 响应结构，返回 userId/userName/roles/buttons
- * @api GET /auth/getUserInfo
+ * @description 对齐 `/auth/getCurrentUserInfo` 响应结构，返回 userId/userName/roles/buttons
+ * @api GET /auth/getCurrentUserInfo
  */
-const legacyGetUserInfo = async (ctx) => {
+const getUserInfo = async (ctx) => {
   const userId = ctx.state.user?.userId
   if (!userId) {
     ctx.status = httpCode.ok
@@ -361,7 +302,7 @@ const legacyGetUserInfo = async (ctx) => {
     return
   }
 
-  const currentUser = await adminAuthDao.findAdminUserById(userId)
+  const currentUser = await userAuthDao.findAdminUserById(userId)
   if (!currentUser || currentUser.status !== 'active') {
     ctx.status = httpCode.ok
     ctx.body = {
@@ -383,11 +324,10 @@ const legacyGetUserInfo = async (ctx) => {
 
 export default {
   register,
-  login,
-  getProfile,
-  getMenus,
-  getPermissions,
+  getCurrentUserInfo,
+  getUserMenus,
+  getUserPermissions,
   logout,
-  legacyLogin,
-  legacyGetUserInfo
+  login,
+  getUserInfo
 }

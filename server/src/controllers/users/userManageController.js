@@ -3,8 +3,8 @@
  * @description 处理后台用户管理相关的增删改查
  */
 
-import adminUserDao from '../../models/dao/adminUserDao.js'
-import adminRoleDao from '../../models/dao/adminRoleDao.js'
+import userDao from '../../models/dao/usersDao.js'
+import userRoleDao from '../../models/dao/userRoleDao.js'
 import { businessCode, businessMsg } from '../../config/businessCode.js'
 import { httpCode } from '../../config/httpError.js'
 import { hashPassword } from '../../utils/password.js'
@@ -23,9 +23,9 @@ import { hashPassword } from '../../utils/password.js'
 const listUsers = async (ctx) => {
   const { page, pageSize, keyword, status, roleId } = ctx.query
   const [list, total, roleOptions] = await Promise.all([
-    adminUserDao.listUsers({ page, pageSize, keyword, status, roleId }),
-    adminUserDao.countUsers({ keyword, status, roleId }),
-    adminUserDao.listRoleOptions()
+    userDao.listUsers({ page, pageSize, keyword, status, roleId }),
+    userDao.countUsers({ keyword, status, roleId }),
+    userDao.listRoleOptions()
   ])
 
   ctx.status = httpCode.ok
@@ -65,10 +65,10 @@ const createUser = async (ctx) => {
   const { username, password, gender, age, idCard, email, address, status, avatar, roleId } = ctx.request.body
 
   const [existedUser, existedEmail, existedIdCard, role] = await Promise.all([
-    adminUserDao.findUserByUsername(username),
-    adminUserDao.findUserByEmail(email),
-    adminUserDao.findUserByIdCard(idCard),
-    adminRoleDao.findRoleById(roleId)
+    userDao.findUserByUsername(username),
+    userDao.findUserByEmail(email),
+    userDao.findUserByIdCard(idCard),
+    userRoleDao.findRoleById(roleId)
   ])
 
   if (existedUser) {
@@ -96,7 +96,7 @@ const createUser = async (ctx) => {
   }
 
   const passwordHash = await hashPassword(password)
-  const result = await adminUserDao.createUser({
+  const result = await userDao.createUser({
     username,
     gender,
     age: age ?? null,
@@ -137,7 +137,7 @@ const createUser = async (ctx) => {
  */
 const updateUser = async (ctx) => {
   const { id, password, email, idCard, roleId, ...rest } = ctx.request.body
-  const currentUser = await adminUserDao.findUserById(id)
+  const currentUser = await userDao.findUserById(id)
 
   if (!currentUser) {
     ctx.status = httpCode.ok
@@ -146,7 +146,7 @@ const updateUser = async (ctx) => {
   }
 
   if (email) {
-    const existedEmail = await adminUserDao.findUserByEmail(email)
+    const existedEmail = await userDao.findUserByEmail(email)
     if (existedEmail && existedEmail.id !== id) {
       ctx.status = httpCode.ok
       ctx.body = { code: businessCode.emailExist, msg: businessMsg[businessCode.emailExist] }
@@ -155,7 +155,7 @@ const updateUser = async (ctx) => {
   }
 
   if (idCard) {
-    const existedIdCard = await adminUserDao.findUserByIdCard(idCard)
+    const existedIdCard = await userDao.findUserByIdCard(idCard)
     if (existedIdCard && existedIdCard.id !== id) {
       ctx.status = httpCode.ok
       ctx.body = { code: businessCode.idCardExist, msg: businessMsg[businessCode.idCardExist] }
@@ -164,7 +164,7 @@ const updateUser = async (ctx) => {
   }
 
   if (roleId) {
-    const role = await adminRoleDao.findRoleById(roleId)
+    const role = await userRoleDao.findRoleById(roleId)
     if (!role) {
       ctx.status = httpCode.ok
       ctx.body = { code: businessCode.roleNotFound, msg: businessMsg[businessCode.roleNotFound] }
@@ -186,7 +186,7 @@ const updateUser = async (ctx) => {
     payload.password = await hashPassword(password)
   }
 
-  await adminUserDao.updateUser(id, payload)
+  await userDao.updateUser(id, payload)
 
   ctx.status = httpCode.ok
   ctx.body = {
@@ -214,14 +214,14 @@ const deleteUser = async (ctx) => {
     return
   }
 
-  const currentUser = await adminUserDao.findUserById(id)
+  const currentUser = await userDao.findUserById(id)
   if (!currentUser) {
     ctx.status = httpCode.ok
     ctx.body = { code: businessCode.userNotFound, msg: businessMsg[businessCode.userNotFound] }
     return
   }
 
-  await adminUserDao.deleteUser(id)
+  await userDao.deleteUser(id)
 
   ctx.status = httpCode.ok
   ctx.body = {

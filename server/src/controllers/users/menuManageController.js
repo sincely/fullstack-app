@@ -3,7 +3,7 @@
  * @description 处理后台菜单管理相关的增删改查
  */
 
-import adminMenuDao from '../../models/dao/adminMenuDao.js'
+import userMenuDao from '../../models/dao/userMenuDao.js'
 import { buildMenuTree } from '../../utils/adminPermission.js'
 import { businessCode, businessMsg } from '../../config/businessCode.js'
 import { httpCode } from '../../config/httpError.js'
@@ -26,7 +26,7 @@ const toMenuPayload = ({ path, name, component, redirect, meta, parentId }) => {
  * @returns {object} 200 - 获取成功
  */
 const listMenus = async (ctx) => {
-  const menus = await adminMenuDao.listMenus()
+  const menus = await userMenuDao.listMenus()
 
   ctx.status = httpCode.ok
   ctx.body = {
@@ -54,8 +54,8 @@ const listMenus = async (ctx) => {
 const createMenu = async (ctx) => {
   const { path, name, component, redirect, meta, parentId } = ctx.request.body
   const [existedPath, existedName] = await Promise.all([
-    adminMenuDao.findMenuByPath(path),
-    adminMenuDao.findMenuByName(name)
+    userMenuDao.findMenuByPath(path),
+    userMenuDao.findMenuByName(name)
   ])
 
   if (existedPath) {
@@ -71,7 +71,7 @@ const createMenu = async (ctx) => {
   }
 
   if (parentId) {
-    const parentMenu = await adminMenuDao.findMenuById(parentId)
+    const parentMenu = await userMenuDao.findMenuById(parentId)
     if (!parentMenu) {
       ctx.status = httpCode.ok
       ctx.body = { code: businessCode.paramError, msg: '父级菜单不存在' }
@@ -79,7 +79,7 @@ const createMenu = async (ctx) => {
     }
   }
 
-  const result = await adminMenuDao.createMenu(toMenuPayload({ path, name, component, redirect, meta, parentId }))
+  const result = await userMenuDao.createMenu(toMenuPayload({ path, name, component, redirect, meta, parentId }))
 
   ctx.status = httpCode.ok
   ctx.body = {
@@ -106,7 +106,7 @@ const createMenu = async (ctx) => {
  */
 const updateMenu = async (ctx) => {
   const { id, path, name, component, redirect, meta, parentId } = ctx.request.body
-  const currentMenu = await adminMenuDao.findMenuById(id)
+  const currentMenu = await userMenuDao.findMenuById(id)
 
   if (!currentMenu) {
     ctx.status = httpCode.ok
@@ -115,7 +115,7 @@ const updateMenu = async (ctx) => {
   }
 
   if (path) {
-    const existedPath = await adminMenuDao.findMenuByPath(path)
+    const existedPath = await userMenuDao.findMenuByPath(path)
     if (existedPath && existedPath.id !== id) {
       ctx.status = httpCode.ok
       ctx.body = { code: businessCode.menuPathExist, msg: businessMsg[businessCode.menuPathExist] }
@@ -124,7 +124,7 @@ const updateMenu = async (ctx) => {
   }
 
   if (name) {
-    const existedName = await adminMenuDao.findMenuByName(name)
+    const existedName = await userMenuDao.findMenuByName(name)
     if (existedName && existedName.id !== id) {
       ctx.status = httpCode.ok
       ctx.body = { code: businessCode.menuNameExist, msg: businessMsg[businessCode.menuNameExist] }
@@ -140,7 +140,7 @@ const updateMenu = async (ctx) => {
     }
 
     if (parentId !== null) {
-      const parentMenu = await adminMenuDao.findMenuById(parentId)
+      const parentMenu = await userMenuDao.findMenuById(parentId)
       if (!parentMenu) {
         ctx.status = httpCode.ok
         ctx.body = { code: businessCode.paramError, msg: '父级菜单不存在' }
@@ -169,7 +169,7 @@ const updateMenu = async (ctx) => {
     payload.parent_id = parentId ?? null
   }
 
-  await adminMenuDao.updateMenu(id, payload)
+  await userMenuDao.updateMenu(id, payload)
 
   ctx.status = httpCode.ok
   ctx.body = {
@@ -187,7 +187,7 @@ const updateMenu = async (ctx) => {
  */
 const deleteMenu = async (ctx) => {
   const { id } = ctx.request.body
-  const currentMenu = await adminMenuDao.findMenuById(id)
+  const currentMenu = await userMenuDao.findMenuById(id)
 
   if (!currentMenu) {
     ctx.status = httpCode.ok
@@ -195,14 +195,14 @@ const deleteMenu = async (ctx) => {
     return
   }
 
-  const childrenCount = await adminMenuDao.countChildren(id)
+  const childrenCount = await userMenuDao.countChildren(id)
   if (childrenCount > 0) {
     ctx.status = httpCode.ok
     ctx.body = { code: businessCode.menuHasChildren, msg: businessMsg[businessCode.menuHasChildren] }
     return
   }
 
-  await adminMenuDao.deleteMenu(id)
+  await userMenuDao.deleteMenu(id)
 
   ctx.status = httpCode.ok
   ctx.body = {
