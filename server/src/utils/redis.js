@@ -3,8 +3,8 @@
  * 复用 ioredis 连接，避免每个模块各自创建连接
  */
 import Redis from 'ioredis'
-import { redisConfig } from '../config/database.js'
-import logger from '../config/logger.js'
+import { redisConfig } from '#config/database.js'
+import logger from '#config/logger.js'
 
 let client = null
 

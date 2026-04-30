@@ -1,6 +1,6 @@
 import Router from '@koa/router'
-import usersAuthRouter from './router/usersAuthRouter.js'
-import systemManageRouter from './router/systemManageRouter.js'
+import usersAuthRouter from '#routers/router/usersAuthRouter.js'
+import systemManageRouter from '#routers/router/systemManageRouter.js'
 
 const router = new Router({ prefix: '/api' })
 // 健康检查

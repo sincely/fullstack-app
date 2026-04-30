@@ -1,9 +1,9 @@
 import Router from '@koa/router'
-import menuManageController from '../../controllers/users/menuManageController.js'
-import roleManageController from '../../controllers/users/roleManageController.js'
-import userManageController from '../../controllers/users/userManageController.js'
-import { validateBody, validateQuery } from '../../middleware/validationMiddleware.js'
-import { errorControllerWrapper } from '../../utils/errorHandler.js'
+import menuManageController from '#controllers/users/menuManageController.js'
+import roleManageController from '#controllers/users/roleManageController.js'
+import userManageController from '#controllers/users/userManageController.js'
+import { validateBody, validateQuery } from '#middleware/validationMiddleware.js'
+import { errorControllerWrapper } from '#utils/errorHandler.js'
 import {
   SystemManageMenuBodySchema,
   SystemManageMenuDeleteBodySchema,
@@ -16,7 +16,7 @@ import {
   SystemManageRoleRouteQuerySchema,
   SystemManageRoleListQuerySchema,
   SystemManageUserListQuerySchema
-} from '../../schemas/models/systemManageSchema.js'
+} from '#schemas/models/systemManageSchema.js'
 
 const systemManageRouter = new Router()
 

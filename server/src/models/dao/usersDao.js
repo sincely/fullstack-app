@@ -1,4 +1,4 @@
-import { query } from '../../utils/db.js'
+import { query } from '#utils/db.js'
 /**
  * 用户登录 - 根据用户名查找用户并验证密码
  * @param {string} username - 用户名
@@ -72,7 +72,9 @@ const listUsers = async ({ keyword, status, roleId, page, pageSize }) => {
       u.status,
       u.avatar,
       u.roleId,
-      r.roleName
+      r.roleName,
+      u.phone,
+      u.nickName
     from Users u
     left join Roles r on r.roleId = u.roleId
     ${whereSql}
@@ -83,7 +85,7 @@ const listUsers = async ({ keyword, status, roleId, page, pageSize }) => {
   return query(sql, [...params, offset, pageSize])
 }
 
-const listAllUsersWithRoles = async () => {
+const listAllUsersWithRoles = () => {
   const sql = `
     select
       u.id,
@@ -92,7 +94,9 @@ const listAllUsersWithRoles = async () => {
       u.email,
       u.createTime,
       u.status,
-      r.roleName
+      r.roleName,
+      u.phone,
+      u.nickName
     from Users u
     left join Roles r on r.roleId = u.roleId
     order by u.id desc
@@ -128,7 +132,9 @@ const findUserById = async (id) => {
       u.avatar,
       u.roleId,
       u.password,
-      r.roleName
+      r.roleName,
+      u.phone,
+      u.nickName
     from Users u
     left join Roles r on r.roleId = u.roleId
     where u.id = ?

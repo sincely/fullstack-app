@@ -1,6 +1,6 @@
-import { verifyToken } from '../utils/jwt.js'
-import { createErrorResponse } from '../utils/createResponse.js'
-// import { getRedisClient } from '../utils/redis.js'
+import { verifyToken } from '#utils/jwt.js'
+import { createErrorResponse } from '#utils/createResponse.js'
+// import { getRedisClient } from '#utils/redis.js'
 
 async function authenticate(ctx, next) {
   // 从请求头获取 Token

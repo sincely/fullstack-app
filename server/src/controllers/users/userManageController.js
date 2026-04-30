@@ -3,12 +3,12 @@
  * @description 处理后台用户管理相关的增删改查
  */
 
-import userDao from '../../models/dao/usersDao.js'
-import userRoleDao from '../../models/dao/userRoleDao.js'
-import { businessCode, businessMsg } from '../../config/businessCode.js'
-import { httpCode } from '../../config/httpError.js'
-import { hashPassword } from '../../utils/password.js'
-import { toUserRecord } from '../../utils/systemManageFormatter.js'
+import userDao from '#models/dao/usersDao.js'
+import userRoleDao from '#models/dao/userRoleDao.js'
+import { businessCode, businessMsg } from '#config/businessCode.js'
+import { httpCode } from '#config/httpError.js'
+import { hashPassword } from '#utils/password.js'
+import { toUserRecord } from '#utils/dataFormatter.js'
 
 /**
  * @summary 获取用户列表
@@ -27,6 +27,8 @@ const listUsers = async (ctx) => {
   const pageSize = Number(size) || 10
   const records = (await userDao.listAllUsersWithRoles()).map(toUserRecord)
   const normalizedStatus = userStatus ?? status
+  console.log('records', records)
+
   const filteredRecords = records.filter((item) => {
     if (userName && !item.userName.includes(userName)) {
       return false

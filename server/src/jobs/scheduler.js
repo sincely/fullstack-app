@@ -1,4 +1,4 @@
-import { cronQueue } from './queue.js'
+import { cronQueue } from '#jobs/queue.js'
 
 export const initScheduler = async () => {
   console.log('Initializing scheduler...')

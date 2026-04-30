@@ -3,12 +3,12 @@
  * @description 处理后台角色及角色菜单权限的增删改查
  */
 
-import userRoleDao from '../../models/dao/userRoleDao.js'
-import userPermissionDao from '../../models/dao/userPermissionDao.js'
-import userMenuDao from '../../models/dao/userMenuDao.js'
-import { businessCode, businessMsg } from '../../config/businessCode.js'
-import { httpCode } from '../../config/httpError.js'
-import { toRoleCode, toRoleRecord } from '../../utils/systemManageFormatter.js'
+import userRoleDao from '#models/dao/userRoleDao.js'
+import userPermissionDao from '#models/dao/userPermissionDao.js'
+import userMenuDao from '#models/dao/userMenuDao.js'
+import { businessCode, businessMsg } from '#config/businessCode.js'
+import { httpCode } from '#config/httpError.js'
+import { toRoleCode, toRoleRecord } from '#utils/dataFormatter.js'
 
 /**
  * @summary 获取角色列表

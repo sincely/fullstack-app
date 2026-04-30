@@ -3,9 +3,9 @@
  * @description 处理用户相关的业务逻辑，包括登录、注册、查询用户名等功能
  */
 
-import userDao from '../../models/dao/usersDao.js'
-import { httpCode } from '../../config/httpError.js'
-import { businessCode, businessMsg } from '../../config/businessCode.js'
+import userDao from '#models/dao/usersDao.js'
+import { httpCode } from '#config/httpError.js'
+import { businessCode, businessMsg } from '#config/businessCode.js'
 
 /**
  * @summary 用户登录

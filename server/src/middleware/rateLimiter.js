@@ -3,8 +3,8 @@
  * 基于 Redis 滑动计数：IP + 用户名 维度
  * 规则：60 秒窗口内最多 5 次失败 → 锁定 300 秒
  */
-// import { getRedisClient } from '../utils/redis.js'
-import { createErrorResponse } from '../utils/createResponse.js'
+// import { getRedisClient } from '#utils/redis.js'
+import { createErrorResponse } from '#utils/createResponse.js'
 
 const MAX_ATTEMPTS = 5 // 最大尝试次数
 const WINDOW_SECONDS = 60 // 滑动窗口（秒）

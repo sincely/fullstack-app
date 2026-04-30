@@ -6,21 +6,21 @@ import session from 'koa-session'
 import KoaBodyParser from '@koa/bodyparser'
 
 // 配置文件
-import { Port, staticDir } from './config/server.js'
-import { DocsPort, docsDir } from './config/docs.js'
-import logger from './config/logger.js'
-import corsConfig from './config/cors.js'
-import { bodyParserConfig } from './config/koaBodyConfig.js'
+import { Port, staticDir } from '#config/server.js'
+import { DocsPort, docsDir } from '#config/docs.js'
+import logger from '#config/logger.js'
+import corsConfig from '#config/cors.js'
+import { bodyParserConfig } from '#config/koaBodyConfig.js'
 
 // 中间件
-import requestId from './middleware/requestId.js'
-import loggerMiddleware from './middleware/logger.js'
-import error from './middleware/error.js'
-import rewriteUrl from './middleware/rewriteUrl.js'
-import compress from './middleware/compress.js'
+import requestId from '#middleware/requestId.js'
+import loggerMiddleware from '#middleware/logger.js'
+import error from '#middleware/error.js'
+import rewriteUrl from '#middleware/rewriteUrl.js'
+import compress from '#middleware/compress.js'
 
 // 路由
-import Routers from './routers/index.js'
+import Routers from '#routers/index.js'
 
 const app = new Koa()
 const docsApp = new Koa() // 文档服务实例

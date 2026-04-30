@@ -1,8 +1,8 @@
-import adminPermissionDao from '../models/dao/userPermissionDao.js'
-import { businessCode, businessMsg } from '../config/businessCode.js'
-import { createErrorResponse } from '../utils/createResponse.js'
-import { httpCode } from '../config/httpError.js'
-// import { getRedisClient } from '../utils/redis.js'
+import adminPermissionDao from '#models/dao/userPermissionDao.js'
+import { businessCode, businessMsg } from '#config/businessCode.js'
+import { createErrorResponse } from '#utils/createResponse.js'
+import { httpCode } from '#config/httpError.js'
+// import { getRedisClient } from '#utils/redis.js'
 
 /**
  * 获取角色菜单

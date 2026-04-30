@@ -4,6 +4,17 @@
   "description": "Koa2快速启动基础框架",
   "type": "module",
   "main": "src/app.js",
+  "imports": {
+    "#src/*": "./src/*",
+    "#config/*": "./src/config/*",
+    "#controllers/*": "./src/controllers/*",
+    "#jobs/*": "./src/jobs/*",
+    "#middleware/*": "./src/middleware/*",
+    "#models/*": "./src/models/*",
+    "#routers/*": "./src/routers/*",
+    "#schemas/*": "./src/schemas/*",
+    "#utils/*": "./src/utils/*"
+  },
   "scripts": {
     "dev": "cross-env NODE_ENV=development nodemon src/app.js",
     "dev:win": "chcp 65001>nul & cross-env NODE_ENV=development nodemon src/app.js",

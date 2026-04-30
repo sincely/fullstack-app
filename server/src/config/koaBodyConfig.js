@@ -1,4 +1,4 @@
-import { uploadDir } from './server.js'
+import { uploadDir } from '#config/server.js'
 
 /**
  * @koa/bodyparser 配置

@@ -11,7 +11,15 @@
     "resolveJsonModule": true,
     "baseUrl": "./",
     "paths": {
-      "@/*": ["./src/*"]
+      "#src/*": ["./src/*"],
+      "#config/*": ["./src/config/*"],
+      "#controllers/*": ["./src/controllers/*"],
+      "#jobs/*": ["./src/jobs/*"],
+      "#middleware/*": ["./src/middleware/*"],
+      "#models/*": ["./src/models/*"],
+      "#routers/*": ["./src/routers/*"],
+      "#schemas/*": ["./src/schemas/*"],
+      "#utils/*": ["./src/utils/*"]
     }
   },
   "include": ["src/**/*"],
