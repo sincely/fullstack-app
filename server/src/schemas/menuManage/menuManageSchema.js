@@ -15,11 +15,11 @@ const menuButtonSchema = z.object({
   desc: z.string().trim().min(1)
 })
 
-export const SystemManageMenuListQuerySchema = z.object({
+export const menuManageRoleDeleteBodySchema = z.object({
   ...paginationSchema
 })
 
-export const SystemManageMenuBodySchema = z.object({
+export const menuManageMenuBodySchema = z.object({
   id: z.coerce.number().int().positive().optional(),
   parentId: z.coerce.number().int().min(0).default(0),
   menuType: z.enum(['1', '2']),
@@ -43,7 +43,7 @@ export const SystemManageMenuBodySchema = z.object({
   buttons: z.array(menuButtonSchema).optional().default([])
 })
 
-export const SystemManageMenuDeleteBodySchema = z.object({
+export const menuManageMenuDeleteBodySchema = z.object({
   id: z.coerce.number().int().positive().optional(),
   ids: z.array(z.coerce.number().int().positive()).optional()
 })
