@@ -102,14 +102,13 @@ const getUserList = async (ctx) => {
  * @param {number} age - 年龄
  * @param {string} email - 邮箱地址
  * @param {string} status - 用户状态
- * @param {string} avatar - 头像地址
  * @param {number} roleId - 角色 ID
  * @param {string} phone - 手机号
  * @param {string} nickName - 昵称
  * @returns {object} 200 - 创建成功
  */
 const createUser = async (ctx) => {
-  const { username, password, gender, age, email, status, roleId, phone, nickName, avatar } = ctx.request.body
+  const { username, password, gender, age, email, status, roleId, phone, nickName } = ctx.request.body
 
   const [existedUser, existedEmail, existedRole] = await Promise.all([
     userDao.findUserByUsername(username),
@@ -146,7 +145,6 @@ const createUser = async (ctx) => {
     age: age ?? null,
     email,
     status: toDbStatus(status),
-    // avatar: avatar ?? null,
     roleId,
     passwordHash,
     phone: phone ?? null,
@@ -173,7 +171,6 @@ const createUser = async (ctx) => {
  * @param {number} age - 年龄
  * @param {string} email - 邮箱地址
  * @param {string} status - 用户状态
- * @param {string} avatar - 头像地址
  * @param {number} roleId - 角色 ID
  * @returns {object} 200 - 更新成功
  */

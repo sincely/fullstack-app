@@ -13,10 +13,13 @@ import { generateToken, decodeToken, verifyToken } from '#utils/jwt.js'
 import { buildMenuTree, extractPermissionCodes } from '#utils/adminPermission.js'
 import { getRedisClient } from '#utils/redis.js'
 
-const SUCCESS_CODE = '0000'
-const LOGIN_FAIL_CODE = '10001'
+const SUCCESS_CODE = businessCode.success
+const LOGIN_FAIL_CODE = businessCode.userLoginFail
 const TOKEN_INVALID_CODE = '9998'
 const REFRESH_TOKEN_INVALID_CODE = '8888'
+
+// 兼容历史脏数据：旧库里存在空字符串状态，按启用账号处理。
+const isUserActive = (status) => !status || status === 'active'
 
 // 将数据库角色名规范化为前端静态路由识别的角色编码
 const toRoleCode = (roleName = '') => {
@@ -236,7 +239,7 @@ const login = async (ctx) => {
   const { userName, password } = ctx.request.body
 
   const user = await userAuthDao.findAdminUserByUsername(userName)
-  if (!user || user.status !== 'active') {
+  if (!user || !isUserActive(user.status)) {
     ctx.status = httpCode.ok
     ctx.body = {
       code: LOGIN_FAIL_CODE,
@@ -303,7 +306,7 @@ const refreshToken = async (ctx) => {
   }
 
   const currentUser = await userAuthDao.findAdminUserById(decoded.userId)
-  if (!currentUser || currentUser.status !== 'active') {
+  if (!currentUser || !isUserActive(currentUser.status)) {
     ctx.status = httpCode.ok
     ctx.body = {
       code: REFRESH_TOKEN_INVALID_CODE,
@@ -347,7 +350,7 @@ const getUserInfo = async (ctx) => {
   }
 
   const currentUser = await userAuthDao.findAdminUserById(userId)
-  if (!currentUser || currentUser.status !== 'active') {
+  if (!currentUser || !isUserActive(currentUser.status)) {
     ctx.status = httpCode.ok
     ctx.body = {
       code: businessCode.userNotFound,

@@ -1,13 +1,13 @@
 import { query } from '#utils/db.js'
 
-// 管理员用户信息基础查询片段（含角色信息）
+// 管理员用户信息基础查询片段（含角色信息）。
+// 以当前真实 Users 表结构为准，不再查询已移除字段。
 const getAdminUserBaseSql = `
   select
     u.id,
     u.username,
     u.email,
     u.status,
-    u.avatar,
     u.roleId,
     u.password,
     r.roleName,
@@ -61,27 +61,17 @@ const findRoleByName = async (roleName) => {
 }
 
 /**
- * 生成注册场景用的 idCard 占位值（避免为空）。
- * @returns {string}
- */
-const createRegisterIdCard = () => {
-  return `A${Date.now()}${Math.floor(Math.random() * 10000)
-    .toString()
-    .padStart(4, '0')}`
-}
-
-/**
  * 创建管理员用户记录。
  * @param {{username:string,email:string,passwordHash:string,roleId:number}} payload
  * @returns {Promise<any>}
  */
 const createAdminUser = async ({ username, email, passwordHash, roleId }) => {
   const sql = `
-    insert into Users (username, gender, age, idCard, email, address, status, avatar, roleId, password)
-    values (?, 'other', null, ?, ?, null, 'active', null, ?, ?)
+    insert into Users (username, gender, email, status, roleId, password, phone, nickName)
+    values (?, 'other', ?, 'active', ?, ?, null, ?)
   `
 
-  return query(sql, [username, createRegisterIdCard(), email, roleId, passwordHash])
+  return query(sql, [username, email, roleId, passwordHash, username])
 }
 
 export default {

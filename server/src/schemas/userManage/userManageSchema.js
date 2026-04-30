@@ -24,8 +24,7 @@ export const userManageUserCreateBodySchema = z.object({
   status: z.enum(['active', 'inactive', 'banned', '1', '2']).optional().default('active'),
   roleId: z.coerce.number().int().positive(),
   phone: z.string().trim().max(20).optional(),
-  nickName: z.string().trim().max(50).optional(),
-  avatar: z.string().trim().max(255).optional()
+  nickName: z.string().trim().max(50).optional()
 })
 
 export const userManageUserUpdateBodySchema = z
@@ -36,7 +35,6 @@ export const userManageUserUpdateBodySchema = z
     age: z.coerce.number().int().min(0).max(150).nullable().optional(),
     email: z.string().email('邮箱格式不正确').optional(),
     status: z.enum(['active', 'inactive', 'banned', '1', '2']).optional(),
-    avatar: z.string().trim().max(255).nullable().optional(),
     roleId: z.coerce.number().int().positive().optional()
   })
   .refine((data) => Object.keys(data).length > 1, {

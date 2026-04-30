@@ -155,12 +155,6 @@ const findUserByEmail = async (email) => {
   return rows[0] || null
 }
 
-const findUserByIdCard = async (idCard) => {
-  const sql = 'select id, idCard from Users where idCard = ? limit 1'
-  const rows = await query(sql, [idCard])
-  return rows[0] || null
-}
-
 const createUser = async ({ username, gender, phone, nickName, email, status, roleId, passwordHash }) => {
   const sql = `
     insert into Users (username, gender, phone, nickName, email, status, roleId, password)
@@ -208,7 +202,6 @@ export default {
   findUserBaseById,
   findUserByUsername,
   findUserByEmail,
-  findUserByIdCard,
   createUser,
   updateUser,
   deleteUser,
