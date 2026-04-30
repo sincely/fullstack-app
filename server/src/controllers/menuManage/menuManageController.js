@@ -1,4 +1,4 @@
-import userMenuDao from '#models/dao/userMenuDao.js'
+import userMenuDao from '#src/dao/systemManage/menuManage/userMenuDao.js'
 import { businessCode, businessMsg } from '#config/businessCode.js'
 import { httpCode } from '#config/httpError.js'
 import { fileURLToPath } from 'node:url'
@@ -192,17 +192,6 @@ const listMenus = async (ctx) => {
   }
 }
 
-const listMenusV1 = async (ctx) => {
-  const formattedMenus = await getFormattedMenus()
-
-  ctx.status = httpCode.ok
-  ctx.body = {
-    code: '0000',
-    msg: '获取菜单列表成功',
-    data: formattedMenus
-  }
-}
-
 const getAllPages = async (ctx) => {
   const pageNames = await loadPageNames()
 
@@ -366,7 +355,6 @@ const deleteMenu = async (ctx) => {
 
 export default {
   listMenus,
-  listMenusV1,
   getAllPages,
   getMenuTree,
   createMenu,

@@ -3,8 +3,8 @@
  * @description 处理后台登录、注册、退出和权限信息获取
  */
 
-import userAuthDao from '#models/dao/userAuthDao.js'
-import userPermissionDao from '#models/dao/userPermissionDao.js'
+import userAuthDao from '#src/dao/common/userAuthDao.js'
+import userPermissionDao from '#src/dao/systemManage/roleManage/userPermissionDao.js'
 import { httpCode } from '#config/httpError.js'
 import { businessCode, businessMsg } from '#config/businessCode.js'
 import { defaultAdminRoleName } from '#config/admin.js'

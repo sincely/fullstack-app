@@ -73,13 +73,13 @@ async function getRoleOptions() {
 
     // mock 数据中缺少 roleCode，这里补齐当前用户已有角色
     // 接入真实接口后可移除下面这段兜底逻辑
-    const userRoleOptions = model.userRoles.map((item) => ({
-      label: item,
-      value: item
-    }))
+    // const userRoleOptions = model.userRoles.map((item) => ({
+    //   label: item,
+    //   value: item
+    // }))
     // 兜底逻辑结束
 
-    roleOptions.value = [...userRoleOptions, ...options]
+    roleOptions.value = [...options]
   }
 }
 

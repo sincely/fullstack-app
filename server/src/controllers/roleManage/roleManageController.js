@@ -3,9 +3,9 @@
  * @description 处理后台角色及角色菜单权限的增删改查
  */
 
-import userRoleDao from '#models/dao/userRoleDao.js'
-import userPermissionDao from '#models/dao/userPermissionDao.js'
-import userMenuDao from '#models/dao/userMenuDao.js'
+import userRoleDao from '#src/dao/systemManage/roleManage/userRoleDao.js'
+import userPermissionDao from '#src/dao/systemManage/roleManage/userPermissionDao.js'
+import userMenuDao from '#src/dao/systemManage/menuManage/userMenuDao.js'
 import { businessCode, businessMsg } from '#config/businessCode.js'
 import { httpCode } from '#config/httpError.js'
 import { toRoleCode, toRoleRecord } from '#utils/dataFormatter.js'
