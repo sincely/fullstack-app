@@ -7,9 +7,13 @@
  */
 export const businessCode = {
   // 全局
-  success: 0,
-  error: 1,
-  paramError: 2, // 参数错误
+  success: 200,
+  error: 400,
+  paramError: 400, // 参数错误
+  systemError: 500, // 系统错误
+  notFound: 404, // 未找到资源
+  forbidden: 403, // 无权限访问
+  unAuthorized: 401, // 未授权/令牌过期
 
   // 用户模块
   userParamMissing: 10001, // 用户名或密码为空

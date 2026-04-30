@@ -181,7 +181,7 @@ const listMenus = async (ctx) => {
 
   ctx.status = httpCode.ok
   ctx.body = {
-    code: '0000',
+    code: '200',
     msg: '获取菜单列表成功',
     data: {
       records: treeRecords,
@@ -197,7 +197,7 @@ const getAllPages = async (ctx) => {
 
   ctx.status = httpCode.ok
   ctx.body = {
-    code: '0000',
+    code: '200',
     msg: '获取全部页面成功',
     data: pageNames
   }
@@ -208,7 +208,7 @@ const getMenuTree = async (ctx) => {
 
   ctx.status = httpCode.ok
   ctx.body = {
-    code: '0000',
+    code: '200',
     msg: '获取菜单树成功',
     data: buildTreeOptions(formattedMenus)
   }
@@ -256,7 +256,7 @@ const createMenu = async (ctx) => {
 
   ctx.status = httpCode.ok
   ctx.body = {
-    code: '0000',
+    code: '200',
     msg: '创建菜单成功',
     data: menuRecord
   }
@@ -316,7 +316,7 @@ const updateMenu = async (ctx) => {
 
   ctx.status = httpCode.ok
   ctx.body = {
-    code: '0000',
+    code: '200',
     msg: '更新菜单成功',
     data: menuRecord
   }
@@ -348,7 +348,7 @@ const deleteMenu = async (ctx) => {
 
   ctx.status = httpCode.ok
   ctx.body = {
-    code: '0000',
+    code: '200',
     msg: '删除菜单成功'
   }
 }

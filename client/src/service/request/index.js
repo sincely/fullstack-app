@@ -8,6 +8,12 @@ import { handleRefreshToken } from './shared'
 
 const isHttpProxy = import.meta.env.DEV && import.meta.env.VITE_HTTP_PROXY === 'Y'
 const { baseURL, otherBaseURL } = getServiceBaseURL(import.meta.env, isHttpProxy)
+const toCodeString = (code) => String(code ?? '').trim()
+const parseCodeList = (rawValue) =>
+  String(rawValue ?? '')
+    .split(',')
+    .map((item) => item.trim())
+    .filter(Boolean)
 
 export const request = createFlatRequest(
   {
@@ -28,12 +34,14 @@ export const request = createFlatRequest(
       return config
     },
     isBackendSuccess(response) {
-      // 后端响应码为 "0000"（默认值）时视为请求成功
+      // 后端响应码命中 `VITE_SERVICE_SUCCESS_CODE` 时视为请求成功
       // 如需自定义成功判定，可修改 `.env` 中的 `VITE_SERVICE_SUCCESS_CODE`
-      return response.data.code === import.meta.env.VITE_SERVICE_SUCCESS_CODE
+      const backendCode = toCodeString(response.data.code)
+      return backendCode === toCodeString(import.meta.env.VITE_SERVICE_SUCCESS_CODE)
     },
     async onBackendFail(response, instance) {
       const authStore = useAuthStore()
+      const backendCode = toCodeString(response.data.code)
 
       function handleLogout() {
         authStore.resetStore()
@@ -45,15 +53,15 @@ export const request = createFlatRequest(
       }
 
       // 命中 `logoutCodes` 时，直接登出并跳转登录页
-      const logoutCodes = import.meta.env.VITE_SERVICE_LOGOUT_CODES?.split(',') || []
-      if (logoutCodes.includes(response.data.code)) {
+      const logoutCodes = parseCodeList(import.meta.env.VITE_SERVICE_LOGOUT_CODES)
+      if (logoutCodes.includes(backendCode)) {
         handleLogout()
         return null
       }
 
       // 命中 `modalLogoutCodes` 时，通过弹窗提示并登出
-      const modalLogoutCodes = import.meta.env.VITE_SERVICE_MODAL_LOGOUT_CODES?.split(',') || []
-      if (modalLogoutCodes.includes(response.data.code)) {
+      const modalLogoutCodes = parseCodeList(import.meta.env.VITE_SERVICE_MODAL_LOGOUT_CODES)
+      if (modalLogoutCodes.includes(backendCode)) {
         // 防止用户在处理弹窗期间刷新页面
         window.addEventListener('beforeunload', handleLogout)
 
@@ -75,8 +83,8 @@ export const request = createFlatRequest(
 
       // 命中 `expiredTokenCodes` 时，执行刷新 token 并重试请求
       // 刷新 token 接口不能再返回 `expiredTokenCodes`，否则会死循环，应返回登出类错误码
-      const expiredTokenCodes = import.meta.env.VITE_SERVICE_EXPIRED_TOKEN_CODES?.split(',') || []
-      if (expiredTokenCodes.includes(response.data.code) && !request.state.isRefreshingToken) {
+      const expiredTokenCodes = parseCodeList(import.meta.env.VITE_SERVICE_EXPIRED_TOKEN_CODES)
+      if (expiredTokenCodes.includes(backendCode) && !request.state.isRefreshingToken) {
         request.state.isRefreshingToken = true
 
         const refreshConfig = await handleRefreshToken(response.config)
@@ -102,17 +110,17 @@ export const request = createFlatRequest(
       // 提取后端返回的错误信息与错误码
       if (error.code === BACKEND_ERROR_CODE) {
         message = error.response?.data?.msg || message
-        backendErrorCode = error.response?.data?.code || ''
+        backendErrorCode = toCodeString(error.response?.data?.code)
       }
 
       // 弹窗登出类错误已在弹窗中处理，这里不重复提示
-      const modalLogoutCodes = import.meta.env.VITE_SERVICE_MODAL_LOGOUT_CODES?.split(',') || []
+      const modalLogoutCodes = parseCodeList(import.meta.env.VITE_SERVICE_MODAL_LOGOUT_CODES)
       if (modalLogoutCodes.includes(backendErrorCode)) {
         return
       }
 
       // token 过期会走刷新并重试，无需重复提示
-      const expiredTokenCodes = import.meta.env.VITE_SERVICE_EXPIRED_TOKEN_CODES?.split(',') || []
+      const expiredTokenCodes = parseCodeList(import.meta.env.VITE_SERVICE_EXPIRED_TOKEN_CODES)
       if (expiredTokenCodes.includes(backendErrorCode)) {
         return
       }

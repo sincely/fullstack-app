@@ -39,7 +39,7 @@ const listRoles = async (ctx) => {
 
   ctx.status = httpCode.ok
   ctx.body = {
-    code: '0000',
+    code: '200',
     msg: '获取角色列表成功',
     data: {
       records: pageRecords,
@@ -55,7 +55,7 @@ const getAllRoles = async (ctx) => {
 
   ctx.status = httpCode.ok
   ctx.body = {
-    code: '0000',
+    code: '200',
     msg: '获取全部角色成功',
     data: roles.map((role) => ({
       id: String(role.roleId),
@@ -79,7 +79,7 @@ const getRoleRouteIds = async (ctx) => {
 
   ctx.status = httpCode.ok
   ctx.body = {
-    code: '0000',
+    code: '200',
     msg: '获取角色菜单成功',
     data: routeIds
   }
@@ -99,7 +99,7 @@ const getRoleButtonIds = async (ctx) => {
 
   ctx.status = httpCode.ok
   ctx.body = {
-    code: '0000',
+    code: '200',
     msg: '获取角色按钮成功',
     data: buttonIds
   }
@@ -122,7 +122,7 @@ const updateRoleRouteIds = async (ctx) => {
 
   ctx.status = httpCode.ok
   ctx.body = {
-    code: '0000',
+    code: '200',
     msg: '更新角色菜单成功'
   }
 }
@@ -144,7 +144,7 @@ const updateRoleButtonIds = async (ctx) => {
 
   ctx.status = httpCode.ok
   ctx.body = {
-    code: '0000',
+    code: '200',
     msg: '更新角色按钮成功'
   }
 }
@@ -173,7 +173,7 @@ const getAllButtons = async (ctx) => {
 
   ctx.status = httpCode.ok
   ctx.body = {
-    code: '0000',
+    code: '200',
     msg: '获取全部按钮成功',
     data: [...grouped.values()]
   }

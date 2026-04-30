@@ -18,10 +18,14 @@ export const userManageUserListQuerySchema = z.object({
 
 export const userManageUserCreateBodySchema = z.object({
   username: z.string().trim().min(1, '用户名不能为空'),
-  gender: z.enum(['male', 'female']).optional().default('male'),
+  gender: z.enum(['male', 'female', 'other', '1', '2']).optional().default('1'),
+  age: z.coerce.number().int().min(0).max(150).nullable().optional(),
   email: z.string().email('邮箱格式不正确'),
   status: z.enum(['active', 'inactive', 'banned', '1', '2']).optional().default('active'),
-  roleId: z.coerce.number().int().positive()
+  roleId: z.coerce.number().int().positive(),
+  phone: z.string().trim().max(20).optional(),
+  nickName: z.string().trim().max(50).optional(),
+  avatar: z.string().trim().max(255).optional()
 })
 
 export const userManageUserUpdateBodySchema = z

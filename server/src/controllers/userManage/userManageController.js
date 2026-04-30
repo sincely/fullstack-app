@@ -10,6 +10,32 @@ import { httpCode } from '#config/httpError.js'
 import { hashPassword } from '#utils/password.js'
 import { toUserRecord } from '#utils/dataFormatter.js'
 
+const toDbGender = (gender) => {
+  if (gender === '1') {
+    return 'male'
+  }
+  if (gender === '2') {
+    return 'female'
+  }
+  if (gender === 'male' || gender === 'female' || gender === 'other') {
+    return gender
+  }
+  return 'male'
+}
+
+const toDbStatus = (status) => {
+  if (status === '1') {
+    return 'active'
+  }
+  if (status === '2') {
+    return 'inactive'
+  }
+  if (status === 'active' || status === 'inactive' || status === 'banned') {
+    return status
+  }
+  return 'active'
+}
+
 /**
  * @summary 获取用户列表
  * @description 分页获取后台用户列表，并返回角色选项
@@ -55,7 +81,7 @@ const getUserList = async (ctx) => {
 
   ctx.status = httpCode.ok
   ctx.body = {
-    code: '0000',
+    code: '200',
     msg: '获取用户列表成功',
     data: {
       records: pageRecords,
@@ -83,8 +109,7 @@ const getUserList = async (ctx) => {
  * @returns {object} 200 - 创建成功
  */
 const createUser = async (ctx) => {
-  const { username, password, gender, email, status, roleId, phone, nickName } = ctx.request.body
-  ctx.request.body
+  const { username, password, gender, age, email, status, roleId, phone, nickName, avatar } = ctx.request.body
 
   const [existedUser, existedEmail, existedRole] = await Promise.all([
     userDao.findUserByUsername(username),
@@ -116,12 +141,12 @@ const createUser = async (ctx) => {
   // 密码为空时，默认密码为 123456
   const passwordHash = await hashPassword(password ? password : '123456')
   const result = await userDao.createUser({
-    gender,
+    username,
     gender: toDbGender(gender),
     age: age ?? null,
-    status,
+    email,
     status: toDbStatus(status),
-    avatar: avatar ?? null,
+    // avatar: avatar ?? null,
     roleId,
     passwordHash,
     phone: phone ?? null,

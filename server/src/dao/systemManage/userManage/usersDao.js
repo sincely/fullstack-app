@@ -64,12 +64,10 @@ const listUsers = async ({ keyword, status, roleId, page, pageSize }) => {
       u.id,
       u.username,
       u.gender,
-      u.age,
       u.email,
       u.createTime,
       u.status,
-      u.avatar,
-      u.roleId,
+
       r.roleName,
       u.phone,
       u.nickName
@@ -122,11 +120,9 @@ const findUserById = async (id) => {
       u.id,
       u.username,
       u.gender,
-      u.age,
       u.email,
       u.createTime,
       u.status,
-      u.avatar,
       u.roleId,
       u.password,
       r.roleName,
@@ -165,13 +161,13 @@ const findUserByIdCard = async (idCard) => {
   return rows[0] || null
 }
 
-const createUser = async ({ username, gender, age, email, status, roleId, passwordHash, phone, nickName }) => {
+const createUser = async ({ username, gender, phone, nickName, email, status, roleId, passwordHash }) => {
   const sql = `
-    insert into Users (username, gender, age, email, roleId, status, password, phone, nickName)
-    values (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    insert into Users (username, gender, phone, nickName, email, status, roleId, password)
+    values (?, ?, ?, ?, ?, ?, ?, ?)
   `
 
-  return query(sql, [username, gender, age, email, roleId, status, passwordHash, phone, nickName])
+  return query(sql, [username, gender, phone, nickName, email, status, roleId, passwordHash])
 }
 
 const updateUser = async (id, payload) => {
