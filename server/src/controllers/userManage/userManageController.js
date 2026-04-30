@@ -155,7 +155,7 @@ const createUser = async (ctx) => {
 const updateUser = async (ctx) => {
   const { id, password, email, roleId, ...rest } = ctx.request.body
   const targetUserId = Number(id)
-  const currentUser = await userDao.findUserById(id)
+  const currentUser = await userDao.findUserBaseById(id)
 
   if (!currentUser) {
     ctx.status = httpCode.ok
@@ -222,7 +222,7 @@ const deleteUser = async (ctx) => {
     return
   }
 
-  const currentUser = await userDao.findUserById(id)
+  const currentUser = await userDao.findUserBaseById(id)
   if (!currentUser) {
     ctx.status = httpCode.ok
     ctx.body = { code: businessCode.userNotFound, msg: businessMsg[businessCode.userNotFound] }

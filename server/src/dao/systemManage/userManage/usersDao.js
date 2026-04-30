@@ -141,6 +141,12 @@ const findUserById = async (id) => {
   return rows[0] || null
 }
 
+const findUserBaseById = async (id) => {
+  const sql = 'select id from Users where id = ? limit 1'
+  const rows = await query(sql, [id])
+  return rows[0] || null
+}
+
 const findUserByUsername = async (username) => {
   const sql = 'select id, username from Users where username = ? limit 1'
   const rows = await query(sql, [username])
@@ -203,6 +209,7 @@ export default {
   listAllUsersWithRoles,
   countUsers,
   findUserById,
+  findUserBaseById,
   findUserByUsername,
   findUserByEmail,
   findUserByIdCard,
