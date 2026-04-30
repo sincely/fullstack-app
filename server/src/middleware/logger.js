@@ -3,6 +3,11 @@ import logger from '#config/logger.js'
 
 const httpLogger = pinoHttp({
   logger,
+  customProps: function (req) {
+    return {
+      requestId: req.id // 从 Koa 上下文获取 requestId
+    }
+  },
   customLogLevel: function (req, res, err) {
     if (res.statusCode >= 400 && res.statusCode < 500) {
       return 'warn'
@@ -31,8 +36,10 @@ const httpLogger = pinoHttp({
 })
 
 export default async (ctx, next) => {
+  const requestId = ctx.state.requestId
+  ctx.req.id = requestId
   httpLogger(ctx.req, ctx.res)
-  ctx.log = ctx.req.log
+  ctx.log = ctx.req.log.child({ requestId })
   await next()
   // 将 Koa 解析的 query 和 body 挂载到原生 req 对象上，以便 pino serializer 访问
   ctx.req.query = ctx.request.query

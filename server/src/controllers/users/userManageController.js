@@ -27,7 +27,6 @@ const listUsers = async (ctx) => {
   const pageSize = Number(size) || 10
   const records = (await userDao.listAllUsersWithRoles()).map(toUserRecord)
   const normalizedStatus = userStatus ?? status
-  console.log('records', records)
 
   const filteredRecords = records.filter((item) => {
     if (userName && !item.userName.includes(userName)) {

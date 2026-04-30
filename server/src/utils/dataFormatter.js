@@ -82,7 +82,6 @@ export const toRoleRecord = (role) => {
 }
 
 export const toUserRecord = (user) => {
-  console.log('user', user)
   return {
     id: user.id,
     createBy: user.createBy ?? '',
