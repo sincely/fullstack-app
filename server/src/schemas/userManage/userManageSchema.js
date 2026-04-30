@@ -18,13 +18,27 @@ export const userManageUserListQuerySchema = z.object({
 
 export const userManageUserCreateBodySchema = z.object({
   username: z.string().trim().min(1, '用户名不能为空'),
-  password: z.string().min(6, '密码至少 6 位'),
-  gender: z.enum(['male', 'female', 'other', '1', '2']).optional().default('other'),
-  age: z.coerce.number().int().min(0).max(150).nullable().optional(),
-  idCard: z.string().trim().min(1, '身份证号不能为空'),
+  gender: z.enum(['male', 'female']).optional().default('male'),
   email: z.string().email('邮箱格式不正确'),
-  address: z.string().trim().max(255).nullable().optional(),
   status: z.enum(['active', 'inactive', 'banned', '1', '2']).optional().default('active'),
-  avatar: z.string().trim().max(255).nullable().optional(),
   roleId: z.coerce.number().int().positive()
+})
+
+export const userManageUserUpdateBodySchema = z
+  .object({
+    id: z.coerce.number().int().positive(),
+    password: z.string().min(6, '密码至少 6 位').optional(),
+    gender: z.enum(['male', 'female', 'other', '1', '2']).optional(),
+    age: z.coerce.number().int().min(0).max(150).nullable().optional(),
+    email: z.string().email('邮箱格式不正确').optional(),
+    status: z.enum(['active', 'inactive', 'banned', '1', '2']).optional(),
+    avatar: z.string().trim().max(255).nullable().optional(),
+    roleId: z.coerce.number().int().positive().optional()
+  })
+  .refine((data) => Object.keys(data).length > 1, {
+    message: '至少提供一个需要更新的字段'
+  })
+
+export const userManageUserDeleteBodySchema = z.object({
+  id: z.coerce.number().int().positive()
 })

@@ -65,9 +65,7 @@ const listUsers = async ({ keyword, status, roleId, page, pageSize }) => {
       u.username,
       u.gender,
       u.age,
-      u.idCard,
       u.email,
-      u.address,
       u.createTime,
       u.status,
       u.avatar,
@@ -78,7 +76,7 @@ const listUsers = async ({ keyword, status, roleId, page, pageSize }) => {
     from Users u
     left join Roles r on r.roleId = u.roleId
     ${whereSql}
-    order by u.id desc
+    order by u.createTime desc
     limit ?, ?
   `
 
@@ -94,12 +92,13 @@ const listAllUsersWithRoles = () => {
       u.email,
       u.createTime,
       u.status,
+      u.roleId,
       r.roleName,
       u.phone,
       u.nickName
     from Users u
     left join Roles r on r.roleId = u.roleId
-    order by u.id desc
+    order by u.createTime desc
   `
 
   return query(sql)
@@ -124,9 +123,7 @@ const findUserById = async (id) => {
       u.username,
       u.gender,
       u.age,
-      u.idCard,
       u.email,
-      u.address,
       u.createTime,
       u.status,
       u.avatar,
@@ -162,13 +159,13 @@ const findUserByIdCard = async (idCard) => {
   return rows[0] || null
 }
 
-const createUser = async ({ username, gender, age, idCard, email, address, status, avatar, roleId, passwordHash }) => {
+const createUser = async ({ username, gender, age, email, status, roleId, passwordHash, phone, nickName }) => {
   const sql = `
-    insert into Users (username, gender, age, idCard, email, address, status, avatar, roleId, password)
-    values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    insert into Users (username, gender, age, email, roleId, status, password, phone, nickName)
+    values (?, ?, ?, ?, ?, ?, ?, ?, ?)
   `
 
-  return query(sql, [username, gender, age, idCard, email, address, status, avatar, roleId, passwordHash])
+  return query(sql, [username, gender, age, email, roleId, status, passwordHash, phone, nickName])
 }
 
 const updateUser = async (id, payload) => {

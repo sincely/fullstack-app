@@ -84,6 +84,7 @@ export const toRoleRecord = (role) => {
 export const toUserRecord = (user) => {
   return {
     id: user.id,
+    roleId: user.roleId ?? undefined,
     createBy: user.createBy ?? '',
     createTime: formatDateTime(user.createTime),
     updateBy: user.updateBy ?? '',
@@ -94,7 +95,6 @@ export const toUserRecord = (user) => {
     nickName: user.nickName ?? '',
     userPhone: user.phone ?? '',
     userEmail: user.email ?? '',
-    userAddress: user.address ?? '',
     userRoles: [toRoleCode(user.roleName)]
   }
 }

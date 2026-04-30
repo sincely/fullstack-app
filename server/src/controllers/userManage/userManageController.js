@@ -13,7 +13,7 @@ import { toUserRecord } from '#utils/dataFormatter.js'
 /**
  * @summary 获取用户列表
  * @description 分页获取后台用户列表，并返回角色选项
- * @api GET /admin/system/users
+ * @api GET /systemManage/getUserList
  * @param {number} page - 当前页码
  * @param {number} pageSize - 每页数量
  * @param {string} keyword - 用户名或邮箱关键词
@@ -21,7 +21,7 @@ import { toUserRecord } from '#utils/dataFormatter.js'
  * @param {number} roleId - 角色 ID
  * @returns {object} 200 - 获取成功
  */
-const listUsers = async (ctx) => {
+const getUserList = async (ctx) => {
   const { current = 1, size = 10, userName, userGender, nickName, userPhone, userEmail, userStatus, status } = ctx.query
   const currentPage = Number(current) || 1
   const pageSize = Number(size) || 10
@@ -69,65 +69,63 @@ const listUsers = async (ctx) => {
 /**
  * @summary 创建用户
  * @description 新增后台用户并绑定角色
- * @api POST /admin/system/users
+ * @api POST /systemManage/saveUser
  * @param {string} username - 用户名
  * @param {string} password - 登录密码
  * @param {string} gender - 性别
  * @param {number} age - 年龄
- * @param {string} idCard - 身份证号
  * @param {string} email - 邮箱地址
- * @param {string} address - 联系地址
  * @param {string} status - 用户状态
  * @param {string} avatar - 头像地址
  * @param {number} roleId - 角色 ID
+ * @param {string} phone - 手机号
+ * @param {string} nickName - 昵称
  * @returns {object} 200 - 创建成功
  */
 const createUser = async (ctx) => {
-  const { username, password, gender, age, idCard, email, address, status, avatar, roleId } = ctx.request.body
+  const { username, password, gender, email, status, roleId, phone, nickName } = ctx.request.body
+  ctx.request.body
 
-  const [existedUser, existedEmail, existedIdCard, role] = await Promise.all([
+  const [existedUser, existedEmail, existedRole] = await Promise.all([
     userDao.findUserByUsername(username),
     userDao.findUserByEmail(email),
-    userDao.findUserByIdCard(idCard),
     userRoleDao.findRoleById(roleId)
   ])
 
+  // 校验用户名、邮箱是否存在
   if (existedUser) {
     ctx.status = httpCode.ok
     ctx.body = { code: businessCode.userExist, msg: businessMsg[businessCode.userExist] }
     return
   }
 
+  // 校验邮箱是否存在
   if (existedEmail) {
     ctx.status = httpCode.ok
     ctx.body = { code: businessCode.emailExist, msg: businessMsg[businessCode.emailExist] }
     return
   }
 
-  if (existedIdCard) {
-    ctx.status = httpCode.ok
-    ctx.body = { code: businessCode.idCardExist, msg: businessMsg[businessCode.idCardExist] }
-    return
-  }
-
-  if (!role) {
+  // 校验角色是否存在
+  if (!existedRole) {
     ctx.status = httpCode.ok
     ctx.body = { code: businessCode.roleNotFound, msg: businessMsg[businessCode.roleNotFound] }
     return
   }
 
-  const passwordHash = await hashPassword(password)
+  // 密码为空时，默认密码为 123456
+  const passwordHash = await hashPassword(password ? password : '123456')
   const result = await userDao.createUser({
-    username,
     gender,
+    gender: toDbGender(gender),
     age: age ?? null,
-    idCard,
-    email,
-    address: address ?? null,
     status,
+    status: toDbStatus(status),
     avatar: avatar ?? null,
     roleId,
-    passwordHash
+    passwordHash,
+    phone: phone ?? null,
+    nickName: nickName ?? null
   })
 
   ctx.status = httpCode.ok
@@ -143,21 +141,20 @@ const createUser = async (ctx) => {
 /**
  * @summary 更新用户
  * @description 更新后台用户资料、角色或密码
- * @api PUT /admin/system/users
+ * @api PUT /systemManage/updateUser
  * @param {number} id - 用户 ID
  * @param {string} password - 新密码
  * @param {string} gender - 性别
  * @param {number} age - 年龄
- * @param {string} idCard - 身份证号
  * @param {string} email - 邮箱地址
- * @param {string} address - 联系地址
  * @param {string} status - 用户状态
  * @param {string} avatar - 头像地址
  * @param {number} roleId - 角色 ID
  * @returns {object} 200 - 更新成功
  */
 const updateUser = async (ctx) => {
-  const { id, password, email, idCard, roleId, ...rest } = ctx.request.body
+  const { id, password, email, roleId, ...rest } = ctx.request.body
+  const targetUserId = Number(id)
   const currentUser = await userDao.findUserById(id)
 
   if (!currentUser) {
@@ -168,18 +165,9 @@ const updateUser = async (ctx) => {
 
   if (email) {
     const existedEmail = await userDao.findUserByEmail(email)
-    if (existedEmail && existedEmail.id !== id) {
+    if (existedEmail && Number(existedEmail.id) !== targetUserId) {
       ctx.status = httpCode.ok
       ctx.body = { code: businessCode.emailExist, msg: businessMsg[businessCode.emailExist] }
-      return
-    }
-  }
-
-  if (idCard) {
-    const existedIdCard = await userDao.findUserByIdCard(idCard)
-    if (existedIdCard && existedIdCard.id !== id) {
-      ctx.status = httpCode.ok
-      ctx.body = { code: businessCode.idCardExist, msg: businessMsg[businessCode.idCardExist] }
       return
     }
   }
@@ -196,9 +184,6 @@ const updateUser = async (ctx) => {
   const payload = { ...rest }
   if (email !== undefined) {
     payload.email = email
-  }
-  if (idCard !== undefined) {
-    payload.idCard = idCard
   }
   if (roleId !== undefined) {
     payload.roleId = roleId
@@ -219,14 +204,16 @@ const updateUser = async (ctx) => {
 /**
  * @summary 删除用户
  * @description 删除指定后台用户
- * @api DELETE /admin/system/users
+ * @api DELETE /systemManage/deleteUser
  * @param {number} id - 用户 ID
  * @returns {object} 200 - 删除成功
  */
 const deleteUser = async (ctx) => {
   const { id } = ctx.request.body
+  const operatorId = Number(ctx.state.user?.userId)
+  const targetUserId = Number(id)
 
-  if (ctx.state.user.userId === id) {
+  if (Number.isFinite(operatorId) && operatorId === targetUserId) {
     ctx.status = httpCode.ok
     ctx.body = {
       code: businessCode.userDeleteSelfDenied,
@@ -241,7 +228,6 @@ const deleteUser = async (ctx) => {
     ctx.body = { code: businessCode.userNotFound, msg: businessMsg[businessCode.userNotFound] }
     return
   }
-
   await userDao.deleteUser(id)
 
   ctx.status = httpCode.ok
@@ -252,7 +238,7 @@ const deleteUser = async (ctx) => {
 }
 
 export default {
-  listUsers,
+  getUserList,
   createUser,
   updateUser,
   deleteUser

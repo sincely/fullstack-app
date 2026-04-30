@@ -3,7 +3,7 @@ import { Button, Popconfirm, Tag } from 'ant-design-vue'
 
 import { enableStatusRecord, userGenderRecord } from '@/constants/business'
 import { useTable, useTableOperate, useTableScroll } from '@/hooks/common/table'
-import { fetchGetUserList } from '@/service/api'
+import { fetchDeleteUser, fetchGetUserList } from '@/service/api'
 
 import UserOperateDrawer from './modules/user-operate-drawer.vue'
 import UserSearch from './modules/user-search.vue'
@@ -146,16 +146,18 @@ const {
 } = useTableOperate(data, getData)
 
 async function handleBatchDelete() {
-  // 请求
-
-  onBatchDeleted()
+  const deleteTasks = checkedRowKeys.value.map((id) => fetchDeleteUser({ id }))
+  const results = await Promise.all(deleteTasks)
+  if (results.every((item) => !item.error)) {
+    onBatchDeleted()
+  }
 }
 
-function handleDelete(id) {
-  // 请求
-  console.log(id)
-
-  onDeleted()
+async function handleDelete(id) {
+  const { error } = await fetchDeleteUser({ id })
+  if (!error) {
+    onDeleted()
+  }
 }
 
 function edit(id) {
