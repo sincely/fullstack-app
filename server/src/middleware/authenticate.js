@@ -1,6 +1,5 @@
 import { verifyToken } from '../utils/jwt.js'
 import { createErrorResponse } from '../utils/createResponse.js'
-import { getRedisClient } from '../utils/redis.js'
 
 async function authenticate(ctx, next) {
   // 从请求头获取 Token
@@ -17,15 +16,6 @@ async function authenticate(ctx, next) {
   if (!token) {
     ctx.status = 401
     ctx.body = createErrorResponse('Token 格式错误，应为 Bearer <token>', 401)
-    return
-  }
-
-  // 检查 Token 是否在黑名单中（已登出）
-  const redis = getRedisClient()
-  const isBlacklisted = await redis.exists(`blacklist:${token}`)
-  if (isBlacklisted) {
-    ctx.status = 401
-    ctx.body = createErrorResponse('Token 已失效，请重新登录', 401)
     return
   }
 

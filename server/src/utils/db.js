@@ -12,7 +12,7 @@ const pool = mysql.createPool(dbConfig)
  */
 // 封装查询函数
 const query = async (sql, params = []) => {
-  const [result] = await pool.execute(sql, params)
+  const [result] = await pool.query(sql, params)
   return result
 }
 

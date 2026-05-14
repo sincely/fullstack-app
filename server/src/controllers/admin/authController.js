@@ -9,9 +9,8 @@ import { httpCode } from '../../config/httpError.js'
 import { businessCode, businessMsg } from '../../config/businessCode.js'
 import { defaultAdminRoleName } from '../../config/admin.js'
 import { hashPassword, comparePassword } from '../../utils/password.js'
-import { generateToken, decodeToken } from '../../utils/jwt.js'
+import { generateToken } from '../../utils/jwt.js'
 import { buildMenuTree, extractPermissionCodes } from '../../utils/adminPermission.js'
-import { getRedisClient } from '../../utils/redis.js'
 
 const formatUserInfo = (user) => {
   return {
@@ -232,26 +231,11 @@ const getPermissions = async (ctx) => {
 }
 
 /**
- * 后台退出登录 - Token 加入 Redis 黑名单
+ * 后台退出登录
  * @api POST /admin/auth/logout
  * @description 后台认证
  */
 const logout = async (ctx) => {
-  const token = ctx.state.token
-  if (token) {
-    try {
-      const redis = getRedisClient()
-      // 解析 token 过期时间，TTL 设为剩余有效期（最少 1 秒）
-      const decoded = decodeToken(token)
-      const exp = decoded?.exp
-      const now = Math.floor(Date.now() / 1000)
-      const ttl = exp ? Math.max(exp - now, 1) : 3600 // 无法解析则默认 1 小时
-      await redis.setex(`blacklist:${token}`, ttl, '1')
-    } catch {
-      // 黑名单写入失败不影响退出响应，但记录日志
-    }
-  }
-
   ctx.status = httpCode.ok
   ctx.body = {
     code: businessCode.success,

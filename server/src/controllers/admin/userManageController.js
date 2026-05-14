@@ -20,9 +20,13 @@ import { hashPassword } from '../../utils/password.js'
  * @query {integer} [roleId] - 角色 ID
  */
 const listUsers = async (ctx) => {
-  const { page, pageSize, keyword, status, roleId } = ctx.query
+  // 前端兼容：current/size 转换为 page/pageSize
+  const { current, size, page, pageSize, keyword, status, roleId } = ctx.query
+  const actualPage = page || current || 1
+  const actualPageSize = pageSize || size || 10
+
   const [list, total, roleOptions] = await Promise.all([
-    adminUserDao.listUsers({ page, pageSize, keyword, status, roleId }),
+    adminUserDao.listUsers({ page: actualPage, pageSize: actualPageSize, keyword, status, roleId }),
     adminUserDao.countUsers({ keyword, status, roleId }),
     adminUserDao.listRoleOptions()
   ])
@@ -36,9 +40,9 @@ const listUsers = async (ctx) => {
       roleOptions,
       pagination: {
         total,
-        page,
-        pageSize,
-        totalPages: Math.ceil(total / pageSize)
+        current: actualPage,
+        size: actualPageSize,
+        totalPages: Math.ceil(total / actualPageSize)
       }
     }
   }

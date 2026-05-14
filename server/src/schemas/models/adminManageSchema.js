@@ -5,11 +5,13 @@ const userStatusEnum = z.enum(['active', 'inactive', 'banned'])
 // 性别枚举
 const genderEnum = z.enum(['male', 'female', 'other'])
 
-// 用户列表查询参数
+// 用户列表查询参数（前端兼容：current/size 与 page/pageSize 都支持）
 export const AdminUserListQuerySchema = z.object({
-  page: z.coerce.number().int().min(1).default(1),
-  pageSize: z.coerce.number().int().min(1).max(100).default(10),
-  keyword: z.string().trim().optional().default(''),
+  current: z.coerce.number().int().min(1).default(1),
+  size: z.coerce.number().int().min(1).max(100).default(10),
+  page: z.coerce.number().int().min(1).optional(),
+  pageSize: z.coerce.number().int().min(1).max(100).optional(),
+  keyword: z.string().max(100).optional().transform(v => v || ''),
   status: userStatusEnum.optional(),
   roleId: z.coerce.number().int().positive().optional()
 })

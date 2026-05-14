@@ -7,28 +7,28 @@
  */
 export const businessCode = {
   // 全局
-  success: 0,
-  error: 1,
-  paramError: 2, // 参数错误
+  success: 200,
+  error: 500,
+  paramError: 400, // 参数错误
 
   // 用户模块
-  userParamMissing: 10001, // 用户名或密码为空
-  userNameInvalid: 10002, // 用户名格式错误
-  passwordInvalid: 10003, // 密码格式错误
-  userNotFound: 10004, // 用户不存在
-  userExist: 10005, // 用户已存在
-  userLoginFail: 10006, // 用户名或密码错误(登录失败)
-  adminUserDisabled: 10010, // 后台账号已禁用
-  roleNotFound: 10011, // 角色不存在
-  permissionDenied: 10012, // 权限不足
-  emailExist: 10013, // 邮箱已存在
-  roleExist: 10014, // 角色已存在
-  roleInUse: 10015, // 角色仍被使用
-  menuPathExist: 10016, // 菜单路径已存在
-  menuNameExist: 10017, // 菜单名称已存在
-  menuHasChildren: 10018, // 菜单存在子节点
-  userDeleteSelfDenied: 10019, // 不能删除自己
-  idCardExist: 10020 // 身份证号已存在
+  userParamMissing: 40001, // 用户名或密码为空
+  userNameInvalid: 40002, // 用户名格式错误
+  passwordInvalid: 40003, // 密码格式错误
+  userNotFound: 40004, // 用户不存在
+  userExist: 40005, // 用户已存在
+  userLoginFail: 40006, // 用户名或密码错误(登录失败)
+  adminUserDisabled: 40010, // 后台账号已禁用
+  roleNotFound: 40011, // 角色不存在
+  permissionDenied: 40012, // 权限不足
+  emailExist: 40013, // 邮箱已存在
+  roleExist: 40014, // 角色已存在
+  roleInUse: 40015, // 角色仍被使用
+  menuPathExist: 40016, // 菜单路径已存在
+  menuNameExist: 40017, // 菜单名称已存在
+  menuHasChildren: 40018, // 菜单存在子节点
+  userDeleteSelfDenied: 40019, // 不能删除自己
+  idCardExist: 40020 // 身份证号已存在
 }
 
 export const businessMsg = {

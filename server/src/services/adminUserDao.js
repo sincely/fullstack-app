@@ -27,7 +27,11 @@ const buildUserFilters = ({ keyword, status, roleId }) => {
 
 const listUsers = async ({ keyword, status, roleId, page, pageSize }) => {
   const { whereSql, params } = buildUserFilters({ keyword, status, roleId })
-  const offset = (page - 1) * pageSize
+  // 确保 page 和 pageSize 是整数
+  const safePage = Number.parseInt(page, 10) || 1
+  const safePageSize = Number.parseInt(pageSize, 10) || 10
+  const offset = (safePage - 1) * safePageSize
+
   const sql = `
     select
       u.id,
@@ -49,7 +53,7 @@ const listUsers = async ({ keyword, status, roleId, page, pageSize }) => {
     limit ?, ?
   `
 
-  return query(sql, [...params, offset, pageSize])
+  return query(sql, [...params, offset, safePageSize])
 }
 
 const countUsers = async ({ keyword, status, roleId }) => {
