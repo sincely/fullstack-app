@@ -1,4 +1,4 @@
-import '#config/env.js'
+import './env.js'
 
 export const dbConfig = {
   host: process.env.DB_HOST,

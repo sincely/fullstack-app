@@ -1,4 +1,4 @@
-import logger from '#config/logger.js'
+import logger from '../config/logger.js'
 
 export default async (ctx, next) => {
   try {

@@ -1,6 +1,6 @@
-import { verifyToken } from '#utils/jwt.js'
-import { createErrorResponse } from '#utils/createResponse.js'
-// import { getRedisClient } from '#utils/redis.js'
+import { verifyToken } from '../utils/jwt.js'
+import { createErrorResponse } from '../utils/createResponse.js'
+import { getRedisClient } from '../utils/redis.js'
 
 async function authenticate(ctx, next) {
   // 从请求头获取 Token
@@ -20,14 +20,14 @@ async function authenticate(ctx, next) {
     return
   }
 
-  // Redis 黑名单逻辑已临时关闭（调试环境）
-  // const redis = getRedisClient()
-  // const isBlacklisted = await redis.exists(`blacklist:${token}`)
-  // if (isBlacklisted) {
-  //   ctx.status = 401
-  //   ctx.body = createErrorResponse('Token 已失效，请重新登录', 401)
-  //   return
-  // }
+  // 检查 Token 是否在黑名单中（已登出）
+  const redis = getRedisClient()
+  const isBlacklisted = await redis.exists(`blacklist:${token}`)
+  if (isBlacklisted) {
+    ctx.status = 401
+    ctx.body = createErrorResponse('Token 已失效，请重新登录', 401)
+    return
+  }
 
   // 验证 Token（verifyToken 现在会抛出带 code 的错误）
   let decoded

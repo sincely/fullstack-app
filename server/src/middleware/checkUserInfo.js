@@ -1,5 +1,5 @@
-import { httpCode } from '#config/httpError.js'
-import { businessCode, businessMsg } from '#config/businessCode.js'
+import { httpCode } from '../config/httpError.js'
+import { businessCode, businessMsg } from '../config/businessCode.js'
 
 /**
  * 校验用户信息是否符合规则

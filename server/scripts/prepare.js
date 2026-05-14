@@ -1,10 +1,8 @@
 import { execSync } from 'child_process'
-import { existsSync } from 'fs'
 
 const isProduction = process.env.NODE_ENV === 'production'
-const hasGitDir = existsSync('.git')
 
-if (isProduction || !hasGitDir) {
+if (isProduction) {
   process.exit(0)
 }
 

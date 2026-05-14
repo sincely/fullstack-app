@@ -1,5 +1,5 @@
-import { createErrorResponse } from '#utils/createResponse.js'
-import { httpCode } from '#config/httpError.js'
+import { createErrorResponse } from '../utils/createResponse.js'
+import { httpCode } from '../config/httpError.js'
 
 /**
  * 将 Zod 错误对象转换为统一的错误详情结构。

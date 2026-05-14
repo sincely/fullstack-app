@@ -1,4 +1,4 @@
-import { businessCode } from '#config/businessCode.js'
+import { businessCode } from '../config/businessCode.js'
 
 /**
  * 参数校验工具函数

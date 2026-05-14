@@ -19,23 +19,23 @@ const httpCode = {
 }
 
 const httpMessage = {
-  [httpCode.ok]: '成功',
-  [httpCode.created]: '创建成功',
-  [httpCode.accepted]: '已接受',
-  [httpCode.noContent]: '无内容',
-  [httpCode.badRequest]: '请求参数错误',
-  [httpCode.unauthorized]: '未授权',
-  [httpCode.forbidden]: '禁止访问',
-  [httpCode.notFound]: '资源不存在',
-  [httpCode.methodNotAllowed]: '请求方法不允许',
-  [httpCode.requestTimeout]: '请求超时',
-  [httpCode.conflict]: '资源冲突',
-  [httpCode.unprocessableEntity]: '无法处理的实体',
-  [httpCode.internalServerError]: '服务器内部错误',
-  [httpCode.notImplemented]: '功能未实现',
-  [httpCode.badGateway]: '网关错误',
-  [httpCode.serviceUnavailable]: '服务不可用',
-  [httpCode.gatewayTimeout]: '网关超时'
+  [httpCode.ok]: 'Success',
+  [httpCode.created]: 'Created',
+  [httpCode.accepted]: 'Accepted',
+  [httpCode.noContent]: 'No Content',
+  [httpCode.badRequest]: 'Bad Request',
+  [httpCode.unauthorized]: 'Unauthorized',
+  [httpCode.forbidden]: 'Forbidden',
+  [httpCode.notFound]: 'Not Found',
+  [httpCode.methodNotAllowed]: 'Method Not Allowed',
+  [httpCode.requestTimeout]: 'Request Timeout',
+  [httpCode.conflict]: 'Conflict',
+  [httpCode.unprocessableEntity]: 'Unprocessable Entity',
+  [httpCode.internalServerError]: 'Internal Server Error',
+  [httpCode.notImplemented]: 'Not Implemented',
+  [httpCode.badGateway]: 'Bad Gateway',
+  [httpCode.serviceUnavailable]: 'Service Unavailable',
+  [httpCode.gatewayTimeout]: 'Gateway Timeout'
 }
 
 export { httpCode, httpMessage }
