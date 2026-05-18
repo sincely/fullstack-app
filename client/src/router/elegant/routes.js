@@ -199,7 +199,7 @@ export const generatedRoutes = [
           title: '角色管理',
           icon: 'carbon:user-role',
           order: 2,
-          roles: ['super']
+          roles: ['admin']
         }
       },
       {

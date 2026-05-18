@@ -14,8 +14,12 @@ import MenuOperateModal from './modules/menu-operate-modal.vue'
 const { bool: visible, setTrue: openModal } = useBoolean()
 const { tableWrapperRef, scrollConfig } = useTableScroll()
 
-const { columns, columnChecks, data, loading, pagination, getData, getDataByPage } = useTable({
+const { columns, columnChecks, data, loading, getData } = useTable({
   apiFn: fetchGetMenuList,
+  apiParams: {
+    current: 1,
+    size: 999
+  },
   columns: () => [
     {
       key: 'id',
@@ -242,7 +246,7 @@ init()
         :loading="loading"
         row-key="id"
         :scroll="scrollConfig"
-        :pagination="pagination"
+        :pagination="false"
         class="h-full"
       />
       <MenuOperateModal
@@ -250,7 +254,7 @@ init()
         :operate-type="operateType"
         :row-data="editingData"
         :all-pages="allPages"
-        @submitted="getDataByPage"
+        @submitted="getData"
       />
     </ACard>
   </div>

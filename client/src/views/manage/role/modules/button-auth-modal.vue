@@ -1,5 +1,5 @@
 <script setup>
-import { computed, shallowRef, watch } from 'vue'
+import { shallowRef, watch } from 'vue'
 
 import { fetchGetAllButtons, fetchGetRoleButtonIds, fetchUpdateRoleButtonIds } from '@/service/api'
 
@@ -22,7 +22,7 @@ function closeModal() {
   visible.value = false
 }
 
-const title = computed(() => '编辑' + '按钮权限')
+const title = '编辑按钮权限'
 
 const tree = shallowRef([])
 
@@ -30,8 +30,30 @@ async function getAllButtons() {
   const { error, data } = await fetchGetAllButtons()
 
   if (!error) {
-    tree.value = data || []
+    tree.value = transformButtonTree(data || [])
   }
+}
+
+function transformButtonTree(buttons = []) {
+  const routeMap = new Map()
+
+  buttons.forEach((item) => {
+    const routeKey = `route-${item.routeId}`
+    if (!routeMap.has(routeKey)) {
+      routeMap.set(routeKey, {
+        key: routeKey,
+        title: item.routeName,
+        children: []
+      })
+    }
+
+    routeMap.get(routeKey).children.push({
+      key: String(item.buttonId),
+      title: item.buttonLabel || item.buttonName
+    })
+  })
+
+  return Array.from(routeMap.values())
 }
 
 const checks = shallowRef([])

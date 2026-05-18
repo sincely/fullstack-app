@@ -46,6 +46,7 @@ function createDefaultModel() {
   return {
     id: undefined,
     userName: '',
+    password: '',
     userGender: '1',
     nickName: '',
     userPhone: '',
@@ -61,6 +62,7 @@ const rules = computed(() => {
 
   return {
     userName: requiredRule,
+    ...(props.operateType === 'add' ? { password: requiredRule } : {}),
     userEmail: [requiredRule, patternRules.email],
     roleId: requiredRule,
     status: requiredRule
@@ -76,7 +78,7 @@ async function getRoleOptions() {
   if (!error) {
     const options = data.map((item) => ({
       label: item.roleName,
-      value: item.id,
+      value: item.roleId,
       roleCode: item.roleCode
     }))
 
@@ -96,12 +98,13 @@ async function handleInitModel() {
   Object.assign(model, createDefaultModel())
 
   if (props.operateType === 'edit' && props.rowData) {
-    const currentRoleCode = props.rowData.userRoles?.[0]
+    const currentRoleCode = props.rowData.roleCodes?.[0]
     const matchedRole = roleOptions.value.find((item) => item.roleCode === currentRoleCode)
 
     Object.assign(model, {
       id: props.rowData.id,
       userName: props.rowData.userName ?? '',
+      password: '',
       userGender: props.rowData.userGender ?? '1',
       nickName: props.rowData.nickName ?? '',
       userPhone: props.rowData.userPhone ?? '',
@@ -121,6 +124,7 @@ async function handleSubmit() {
   if (props.operateType === 'add') {
     const payload = {
       username: model.userName,
+      password: model.password,
       gender: model.userGender,
       email: model.userEmail,
 
@@ -138,6 +142,7 @@ async function handleSubmit() {
   } else {
     const payload = {
       id: model.id,
+      password: model.password || undefined,
       gender: model.userGender,
       email: model.userEmail || undefined,
       status: model.status,
@@ -173,6 +178,12 @@ watch(visible, () => {
     <AForm ref="formRef" layout="vertical" :model="model" :rules="rules">
       <AFormItem :label="'用户名'" name="userName">
         <AInput v-model:value="model.userName" :placeholder="'请输入用户名'" :disabled="props.operateType === 'edit'" />
+      </AFormItem>
+      <AFormItem :label="props.operateType === 'add' ? '密码' : '新密码'" name="password">
+        <AInputPassword
+          v-model:value="model.password"
+          :placeholder="props.operateType === 'add' ? '请输入密码' : '不修改可留空'"
+        />
       </AFormItem>
       <AFormItem :label="'性别'" name="userGender">
         <ARadioGroup v-model:value="model.userGender">

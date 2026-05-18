@@ -47,10 +47,12 @@ const model = reactive(createDefaultModel())
 
 function createDefaultModel() {
   return {
+    id: undefined,
     roleName: '',
     roleCode: '',
     roleDesc: '',
-    status: '1'
+    status: '1',
+    routeIds: []
   }
 }
 
@@ -71,7 +73,7 @@ function handleUpdateModelWhenEdit() {
   }
 
   if (props.operateType === 'edit' && props.rowData) {
-    Object.assign(model, props.rowData)
+    Object.assign(model, createDefaultModel(), props.rowData)
   }
 }
 
@@ -83,11 +85,15 @@ async function handleSubmit() {
   await validate()
   const submitApi = props.operateType === 'edit' ? fetchUpdateRole : fetchCreateRole
   const payload = {
-    ...model
+    roleName: model.roleName,
+    roleCode: model.roleCode,
+    roleDesc: model.roleDesc,
+    status: model.status,
+    routeIds: props.operateType === 'edit' ? props.rowData?.routeIds || model.routeIds || [] : []
   }
 
   if (props.operateType === 'edit') {
-    payload.id = props.rowData.id
+    payload.roleId = props.rowData.id
   }
 
   const { error } = await submitApi(payload)

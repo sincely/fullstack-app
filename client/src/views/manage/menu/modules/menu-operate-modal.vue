@@ -1,11 +1,11 @@
 <script setup lang="jsx">
 import { SimpleScrollbar } from '@sa/materials'
-import { computed, nextTick, reactive, ref, watch } from 'vue'
+import { computed, nextTick, reactive, watch } from 'vue'
 
 import SvgIcon from '@/components/custom/svg-icon.vue'
 import { enableStatusOptions, menuIconTypeOptions, menuTypeOptions } from '@/constants/business'
 import { useAntdForm, useFormRules } from '@/hooks/common/form'
-import { fetchCreateMenu, fetchGetAllRoles, fetchUpdateMenu } from '@/service/api'
+import { fetchCreateMenu, fetchUpdateMenu } from '@/service/api'
 import { getLocalIcons } from '@/utils/icon'
 
 import {
@@ -109,13 +109,16 @@ const showPage = computed(() => model.menuType === '2')
 const pageOptions = computed(() => {
   const allPages = [...props.allPages]
 
-  if (model.routeName && !allPages.includes(model.routeName)) {
-    allPages.unshift(model.routeName)
+  if (model.routeName && !allPages.some((item) => item.name === model.routeName)) {
+    allPages.unshift({
+      name: model.routeName,
+      label: model.menuName || model.routeName
+    })
   }
 
   const opts = allPages.map((page) => ({
-    label: page,
-    value: page
+    label: page.label ? `${page.label} (${page.name})` : page.name,
+    value: page.name
   }))
 
   return opts
@@ -131,22 +134,6 @@ const layoutOptions = [
     value: 'blank'
   }
 ]
-
-/** 可用角色选项 */
-const roleOptions = ref([])
-
-async function getRoleOptions() {
-  const { error, data } = await fetchGetAllRoles()
-
-  if (!error) {
-    const options = data.map((item) => ({
-      label: item.roleName,
-      value: item.roleCode
-    }))
-
-    roleOptions.value = [...options]
-  }
-}
 
 /** 新增一项路由参数 */
 function addQuery(index) {
@@ -222,13 +209,17 @@ function handleUpdateRoutePathByRouteName() {
 }
 
 function getSubmitParams() {
-  const { layout, page, pathParam, ...params } = model
+  const { layout, page, pathParam, order, constant, href, query, fixedIndexInTab, ...params } = model
 
   const component = transformLayoutAndPageToComponent(layout, page)
   const routePath = getRoutePathWithParam(model.routePath, pathParam)
 
-  params.component = component
+  params.component = component || null
   params.routePath = routePath
+  params.orderNum = Number(order || 0)
+  params.parentId = Number(model.parentId || 0)
+  params.menuType = Number(model.menuType)
+  params.iconType = Number(model.iconType)
 
   return params
 }
@@ -254,7 +245,6 @@ watch(visible, () => {
   if (visible.value) {
     handleInitModel()
     resetFields()
-    getRoleOptions()
   }
 })
 

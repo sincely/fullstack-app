@@ -1,7 +1,7 @@
 <script setup>
-import { computed, shallowRef, watch } from 'vue'
+import { shallowRef, watch } from 'vue'
 
-import { fetchGetAllPages, fetchGetMenuTree, fetchGetRoleRouteIds, fetchUpdateRoleRouteIds } from '@/service/api'
+import { fetchGetMenuTree, fetchGetRoleRouteIds, fetchUpdateRoleRouteIds } from '@/service/api'
 
 defineOptions({
   name: 'MenuAuthModal'
@@ -22,40 +22,7 @@ function closeModal() {
   visible.value = false
 }
 
-const title = computed(() => '编辑' + '菜单权限')
-
-const home = shallowRef('')
-
-async function getHome() {
-  console.log(props.roleId)
-
-  home.value = 'home'
-}
-
-async function updateHome(val) {
-  // 请求
-
-  home.value = val
-}
-
-const pages = shallowRef([])
-
-async function getPages() {
-  const { error, data } = await fetchGetAllPages()
-
-  if (!error) {
-    pages.value = data
-  }
-}
-
-const pageSelectOptions = computed(() => {
-  const opts = pages.value.map((page) => ({
-    label: page,
-    value: page
-  }))
-
-  return opts
-})
+const title = '编辑菜单权限'
 
 const tree = shallowRef([])
 
@@ -63,37 +30,16 @@ async function getTree() {
   const { error, data } = await fetchGetMenuTree()
 
   if (!error) {
-    tree.value = transformFlatMenuTree(data)
+    tree.value = transformMenuTree(data)
   }
 }
 
-function transformFlatMenuTree(data) {
-  const nodeMap = new Map(
-    data.map((item) => [
-      String(item.id),
-      {
-        key: String(item.id),
-        title: item.label,
-        children: []
-      }
-    ])
-  )
-
-  const roots = []
-
-  data.forEach((item) => {
-    const currentNode = nodeMap.get(String(item.id))
-    const parentId = String(item.pId)
-
-    if (parentId !== '0' && nodeMap.has(parentId)) {
-      nodeMap.get(parentId).children.push(currentNode)
-      return
-    }
-
-    roots.push(currentNode)
-  })
-
-  return roots
+function transformMenuTree(nodes = []) {
+  return nodes.map((item) => ({
+    key: String(item.id),
+    title: item.meta?.title || item.name || item.path,
+    children: item.children?.length ? transformMenuTree(item.children) : undefined
+  }))
 }
 
 const checks = shallowRef([])
@@ -123,8 +69,6 @@ async function handleSubmit() {
 }
 
 async function init() {
-  getHome()
-  getPages()
   await getTree()
   await getChecks()
 }
@@ -138,10 +82,7 @@ watch(visible, (val) => {
 
 <template>
   <AModal v-model:open="visible" :title="title" class="w-480px">
-    <div class="flex-y-center gap-16px pb-12px">
-      <div>{{ '首页' }}</div>
-      <ASelect :value="home" :options="pageSelectOptions" class="w-240px" @update:value="updateHome" />
-    </div>
+    <div class="pb-12px text-14px text-secondary">{{ '勾选后保存该角色可访问的菜单' }}</div>
     <ATree v-model:checked-keys="checks" :tree-data="tree" checkable :height="280" class="h-280px" />
     <template #footer>
       <AButton size="small" class="mt-16px" @click="closeModal">

@@ -20,7 +20,8 @@ const scrollConfig = computed(() => {
   }
 })
 
-const { columns, columnChecks, data, loading, getData, mobilePagination, searchParams, resetSearchParams } = useTable({
+const { columns, columnChecks, data, loading, getData, getDataByPage, mobilePagination, searchParams, resetSearchParams } =
+  useTable({
   apiFn: fetchGetRoleList,
   apiParams: {
     current: 1,
@@ -97,7 +98,7 @@ const { columns, columnChecks, data, loading, getData, mobilePagination, searchP
       )
     }
   ]
-})
+  })
 
 const {
   drawerVisible,
@@ -135,7 +136,7 @@ function edit(id) {
 
 <template>
   <div class="min-h-500px flex-col-stretch gap-16px overflow-hidden lt-sm:overflow-auto">
-    <RoleSearch v-model:model="searchParams" @reset="resetSearchParams" @search="getData" />
+    <RoleSearch v-model:model="searchParams" @reset="resetSearchParams" @search="getDataByPage" />
     <ACard
       :title="'角色列表'"
       :bordered="false"
@@ -168,7 +169,7 @@ function edit(id) {
         v-model:visible="drawerVisible"
         :operate-type="operateType"
         :row-data="editingData"
-        @submitted="getData"
+          @submitted="getData"
       />
     </ACard>
   </div>

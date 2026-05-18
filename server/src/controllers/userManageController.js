@@ -3,11 +3,83 @@
  * @description 处理后台用户管理相关的增删改查
  */
 
-import adminUserDao from '../../services/adminUserDao.js'
-import adminRoleDao from '../../services/adminRoleDao.js'
-import { businessCode, businessMsg } from '../../config/businessCode.js'
-import { httpCode } from '../../config/httpError.js'
-import { hashPassword } from '../../utils/password.js'
+import adminUserDao from '../services/userDao.js'
+import adminRoleDao from '../services/roleDao.js'
+import { businessCode, businessMsg } from '../config/businessCode.js'
+import { httpCode } from '../config/httpError.js'
+import { hashPassword } from '../utils/password.js'
+
+const toFrontendGender = (gender) => {
+  if (gender === 'male') {
+    return '1'
+  }
+
+  if (gender === 'female') {
+    return '2'
+  }
+
+  return null
+}
+
+const toDbGender = (gender) => {
+  if (gender === '1') {
+    return 'male'
+  }
+
+  if (gender === '2') {
+    return 'female'
+  }
+
+  return undefined
+}
+
+const toDbStatus = (status) => {
+  if (status === '2' || Number(status) === 0) {
+    return 0
+  }
+
+  return 1
+}
+
+const toFrontendStatus = (status) => {
+  return Number(status) === 1 ? '1' : '2'
+}
+
+const parseRoleIds = (value) => {
+  if (typeof value !== 'string' || !value.trim()) {
+    return []
+  }
+
+  return value
+    .split(',')
+    .map((item) => Number(item))
+    .filter(Boolean)
+}
+
+const formatUserRow = (row) => {
+  const roleIds = parseRoleIds(row.roleIds)
+
+  return {
+    id: row.id,
+    userName: row.username,
+    userGender: toFrontendGender(row.gender),
+    nickName: row.nickName ?? '',
+    userPhone: row.phone ?? '',
+    userEmail: row.email ?? '',
+    status: toFrontendStatus(row.status),
+    age: row.age,
+    idCard: row.idCard ?? '',
+    address: row.address ?? '',
+    avatar: row.avatar ?? '',
+    createBy: row.createBy ?? '',
+    createTime: row.createTime ?? '',
+    updateBy: row.updateBy ?? '',
+    updateTime: row.updateTime ?? '',
+    roleId: roleIds[0] ?? (row.roleId ? Number(row.roleId) : undefined),
+    roleIds,
+    roleNames: typeof row.roleNames === 'string' && row.roleNames ? row.roleNames.split(',') : []
+  }
+}
 
 /**
  * 获取用户列表 - 分页查询并返回角色选项
@@ -21,14 +93,23 @@ import { hashPassword } from '../../utils/password.js'
  */
 const listUsers = async (ctx) => {
   // 前端兼容：current/size 转换为 page/pageSize
-  const { current, size, page, pageSize, keyword, status, roleId } = ctx.query
-  const actualPage = page || current || 1
-  const actualPageSize = pageSize || size || 10
+  const { current, size, page, pageSize, keyword, status, roleId, userName, nickName, userEmail, userPhone, userGender } = ctx.query
+  const actualPage = Number(page || current || 1)
+  const actualPageSize = Number(pageSize || size || 10)
+  const normalizedKeyword = keyword || userName || nickName || userEmail || userPhone || ''
+  const normalizedStatus = status === '2' ? '0' : status
+  const normalizedGender = toDbGender(userGender)
 
-  const [list, total, roleOptions] = await Promise.all([
-    adminUserDao.listUsers({ page: actualPage, pageSize: actualPageSize, keyword, status, roleId }),
-    adminUserDao.countUsers({ keyword, status, roleId }),
-    adminUserDao.listRoleOptions()
+  const [list, total] = await Promise.all([
+    adminUserDao.listUsers({
+      page: actualPage,
+      pageSize: actualPageSize,
+      keyword: normalizedKeyword,
+      status: normalizedStatus,
+      gender: normalizedGender,
+      roleId
+    }),
+    adminUserDao.countUsers({ keyword: normalizedKeyword, status: normalizedStatus, gender: normalizedGender, roleId })
   ])
 
   ctx.status = httpCode.ok
@@ -36,14 +117,10 @@ const listUsers = async (ctx) => {
     code: businessCode.success,
     msg: '获取用户列表成功',
     data: {
-      list,
-      roleOptions,
-      pagination: {
-        total,
-        current: actualPage,
-        size: actualPageSize,
-        totalPages: Math.ceil(total / actualPageSize)
-      }
+      records: list.map(formatUserRow),
+      current: actualPage,
+      size: actualPageSize,
+      total: Number(total)
     }
   }
 }
@@ -97,17 +174,19 @@ const createUser = async (ctx) => {
     return
   }
 
-  const passwordHash = await hashPassword(password)
+  const passwordHash = await hashPassword(password || '123456')
   const result = await adminUserDao.createUser({
     username,
-    gender,
+    nickName: ctx.request.body.nickName,
+    phone: ctx.request.body.phone,
+    gender: toDbGender(gender) || 'other',
     age: age ?? null,
-    idCard,
+    idCard: idCard ?? null,
     email,
     address: address ?? null,
-    status,
+    status: toDbStatus(status),
     avatar: avatar ?? null,
-    roleId,
+    roleIds: [roleId],
     passwordHash
   })
 
@@ -174,20 +253,26 @@ const updateUser = async (ctx) => {
   }
 
   const payload = { ...rest }
+  if (payload.gender !== undefined) {
+    payload.gender = toDbGender(payload.gender) || 'other'
+  }
+  if (payload.status !== undefined) {
+    payload.status = toDbStatus(payload.status)
+  }
   if (email !== undefined) {
     payload.email = email
   }
   if (idCard !== undefined) {
     payload.idCard = idCard
   }
-  if (roleId !== undefined) {
-    payload.roleId = roleId
-  }
   if (password) {
     payload.password = await hashPassword(password)
   }
 
   await adminUserDao.updateUser(id, payload)
+  if (roleId !== undefined) {
+    await adminUserDao.updateUserRoles(id, [roleId])
+  }
 
   ctx.status = httpCode.ok
   ctx.body = {

@@ -3,14 +3,47 @@
  * @description 处理后台登录、注册、退出和权限信息获取
  */
 
-import adminAuthDao from '../../services/adminAuthDao.js'
-import adminPermissionDao from '../../services/adminPermissionDao.js'
-import { httpCode } from '../../config/httpError.js'
-import { businessCode, businessMsg } from '../../config/businessCode.js'
-import { defaultAdminRoleName } from '../../config/admin.js'
-import { hashPassword, comparePassword } from '../../utils/password.js'
-import { generateToken } from '../../utils/jwt.js'
-import { buildMenuTree, extractPermissionCodes } from '../../utils/adminPermission.js'
+import adminAuthDao from '../services/authDao.js'
+import adminPermissionDao from '../services/permissionDao.js'
+import { httpCode } from '../config/httpError.js'
+import { businessCode, businessMsg } from '../config/businessCode.js'
+import { defaultAdminRoleName } from '../config/admin.js'
+import { hashPassword, comparePassword } from '../utils/password.js'
+import { generateToken } from '../utils/jwt.js'
+import { buildMenuTree, extractPermissionCodes } from '../utils/adminPermission.js'
+
+const parseRoleIds = (value, fallbackRoleId) => {
+  if (typeof value === 'string' && value.trim()) {
+    return value
+      .split(',')
+      .map((item) => Number(item))
+      .filter(Boolean)
+  }
+
+  return fallbackRoleId ? [Number(fallbackRoleId)] : []
+}
+
+const parseRoleNames = (value, fallbackRoleName) => {
+  if (typeof value === 'string' && value.trim()) {
+    return value
+      .split(',')
+      .map((item) => item.trim())
+      .filter(Boolean)
+  }
+
+  return fallbackRoleName ? [fallbackRoleName] : []
+}
+
+const parseRoleCodes = (value, fallbackRoleCode) => {
+  if (typeof value === 'string' && value.trim()) {
+    return value
+      .split(',')
+      .map((item) => item.trim())
+      .filter(Boolean)
+  }
+
+  return fallbackRoleCode ? [fallbackRoleCode] : []
+}
 
 const formatUserInfo = (user) => {
   return {
@@ -20,14 +53,18 @@ const formatUserInfo = (user) => {
     status: user.status,
     avatar: user.avatar,
     roleId: user.roleId,
+    roleIds: parseRoleIds(user.roleIds, user.roleId),
+    roleCode: user.roleCode,
+    roleCodes: parseRoleCodes(user.roleCodes, user.roleCode),
     roleName: user.roleName,
+    roleNames: parseRoleNames(user.roleNames, user.roleName),
     roleDescription: user.roleDescription
   }
 }
 
-const buildPermissionSnapshot = async (roleId) => {
-  const menus = await adminPermissionDao.findMenusByRoleId(roleId)
-  const buttons = await adminPermissionDao.findButtonsByRoleId(roleId)
+const buildPermissionSnapshot = async (roleIds) => {
+  const menus = await adminPermissionDao.findMenusByRoleId(roleIds)
+  const buttons = await adminPermissionDao.findButtonsByRoleId(roleIds)
 
   return {
     menuTree: buildMenuTree(menus),
@@ -129,7 +166,7 @@ const login = async (ctx) => {
     return
   }
 
-  if (user.status !== 'active') {
+  if (Number(user.status) !== 1) {
     ctx.status = httpCode.ok
     ctx.body = {
       code: businessCode.adminUserDisabled,
@@ -148,12 +185,19 @@ const login = async (ctx) => {
     return
   }
 
-  const permissionSnapshot = await buildPermissionSnapshot(user.roleId)
+  const roleIds = parseRoleIds(user.roleIds, user.roleId)
+  const roleCodes = parseRoleCodes(user.roleCodes, user.roleCode)
+  const roleNames = parseRoleNames(user.roleNames, user.roleName)
+  const permissionSnapshot = await buildPermissionSnapshot(roleIds)
   const token = generateToken({
     userId: user.id,
     username: user.username,
     roleId: user.roleId,
-    roleName: user.roleName
+    roleIds,
+    roleCode: user.roleCode,
+    roleCodes,
+    roleName: user.roleName,
+    roleNames
   })
 
   ctx.status = httpCode.ok
@@ -200,7 +244,7 @@ const getProfile = async (ctx) => {
  * @description 后台认证
  */
 const getMenus = async (ctx) => {
-  const permissionSnapshot = await buildPermissionSnapshot(ctx.state.user.roleId)
+  const permissionSnapshot = await buildPermissionSnapshot(parseRoleIds(ctx.state.user.roleIds, ctx.state.user.roleId))
 
   ctx.status = httpCode.ok
   ctx.body = {
@@ -216,7 +260,7 @@ const getMenus = async (ctx) => {
  * @description 后台认证
  */
 const getPermissions = async (ctx) => {
-  const permissionSnapshot = await buildPermissionSnapshot(ctx.state.user.roleId)
+  const permissionSnapshot = await buildPermissionSnapshot(parseRoleIds(ctx.state.user.roleIds, ctx.state.user.roleId))
 
   ctx.status = httpCode.ok
   ctx.body = {

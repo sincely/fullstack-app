@@ -210,10 +210,11 @@ export function fetchGetMenuListV1() {
  * @description 获取菜单列表（v2）
  * @returns {Promise<any>} 请求结果
  */
-export function fetchGetMenuList() {
+export function fetchGetMenuList(params) {
   return request({
     url: '/systemManage/getMenuList/v2',
-    method: 'get'
+    method: 'get',
+    params
   })
 }
 

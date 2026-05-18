@@ -1,8 +1,23 @@
 import Router from '@koa/router'
 import authenticate from '../../middleware/authenticate.js'
 import { errorControllerWrapper } from '../../utils/errorHandler.js'
+import adminPermissionDao from '../../services/permissionDao.js'
+import adminMenuDao from '../../services/menuDao.js'
+import { buildMenuTree } from '../../utils/adminPermission.js'
+import { businessCode } from '../../config/businessCode.js'
 
 const routeRouter = new Router()
+
+const parseRoleIds = (value, fallbackRoleId) => {
+  if (typeof value === 'string' && value.trim()) {
+    return value
+      .split(',')
+      .map((item) => Number(item))
+      .filter(Boolean)
+  }
+
+  return fallbackRoleId ? [Number(fallbackRoleId)] : []
+}
 
 // 获取常量路由
 routeRouter.get(
@@ -17,7 +32,6 @@ routeRouter.get(
           component: 'layout.blankLayout',
           meta: {
             title: 'login',
-            i18nKey: 'route.login',
             constant: true
           }
         },
@@ -27,7 +41,6 @@ routeRouter.get(
           component: 'layout.blankLayout',
           meta: {
             title: '403',
-            i18nKey: 'route.403',
             constant: true
           }
         },
@@ -37,7 +50,6 @@ routeRouter.get(
           component: 'layout.blankLayout',
           meta: {
             title: '404',
-            i18nKey: 'route.404',
             constant: true
           }
         },
@@ -47,7 +59,6 @@ routeRouter.get(
           component: 'layout.blankLayout',
           meta: {
             title: '500',
-            i18nKey: 'route.500',
             constant: true
           }
         }
@@ -61,76 +72,18 @@ routeRouter.get(
 routeRouter.get(
   '/route/getUserRoutes',
   authenticate,
-  errorControllerWrapper((ctx) => {
+  errorControllerWrapper(async (ctx) => {
+    const roleIds = parseRoleIds(ctx.state.user?.roleIds, ctx.state.user?.roleId)
+    let menus = []
+    if (roleIds.length > 0) {
+      menus = await adminPermissionDao.findMenusByRoleId(roleIds)
+    }
+    // 直接用新表结构的扁平列表构建树，buildMenuTree 内部已做字段映射
+    const routeTree = buildMenuTree(menus)
     ctx.body = {
-      code: 200,
+      code: businessCode.success,
       data: {
-        routes: [
-          {
-            name: 'home',
-            path: '/home',
-            component: 'layout.base$view.home',
-            meta: {
-              title: 'home',
-              i18nKey: 'route.home',
-              icon: 'mdi:monitor-dashboard',
-              order: 1
-            }
-          },
-          {
-            name: 'manage',
-            path: '/manage',
-            component: 'layout.base',
-            meta: {
-              title: 'manage',
-              i18nKey: 'route.manage',
-              icon: 'mdi:folder-cog',
-              order: 2
-            },
-            children: [
-              {
-                name: 'manage_user',
-                path: '/manage/user',
-                component: 'view.manage_user',
-                meta: {
-                  title: 'manage_user',
-                  i18nKey: 'route.manage_user',
-                  icon: 'mdi:account'
-                }
-              },
-              {
-                name: 'manage_role',
-                path: '/manage/role',
-                component: 'view.manage_role',
-                meta: {
-                  title: 'manage_role',
-                  i18nKey: 'route.manage_role',
-                  icon: 'mdi:account-group'
-                }
-              },
-              {
-                name: 'manage_menu',
-                path: '/manage/menu',
-                component: 'view.manage_menu',
-                meta: {
-                  title: 'manage_menu',
-                  i18nKey: 'route.manage_menu',
-                  icon: 'mdi:menu'
-                }
-              }
-            ]
-          },
-          {
-            name: 'about',
-            path: '/about',
-            component: 'layout.base$view.about',
-            meta: {
-              title: 'about',
-              i18nKey: 'route.about',
-              icon: 'mdi:information'
-            }
-          }
-        ],
+        routes: routeTree,
         home: 'home'
       },
       msg: 'ok'
@@ -142,11 +95,12 @@ routeRouter.get(
 routeRouter.get(
   '/route/isRouteExist',
   authenticate,
-  errorControllerWrapper((ctx) => {
+  errorControllerWrapper(async (ctx) => {
     const { routeName } = ctx.query
+    const menu = await adminMenuDao.findMenuByName(routeName)
     ctx.body = {
-      code: 200,
-      data: false,
+      code: businessCode.success,
+      data: !!menu,
       msg: 'ok'
     }
   })
