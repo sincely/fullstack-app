@@ -4,7 +4,7 @@ import permissionDao from '../../services/permissionDao.js'
 import authenticate from '../../middleware/authenticate.js'
 import { validateBody } from '../../middleware/validationMiddleware.js'
 import { errorControllerWrapper } from '../../utils/errorHandler.js'
-import { FrontendLoginBodySchema } from '../../schemas/models/adminAuthSchema.js'
+import { loginBodySchema } from '../../schemas/models/authSchema.js'
 import { httpCode } from '../../config/httpError.js'
 import { businessCode, businessMsg } from '../../config/businessCode.js'
 import { comparePassword } from '../../utils/password.js'
@@ -102,7 +102,7 @@ const frontendLogin = async (ctx) => {
   }
 }
 
-adminRouter.post('/user/auth/login', validateBody(FrontendLoginBodySchema), errorControllerWrapper(frontendLogin))
+adminRouter.post('/user/auth/login', validateBody(loginBodySchema), errorControllerWrapper(frontendLogin))
 
 // 前端兼容接口 - 获取用户信息
 const frontendGetUserInfo = async (ctx) => {

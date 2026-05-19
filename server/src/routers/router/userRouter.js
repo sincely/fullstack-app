@@ -4,7 +4,7 @@ import User from '../../controllers/userController.js'
 import { validateBody, validateQuery } from '../../middleware/validationMiddleware.js'
 import authMiddleware from '../../middleware/authenticate.js'
 import { errorControllerWrapper } from '../../utils/errorHandler.js'
-import { LoginBodySchema, FindUserNameBodySchema, RegisterBodySchema } from '../../schemas/models/userEntitySchema.js'
+import { LoginBodySchema, FindUserNameBodySchema, RegisterBodySchema } from '../../schemas/models/userSchema.js'
 
 // 根路由已在 src/routers/index.js 统一挂载 ApiPrefix，这里不要重复添加 prefix
 const usersRouter = new Router()

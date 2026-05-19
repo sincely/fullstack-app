@@ -9,7 +9,7 @@ import {
   UserDeleteBodySchema,
   UserListQuerySchema,
   UserUpdateBodySchema
-} from '../../schemas/models/adminManageSchema.js'
+} from '../../schemas/models/systemManageSchema.js'
 
 const userManageRouter = new Router()
 

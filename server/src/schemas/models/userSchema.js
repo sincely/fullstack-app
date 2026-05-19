@@ -16,20 +16,6 @@ export const userEntitySchema = z.object({
   updated_at: z.coerce.date()
 })
 
-// 书籍创建参数
-export const CreateBookSchema = z.object({
-  title: z.string().nonempty('Title cannot be empty!'),
-  author: z.string().nonempty('Authro cannot be empty!')
-})
-
-// 书籍更新参数（基于创建参数的可选版本）
-export const UpdateBookSchema = CreateBookSchema.partial()
-
-// 用户与书籍关系结构
-export const userBookSchema = z.object({
-  book_id: z.number().int().nonnegative(),
-  user_id: z.number().int().nonnegative()
-})
 
 // 用户登录请求体（确保 username 必填并返回规范化结构）
 export const LoginBodySchema = z
