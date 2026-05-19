@@ -18,7 +18,7 @@ const { columns, columnChecks, data, loading, getData } = useTable({
   apiFn: fetchGetMenuList,
   apiParams: {
     current: 1,
-    size: 999
+    size: 10
   },
   columns: () => [
     {
