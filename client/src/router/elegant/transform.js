@@ -21,19 +21,19 @@ function transformElegantRouteToVueRoute(route, layouts, views) {
   const FIRST_LEVEL_ROUTE_COMPONENT_SPLIT = '$'
 
   function isLayout(component) {
-    return component.startsWith(LAYOUT_PREFIX)
+    return component?.startsWith(LAYOUT_PREFIX)
   }
 
   function getLayoutName(component) {
-    return component.replace(LAYOUT_PREFIX, '')
+    return component?.replace(LAYOUT_PREFIX, '') || ''
   }
 
   function isView(component) {
-    return component.startsWith(VIEW_PREFIX)
+    return component?.startsWith(VIEW_PREFIX)
   }
 
   function getViewName(component) {
-    return component.replace(VIEW_PREFIX, '')
+    return component?.replace(VIEW_PREFIX, '') || ''
   }
 
   function isFirstLevelRoute(item) {
@@ -71,7 +71,7 @@ function transformElegantRouteToVueRoute(route, layouts, views) {
   if (component) {
     if (isSingleLevelRoute(route)) {
       const { layout, view } = getSingleLevelRouteComponent(component)
-
+      // 单级路由会被展开为“布局路由 + 默认子路由”的结构。
       const singleLevelRoute = {
         path,
         component: layouts[layout],
