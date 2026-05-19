@@ -342,7 +342,7 @@ const updateMenu = async (ctx) => {
 
   for (const [bodyKey, colKey] of Object.entries(fieldMap)) {
     if (body[bodyKey] !== undefined) {
-      payload[colKey] = bodyKey === 'status' ? toDbStatus(body[bodyKey]) : body[bodyKey] ?? null
+      payload[colKey] = bodyKey === 'status' ? toDbStatus(body[bodyKey]) : (body[bodyKey] ?? null)
     }
   }
 

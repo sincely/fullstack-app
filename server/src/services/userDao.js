@@ -62,9 +62,7 @@ const listUsers = async ({ keyword, status, gender, roleId, page, pageSize }) =>
     queryParams.push(Number(roleId))
   }
 
-  const finalWhereSql = [whereSql.replace(/^where\s+/i, ''), ...extraWhere]
-    .filter(Boolean)
-    .join(' and ')
+  const finalWhereSql = [whereSql.replace(/^where\s+/i, ''), ...extraWhere].filter(Boolean).join(' and ')
 
   const sql = `
     select
@@ -95,9 +93,7 @@ const countUsers = async ({ keyword, status, gender, roleId }) => {
     queryParams.push(Number(roleId))
   }
 
-  const finalWhereSql = [whereSql.replace(/^where\s+/i, ''), ...extraWhere]
-    .filter(Boolean)
-    .join(' and ')
+  const finalWhereSql = [whereSql.replace(/^where\s+/i, ''), ...extraWhere].filter(Boolean).join(' and ')
 
   const sql = `
     select count(*) as total
@@ -151,7 +147,20 @@ const findUserByIdCard = async (idCard) => {
  * @param {object} payload
  * @returns {Promise<any>}
  */
-const createUser = async ({ username, nickName, gender, age, phone, idCard, email, address, status, avatar, roleIds, passwordHash }) => {
+const createUser = async ({
+  username,
+  nickName,
+  gender,
+  age,
+  phone,
+  idCard,
+  email,
+  address,
+  status,
+  avatar,
+  roleIds,
+  passwordHash
+}) => {
   const connection = await getConnection()
   try {
     await connection.beginTransaction()
@@ -159,7 +168,19 @@ const createUser = async ({ username, nickName, gender, age, phone, idCard, emai
     const [userResult] = await connection.execute(
       `insert into Users (username, nickName, gender, age, phone, idCard, email, address, status, avatar, password)
        values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [username, nickName ?? null, gender ?? 'other', age ?? null, phone ?? null, idCard, email, address ?? null, status ?? 1, avatar ?? null, passwordHash]
+      [
+        username,
+        nickName ?? null,
+        gender ?? 'other',
+        age ?? null,
+        phone ?? null,
+        idCard,
+        email,
+        address ?? null,
+        status ?? 1,
+        avatar ?? null,
+        passwordHash
+      ]
     )
 
     const userId = userResult.insertId

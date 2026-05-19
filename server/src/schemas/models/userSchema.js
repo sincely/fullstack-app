@@ -16,7 +16,6 @@ export const userEntitySchema = z.object({
   updated_at: z.coerce.date()
 })
 
-
 // 用户登录请求体（确保 username 必填并返回规范化结构）
 export const LoginBodySchema = z
   .object({

@@ -245,7 +245,13 @@ const replaceMenuButtons = async (routeId, routeName, buttons = [], connection) 
 
     if (safeButtons.length > 0) {
       const valuesSql = safeButtons.map(() => '(?, ?, ?, ?, ?, 1)').join(', ')
-      const values = safeButtons.flatMap((item) => [routeId, routeName, item.buttonName, item.buttonLabel, item.orderNum])
+      const values = safeButtons.flatMap((item) => [
+        routeId,
+        routeName,
+        item.buttonName,
+        item.buttonLabel,
+        item.orderNum
+      ])
       await executor.execute(
         `
           insert into ButtonAuth (routeId, routeName, buttonName, buttonLabel, orderNum, status)

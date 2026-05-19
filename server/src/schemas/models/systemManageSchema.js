@@ -89,25 +89,29 @@ export const RoleCreateBodySchema = z.object({
 })
 
 // 更新角色请求体
-export const RoleUpdateBodySchema = z.object({
-  roleId: z.coerce.number().int().positive().optional(),
-  id: z.coerce.number().int().positive().optional(),
-  roleName: z.string().min(2, '角色名至少 2 位').max(50, '角色名最长 50 位'),
-  roleCode: z.string().min(2, '角色编码至少 2 位').max(50, '角色编码最长 50 位'),
-  roleDesc: z.string().max(255, '角色描述最长 255 位').optional().default(''),
-  status: adminStatusEnum.default('1'),
-  routeIds: z.array(z.coerce.number().int().positive()).default([])
-}).refine((data) => Boolean(data.roleId || data.id), {
-  message: '角色ID不能为空'
-})
+export const RoleUpdateBodySchema = z
+  .object({
+    roleId: z.coerce.number().int().positive().optional(),
+    id: z.coerce.number().int().positive().optional(),
+    roleName: z.string().min(2, '角色名至少 2 位').max(50, '角色名最长 50 位'),
+    roleCode: z.string().min(2, '角色编码至少 2 位').max(50, '角色编码最长 50 位'),
+    roleDesc: z.string().max(255, '角色描述最长 255 位').optional().default(''),
+    status: adminStatusEnum.default('1'),
+    routeIds: z.array(z.coerce.number().int().positive()).default([])
+  })
+  .refine((data) => Boolean(data.roleId || data.id), {
+    message: '角色ID不能为空'
+  })
 
 // 删除角色请求体
-export const RoleDeleteBodySchema = z.object({
-  roleId: z.coerce.number().int().positive().optional(),
-  id: z.coerce.number().int().positive().optional()
-}).refine((data) => Boolean(data.roleId || data.id), {
-  message: '角色ID不能为空'
-})
+export const RoleDeleteBodySchema = z
+  .object({
+    roleId: z.coerce.number().int().positive().optional(),
+    id: z.coerce.number().int().positive().optional()
+  })
+  .refine((data) => Boolean(data.roleId || data.id), {
+    message: '角色ID不能为空'
+  })
 
 // 菜单列表查询参数（前端兼容：current/size 与 page/pageSize 都支持）
 export const MenuListQuerySchema = z.object({
@@ -183,9 +187,11 @@ export const MenuUpdateBodySchema = z
   })
 
 // 删除菜单请求体
-export const MenuDeleteBodySchema = z.object({
-  id: z.coerce.number().int().positive().optional(),
-  ids: z.array(z.coerce.number().int().positive()).optional()
-}).refine((data) => Boolean(data.id || (data.ids && data.ids.length > 0)), {
-  message: '至少提供一个菜单ID'
-})
+export const MenuDeleteBodySchema = z
+  .object({
+    id: z.coerce.number().int().positive().optional(),
+    ids: z.array(z.coerce.number().int().positive()).optional()
+  })
+  .refine((data) => Boolean(data.id || (data.ids && data.ids.length > 0)), {
+    message: '至少提供一个菜单ID'
+  })

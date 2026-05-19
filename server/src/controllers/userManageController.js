@@ -93,7 +93,20 @@ const formatUserRow = (row) => {
  */
 const listUsers = async (ctx) => {
   // 前端兼容：current/size 转换为 page/pageSize
-  const { current, size, page, pageSize, keyword, status, roleId, userName, nickName, userEmail, userPhone, userGender } = ctx.query
+  const {
+    current,
+    size,
+    page,
+    pageSize,
+    keyword,
+    status,
+    roleId,
+    userName,
+    nickName,
+    userEmail,
+    userPhone,
+    userGender
+  } = ctx.query
   const actualPage = Number(page || current || 1)
   const actualPageSize = Number(pageSize || size || 10)
   const normalizedKeyword = keyword || userName || nickName || userEmail || userPhone || ''

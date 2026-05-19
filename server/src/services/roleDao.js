@@ -173,13 +173,10 @@ const updateRoleWithRoutes = async ({ roleId, roleName, roleCode, description, s
   const connection = await getConnection()
   try {
     await connection.beginTransaction()
-    await connection.execute('update Roles set roleName = ?, roleCode = ?, description = ?, status = ? where roleId = ?', [
-      roleName,
-      roleCode || buildRoleCode(roleName),
-      description,
-      Number(status ?? 1),
-      roleId
-    ])
+    await connection.execute(
+      'update Roles set roleName = ?, roleCode = ?, description = ?, status = ? where roleId = ?',
+      [roleName, roleCode || buildRoleCode(roleName), description, Number(status ?? 1), roleId]
+    )
     await connection.execute('delete from RoleRoute where roleId = ?', [roleId])
 
     if (routeIds.length > 0) {

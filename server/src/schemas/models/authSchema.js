@@ -5,7 +5,6 @@ const usernameRule = /^[a-zA-Z][a-zA-Z0-9_]{4,15}$/
 // 管理端密码规则：6-20 位，允许常见特殊字符
 const passwordRule = /^[a-zA-Z0-9_!@#$%^&*().,\-+=]{6,20}$/
 
-
 // 前端兼容登录请求体校验（接受 userName 参数）
 export const loginBodySchema = z.object({
   userName: z.string().min(1, '用户名不能为空'),
