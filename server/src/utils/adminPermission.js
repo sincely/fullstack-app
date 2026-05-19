@@ -10,7 +10,6 @@ const normalizeMenu = (menu) => {
     title: menu.menuName,
     ...(menu.icon ? { icon: menu.icon } : {}),
     ...(menu.orderNum ? { order: menu.orderNum } : {}),
-    ...(menu.i18nKey ? { i18nKey: menu.i18nKey } : {}),
     ...(menu.hideInMenu ? { hideInMenu: Boolean(menu.hideInMenu) } : {}),
     ...(menu.activeMenu ? { activeMenu: menu.activeMenu } : {}),
     ...(menu.multiTab ? { multiTab: Boolean(menu.multiTab) } : {}),

@@ -37,7 +37,6 @@ const toMenuPayload = (body) => {
     orderNum: body.orderNum ?? 0,
     icon: body.icon ?? null,
     iconType: body.iconType ?? 1,
-    i18nKey: body.i18nKey ?? null,
     hideInMenu: body.hideInMenu ? 1 : 0,
     activeMenu: body.activeMenu ?? null,
     multiTab: body.multiTab ? 1 : 0,
@@ -70,7 +69,6 @@ const formatMenuRow = (row, buttonMap = new Map()) => {
     icon: row.icon,
     iconType: String(row.iconType),
     buttons: buttonMap.get(row.id) || [],
-    ...(row.i18nKey ? { i18nKey: row.i18nKey } : {}),
     ...(row.hideInMenu ? { hideInMenu: Boolean(row.hideInMenu) } : {}),
     ...(row.activeMenu ? { activeMenu: row.activeMenu } : {}),
     ...(row.multiTab ? { multiTab: Boolean(row.multiTab) } : {}),
@@ -211,7 +209,6 @@ const getMenuTree = async (ctx) => {
  * @body {integer} [orderNum=0] - 排序序号
  * @body {string} [icon] - 菜单图标
  * @body {integer} [iconType=1] - 图标类型
- * @body {string} [i18nKey] - 国际化key
  * @body {boolean} [hideInMenu=false] - 是否隐藏
  * @body {string} [activeMenu] - 激活菜单路由名
  * @body {boolean} [multiTab=false] - 是否多标签页
@@ -273,7 +270,6 @@ const createMenu = async (ctx) => {
  * @body {integer} [orderNum] - 排序序号
  * @body {string} [icon] - 菜单图标
  * @body {integer} [iconType] - 图标类型
- * @body {string} [i18nKey] - 国际化key
  * @body {boolean} [hideInMenu] - 是否隐藏
  * @body {string} [activeMenu] - 激活菜单路由名
  * @body {boolean} [multiTab] - 是否多标签页
@@ -339,7 +335,6 @@ const updateMenu = async (ctx) => {
     orderNum: 'orderNum',
     icon: 'icon',
     iconType: 'iconType',
-    i18nKey: 'i18nKey',
     activeMenu: 'activeMenu',
     status: 'status',
     parentId: 'parentId'

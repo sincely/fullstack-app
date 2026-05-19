@@ -5,7 +5,7 @@ import { getConnection, query } from '../utils/db.js'
  */
 const MENU_COLUMNS = `
   id, parentId, menuType, menuName, routeName, routePath,
-  component, redirect, orderNum, icon, iconType, i18nKey,
+  component, redirect, orderNum, icon, iconType,
   hideInMenu, activeMenu, multiTab, keepAlive,
   status, createBy, createTime, updateBy, updateTime
 `
@@ -71,7 +71,7 @@ const createMenu = async (payload) => {
   const sql = `
     insert into RouteAuth (
       parentId, menuType, menuName, routeName, routePath,
-      component, redirect, orderNum, icon, iconType, i18nKey,
+      component, redirect, orderNum, icon, iconType,
       hideInMenu, activeMenu, multiTab, keepAlive, status
     ) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `
@@ -87,7 +87,6 @@ const createMenu = async (payload) => {
     payload.orderNum ?? 0,
     payload.icon ?? null,
     payload.iconType ?? 1,
-    payload.i18nKey ?? null,
     payload.hideInMenu ? 1 : 0,
     payload.activeMenu ?? null,
     payload.multiTab ? 1 : 0,

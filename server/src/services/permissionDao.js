@@ -5,7 +5,7 @@ import { getConnection, query } from '../utils/db.js'
  */
 const MENU_COLUMNS = `
   ra.id, ra.parentId, ra.menuType, ra.menuName, ra.routeName, ra.routePath,
-  ra.component, ra.redirect, ra.orderNum, ra.icon, ra.iconType, ra.i18nKey,
+  ra.component, ra.redirect, ra.orderNum, ra.icon, ra.iconType,
   ra.hideInMenu, ra.activeMenu, ra.multiTab, ra.keepAlive,
   ra.status, ra.createBy, ra.createTime, ra.updateBy, ra.updateTime
 `
