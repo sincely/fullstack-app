@@ -17,6 +17,8 @@ import loggerMiddleware from './middleware/logger.js'
 import error from './middleware/error.js'
 import rewriteUrl from './middleware/rewriteUrl.js'
 import compress from './middleware/compress.js'
+import { securityHeaders } from './middleware/securityHeaders.js'
+import { rateLimiter } from './middleware/rateLimiter.js'
 
 // 路由
 import Routers from './routers/index.js'
@@ -32,6 +34,12 @@ app.use(requestId)
 
 // HTTP请求日志中间件
 app.use(loggerMiddleware)
+
+// 安全响应头（设置各种 HTTP 安全头）
+app.use(securityHeaders)
+
+// 速率限制（防止暴力攻击和频繁请求）
+app.use(rateLimiter)
 
 // 异常处理中间件
 app.use(error)
