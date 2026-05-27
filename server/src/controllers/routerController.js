@@ -64,7 +64,7 @@ const getConstantRoutes = (ctx) => {
         }
       }
     ],
-    msg: 'ok'
+    msg: '请求成功'
   }
 }
 
@@ -86,7 +86,7 @@ const getUserRoutes = async (ctx) => {
       routes: routeTree,
       home: 'home'
     },
-    msg: 'ok'
+    msg: '请求成功'
   }
 }
 
@@ -100,7 +100,7 @@ const isRouteExist = async (ctx) => {
   ctx.body = {
     code: businessCode.success,
     data: !!menu,
-    msg: 'ok'
+    msg: '请求成功'
   }
 }
 

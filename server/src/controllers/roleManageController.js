@@ -219,7 +219,7 @@ const getRoleRouteIds = async (ctx) => {
   ctx.status = httpCode.ok
   ctx.body = {
     code: businessCode.success,
-    msg: 'ok',
+    msg: '请求成功',
     data: routeIds
   }
 }
@@ -259,7 +259,7 @@ const getRoleButtonIds = async (ctx) => {
   ctx.status = httpCode.ok
   ctx.body = {
     code: businessCode.success,
-    msg: 'ok',
+    msg: '请求成功',
     data: buttonIds
   }
 }
@@ -284,7 +284,7 @@ const getAllButtons = async (ctx) => {
   ctx.status = httpCode.ok
   ctx.body = {
     code: businessCode.success,
-    msg: 'ok',
+    msg: '请求成功',
     data: buttons
   }
 }

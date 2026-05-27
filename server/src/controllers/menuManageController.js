@@ -424,7 +424,7 @@ const getAllPages = async (ctx) => {
   ctx.status = httpCode.ok
   ctx.body = {
     code: businessCode.success,
-    msg: 'ok',
+    msg: '请求成功',
     data: pages
   }
 }
