@@ -1,4 +1,4 @@
-import { z } from 'zod'
+ import { z } from 'zod'
 
 // 用户状态枚举（前端兼容 1=启用 2=禁用；数据库层再转换为 1/0）
 const userStatusEnum = z.enum(['1', '2'])
@@ -65,6 +65,22 @@ export const UserUpdateBodySchema = z
 
 // 删除用户请求体
 export const UserDeleteBodySchema = z.object({
+  id: z.coerce.number().int().positive()
+})
+
+// 批量删除用户请求体
+export const UserBatchDeleteBodySchema = z.object({
+  ids: z.array(z.coerce.number().int().positive()).min(1, '至少选择一个用户')
+})
+
+// 更新用户状态请求体
+export const UserStatusUpdateBodySchema = z.object({
+  id: z.coerce.number().int().positive(),
+  status: userStatusEnum
+})
+
+// 重置用户密码请求体
+export const UserPasswordResetBodySchema = z.object({
   id: z.coerce.number().int().positive()
 })
 

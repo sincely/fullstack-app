@@ -8,7 +8,10 @@ import {
   UserCreateBodySchema,
   UserDeleteBodySchema,
   UserListQuerySchema,
-  UserUpdateBodySchema
+  UserUpdateBodySchema,
+  UserBatchDeleteBodySchema,
+  UserStatusUpdateBodySchema,
+  UserPasswordResetBodySchema
 } from '../../schemas/models/systemManageSchema.js'
 
 const userManageRouter = new Router()
@@ -45,6 +48,30 @@ userManageRouter.post(
   ...useAccountManagePermission,
   validateBody(UserDeleteBodySchema),
   errorControllerWrapper(UserManageController.deleteUser)
+)
+
+// 批量删除用户
+userManageRouter.post(
+  '/systemManage/batchDeleteUser',
+  ...useAccountManagePermission,
+  validateBody(UserBatchDeleteBodySchema),
+  errorControllerWrapper(UserManageController.batchDeleteUsers)
+)
+
+// 更新用户状态
+userManageRouter.post(
+  '/systemManage/updateUserStatus',
+  ...useAccountManagePermission,
+  validateBody(UserStatusUpdateBodySchema),
+  errorControllerWrapper(UserManageController.updateUserStatus)
+)
+
+// 重置用户密码
+userManageRouter.post(
+  '/systemManage/resetUserPassword',
+  ...useAccountManagePermission,
+  validateBody(UserPasswordResetBodySchema),
+  errorControllerWrapper(UserManageController.resetUserPassword)
 )
 
 export default userManageRouter

@@ -1,9 +1,15 @@
 <script setup lang="jsx">
-import { Button, Popconfirm, Tag } from 'ant-design-vue'
+import { Button, Popconfirm, Switch, Tag, message } from 'ant-design-vue'
 
 import { enableStatusRecord, userGenderRecord } from '@/constants/business'
 import { useTable, useTableOperate, useTableScroll } from '@/hooks/common/table'
-import { fetchDeleteUser, fetchGetUserList } from '@/service/api'
+import {
+  fetchBatchDeleteUser,
+  fetchDeleteUser,
+  fetchGetUserList,
+  fetchResetUserPassword,
+  fetchUpdateUserStatus
+} from '@/service/api'
 
 import UserOperateDrawer from './modules/user-operate-drawer.vue'
 import UserSearch from './modules/user-search.vue'
@@ -102,25 +108,28 @@ const {
           return null
         }
 
-        const tagMap = {
-          1: 'success',
-          2: 'warning'
-        }
-
-        const label = enableStatusRecord[record.status]
-
-        return <Tag color={tagMap[record.status]}>{label}</Tag>
+        return (
+          <Switch
+            checked={record.status === '1'}
+            checkedChildren="启用"
+            unCheckedChildren="禁用"
+            onChange={(checked) => handleStatusChange(record, checked)}
+          />
+        )
       }
     },
     {
       key: 'operate',
       title: '操作',
       align: 'center',
-      width: 130,
+      width: 200,
       customRender: ({ record }) => (
         <div class="flex-center gap-8px">
           <Button type="primary" ghost size="small" onClick={() => edit(record.id)}>
             {'编辑'}
+          </Button>
+          <Button type="default" size="small" onClick={() => handleResetPassword(record)}>
+            {'重置密码'}
           </Button>
           <Popconfirm title={'确认删除吗？'} onConfirm={() => handleDelete(record.id)}>
             <Button danger size="small">
@@ -146,9 +155,8 @@ const {
 } = useTableOperate(data, getData)
 
 async function handleBatchDelete() {
-  const deleteTasks = checkedRowKeys.value.map((id) => fetchDeleteUser({ id }))
-  const results = await Promise.all(deleteTasks)
-  if (results.every((item) => !item.error)) {
+  const { error } = await fetchBatchDeleteUser({ ids: checkedRowKeys.value })
+  if (!error) {
     onBatchDeleted()
   }
 }
@@ -157,6 +165,22 @@ async function handleDelete(id) {
   const { error } = await fetchDeleteUser({ id })
   if (!error) {
     onDeleted()
+  }
+}
+
+async function handleStatusChange(record, checked) {
+  const newStatus = checked ? '1' : '2'
+  const { error } = await fetchUpdateUserStatus({ id: record.id, status: newStatus })
+  if (!error) {
+    message.success('状态更新成功')
+    getData()
+  }
+}
+
+async function handleResetPassword(record) {
+  const { error, data } = await fetchResetUserPassword({ id: record.id })
+  if (!error) {
+    message.success(data?.msg || '密码重置成功')
   }
 }
 

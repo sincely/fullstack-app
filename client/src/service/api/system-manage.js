@@ -193,6 +193,48 @@ export function fetchDeleteUser(data) {
 }
 
 /**
+ * 批量删除用户
+ * @description 批量删除用户
+ * @param {Record<string, any>} data 请求体 {ids: number[]}
+ * @returns {Promise<any>} 请求结果
+ */
+export function fetchBatchDeleteUser(data) {
+  return request({
+    url: '/systemManage/batchDeleteUser',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 更新用户状态
+ * @description 更新用户状态(启用/禁用)
+ * @param {Record<string, any>} data 请求体 {id: number, status: string}
+ * @returns {Promise<any>} 请求结果
+ */
+export function fetchUpdateUserStatus(data) {
+  return request({
+    url: '/systemManage/updateUserStatus',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 重置用户密码
+ * @description 重置用户密码为默认密码 123456
+ * @param {Record<string, any>} data 请求体 {id: number}
+ * @returns {Promise<any>} 请求结果
+ */
+export function fetchResetUserPassword(data) {
+  return request({
+    url: '/systemManage/resetUserPassword',
+    method: 'post',
+    data
+  })
+}
+
+/**
  * 获取菜单列表
  * @description 获取菜单列表（旧版本）
  * @deprecated 将在下个版本 1.1.0 移除

@@ -32,7 +32,8 @@ export const businessCode = {
   menuNameExist: 40017, // 菜单名称已存在
   menuHasChildren: 40018, // 菜单存在子节点
   userDeleteSelfDenied: 40019, // 不能删除自己
-  idCardExist: 40020 // 身份证号已存在
+  idCardExist: 40020, // 身份证号已存在
+  userDisableSelfDenied: 40021 // 不能禁用自己
 }
 
 export const businessMsg = {
@@ -58,5 +59,6 @@ export const businessMsg = {
   [businessCode.menuNameExist]: '菜单名称已存在',
   [businessCode.menuHasChildren]: '当前菜单存在子菜单，无法删除',
   [businessCode.userDeleteSelfDenied]: '不能删除当前登录账号',
-  [businessCode.idCardExist]: '身份证号已存在'
+  [businessCode.idCardExist]: '身份证号已存在',
+  [businessCode.userDisableSelfDenied]: '不能禁用当前登录账号'
 }

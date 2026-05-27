@@ -328,9 +328,119 @@ const deleteUser = async (ctx) => {
   }
 }
 
+/**
+ * 批量删除用户
+ * @api POST /admin/systemManage/batchDeleteUser
+ * @description 批量删除用户
+ * @body {integer[]} ids - 用户 ID 数组
+ */
+const batchDeleteUsers = async (ctx) => {
+  const { ids } = ctx.request.body
+
+  // 检查是否包含当前登录用户
+  if (ids.includes(ctx.state.user.userId)) {
+    ctx.status = httpCode.ok
+    ctx.body = {
+      code: businessCode.userDeleteSelfDenied,
+      msg: businessMsg[businessCode.userDeleteSelfDenied]
+    }
+    return
+  }
+
+  // 验证所有用户是否存在
+  const userPromises = ids.map((id) => adminUserDao.findUserById(id))
+  const users = await Promise.all(userPromises)
+  const notFoundIds = ids.filter((id, index) => !users[index])
+
+  if (notFoundIds.length > 0) {
+    ctx.status = httpCode.ok
+    ctx.body = {
+      code: businessCode.userNotFound,
+      msg: `以下用户不存在: ${notFoundIds.join(', ')}`
+    }
+    return
+  }
+
+  // 批量删除
+  const deletePromises = ids.map((id) => adminUserDao.deleteUser(id))
+  await Promise.all(deletePromises)
+
+  ctx.status = httpCode.ok
+  ctx.body = {
+    code: businessCode.success,
+    msg: `成功删除 ${ids.length} 个用户`
+  }
+}
+
+/**
+ * 更新用户状态
+ * @api POST /admin/systemManage/updateUserStatus
+ * @description 更新用户状态(启用/禁用)
+ * @body {integer} id - 用户 ID
+ * @body {string} status - 用户状态(1=启用 2=禁用)
+ */
+const updateUserStatus = async (ctx) => {
+  const { id, status } = ctx.request.body
+
+  // 不允许禁用自己
+  if (ctx.state.user.userId === id && status === '2') {
+    ctx.status = httpCode.ok
+    ctx.body = {
+      code: businessCode.userDisableSelfDenied,
+      msg: '不能禁用当前登录的账号'
+    }
+    return
+  }
+
+  const currentUser = await adminUserDao.findUserById(id)
+  if (!currentUser) {
+    ctx.status = httpCode.ok
+    ctx.body = { code: businessCode.userNotFound, msg: businessMsg[businessCode.userNotFound] }
+    return
+  }
+
+  await adminUserDao.updateUser(id, { status: toDbStatus(status) })
+
+  ctx.status = httpCode.ok
+  ctx.body = {
+    code: businessCode.success,
+    msg: '更新用户状态成功'
+  }
+}
+
+/**
+ * 重置用户密码
+ * @api POST /admin/systemManage/resetUserPassword
+ * @description 重置用户密码为默认密码 123456
+ * @body {integer} id - 用户 ID
+ */
+const resetUserPassword = async (ctx) => {
+  const { id } = ctx.request.body
+
+  const currentUser = await adminUserDao.findUserById(id)
+  if (!currentUser) {
+    ctx.status = httpCode.ok
+    ctx.body = { code: businessCode.userNotFound, msg: businessMsg[businessCode.userNotFound] }
+    return
+  }
+
+  const defaultPassword = '123456'
+  const passwordHash = await hashPassword(defaultPassword)
+  await adminUserDao.updateUser(id, { password: passwordHash })
+
+  ctx.status = httpCode.ok
+  ctx.body = {
+    code: businessCode.success,
+    msg: '密码重置成功，默认密码: 123456'
+  }
+}
+
 export default {
   listUsers,
   createUser,
   updateUser,
-  deleteUser
+  deleteUser,
+  batchDeleteUsers,
+  updateUserStatus,
+  resetUserPassword
 }
