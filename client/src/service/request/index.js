@@ -17,10 +17,10 @@ const parseCodeList = (rawValue) =>
 
 export const request = createFlatRequest(
   {
-    baseURL,
-    headers: {
-      apifoxToken: 'XL299LiMEDZ0H5h3A29PxwQXdMJqWyY2'
-    }
+    baseURL
+    // headers: {
+    //   apifoxToken: 'XL299LiMEDZ0H5h3A29PxwQXdMJqWyY2'
+    // }
   },
   {
     async onRequest(config) {
@@ -34,6 +34,7 @@ export const request = createFlatRequest(
       return config
     },
     isBackendSuccess(response) {
+      console.log('response', response)
       // 后端响应码命中 `VITE_SERVICE_SUCCESS_CODE` 时视为请求成功
       // 如需自定义成功判定，可修改 `.env` 中的 `VITE_SERVICE_SUCCESS_CODE`
       const backendCode = toCodeString(response.data.code)
@@ -105,6 +106,7 @@ export const request = createFlatRequest(
       // 请求失败时统一错误提示
 
       let { message } = error
+      console.log('error', error)
       let backendErrorCode = ''
 
       // 提取后端返回的错误信息与错误码

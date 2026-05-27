@@ -1,4 +1,5 @@
 import logger from '../config/logger.js'
+import { httpCode } from '../config/httpError.js'
 import { createErrorResponse, createFailResponse } from './createResponse.js'
 
 /**
@@ -37,15 +38,15 @@ export const errorControllerWrapper = (controller) => {
       if (isHttpError(err)) {
         // HTTP 业务异常（4xx）：warn 级别，不需要完整堆栈
         const status = err.status ?? err.statusCode
-        ctx.status = status
-        ctx.body = createFailResponse(err.message || 'Request failed', ctx.status)
+        ctx.status = httpCode.ok
+        ctx.body = createFailResponse(status, err.message || 'Request failed')
         logger.warn({ err, status, ...requestInfo }, `HTTP ${status}: ${err.message}`)
         return
       }
 
       // 非预期异常（5xx）：error 级别，记录完整堆栈方便定位崩溃位置
-      ctx.status = 500
-      ctx.body = createErrorResponse('Something went wrong', ctx.status, {}, err)
+      ctx.status = httpCode.ok
+      ctx.body = createErrorResponse(500, 'Something went wrong', null, err)
       logger.error({ err, status: 500, ...requestInfo }, `Unhandled error: ${err.message || 'Unknown error'}`)
     }
   }

@@ -6,16 +6,16 @@ async function authenticate(ctx, next) {
   const authorization = ctx.headers.authorization
 
   if (!authorization) {
-    ctx.status = 401
-    ctx.body = createErrorResponse('未登录或登录已过期', 401)
+    ctx.status = 200
+    ctx.body = createErrorResponse(401, '未登录或登录已过期')
     return
   }
 
   // 校验 Token 格式 (Bearer <token>)
   const token = authorization.toLowerCase().startsWith('bearer ') ? authorization.slice(7) : undefined
   if (!token) {
-    ctx.status = 401
-    ctx.body = createErrorResponse('Token 格式错误，应为 Bearer <token>', 401)
+    ctx.status = 200
+    ctx.body = createErrorResponse(401, 'Token 格式错误，应为 Bearer <token>')
     return
   }
 
@@ -24,10 +24,8 @@ async function authenticate(ctx, next) {
   try {
     decoded = verifyToken(token)
   } catch (err) {
-    ctx.status = 401
-    ctx.body = createErrorResponse(err.message, 401)
-    // 把 code 也透传给前端（TOKEN_EXPIRED / TOKEN_INVALID）
-    ctx.body.code = err.code
+    ctx.status = 200
+    ctx.body = createErrorResponse(err.code || 401, err.message)
     return
   }
 

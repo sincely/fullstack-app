@@ -50,7 +50,8 @@ function createCommonRequest(axiosConfig, options) {
 
   instance.interceptors.response.use(
     async (response) => {
-      // 先按业务定义判断“后端是否成功”。
+      // HTTP 2xx 才会进这里
+      // 先判断按业务定义判断“后端是否成功”。
       // 注意：这一步与 HTTP 2xx 成功不同，它是后端业务码维度的成功判断。
       if (opts.isBackendSuccess(response)) {
         return Promise.resolve(response)
@@ -59,6 +60,7 @@ function createCommonRequest(axiosConfig, options) {
       // 后端失败时先走 onBackendFail，允许外部兜底处理并返回可用结果。
       // 例如：刷新 token 后重放请求、弹窗后返回默认值等。
       const fail = await opts.onBackendFail(response, instance)
+      console.log('fail', fail)
       if (fail) {
         return fail
       }
@@ -78,7 +80,7 @@ function createCommonRequest(axiosConfig, options) {
       return Promise.reject(backendError)
     },
     async (error) => {
-      // 处理网络错误、超时、取消等异常。
+      // HTTP 非 2xx（401, 403, 500, 网络错误等）直接进这里处理网络错误、超时、取消等异常。
       await opts.onError(error)
 
       return Promise.reject(error)
