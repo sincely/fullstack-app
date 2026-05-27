@@ -37,6 +37,14 @@ export function fetchRefreshToken(refreshToken) {
   })
 }
 
+/** 退出登录 */
+export function fetchLogout() {
+  return request({
+    url: '/user/auth/logout',
+    method: 'post'
+  })
+}
+
 /**
  * 返回自定义后端错误
  *

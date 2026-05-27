@@ -94,6 +94,9 @@ const frontendLogin = async (ctx) => {
   const token = generateToken(payload)
   const refreshToken = generateRefreshToken(payload)
 
+  // 将当前 Refresh Token 写入用户表，实现单设备登录控制
+  await authDao.updateUserRefreshToken(user.id, refreshToken)
+
   ctx.status = httpCode.ok
   ctx.body = {
     code: businessCode.success,
@@ -143,7 +146,7 @@ adminRouter.get('/user/getUserInfo', authenticate, errorControllerWrapper(fronte
 // 前端兼容接口 - 刷新 token
 adminRouter.post(
   '/user/auth/refreshToken',
-  errorControllerWrapper((ctx) => {
+  errorControllerWrapper(async (ctx) => {
     const { refreshToken } = ctx.request.body
 
     // 检查是否提供了refreshToken
@@ -160,6 +163,17 @@ adminRouter.post(
       // 验证refreshToken是否有效
       const decoded = verifyRefreshToken(refreshToken)
 
+      // 单设备登录控制：校验用户表中的 currentRefreshToken 是否匹配
+      const currentRefreshToken = await authDao.getUserRefreshToken(decoded.userId)
+      if (currentRefreshToken !== refreshToken) {
+        ctx.status = httpCode.ok
+        ctx.body = {
+          code: businessCode.accountKicked,
+          msg: businessMsg[businessCode.accountKicked]
+        }
+        return
+      }
+
       const payload = {
         userId: decoded.userId,
         username: decoded.username,
@@ -171,9 +185,12 @@ adminRouter.post(
         roleNames: decoded.roleNames
       }
 
-      // 生成新的token和refreshToken
+      // 生成新的token和refreshToken（轮换 Refresh Token）
       const newToken = generateToken(payload)
       const newRefreshToken = generateRefreshToken(payload)
+
+      // 更新用户表中的 currentRefreshToken
+      await authDao.updateUserRefreshToken(decoded.userId, newRefreshToken)
 
       ctx.status = httpCode.ok
       ctx.body = {
@@ -188,9 +205,26 @@ adminRouter.post(
       // 如果refreshToken过期或无效，返回登出类错误码，避免前端无限重试
       ctx.status = httpCode.ok
       ctx.body = {
-        code: businessCode.unAuthorized, // 使用 unAuthorized 而不是 tokenExpired，避免前端再次尝试刷新
-        msg: businessMsg[businessCode.unAuthorized] || 'Token 已过期，请重新登录'
+        code: businessCode.accountKicked, // 统一返回 1002，确保旧设备被踢出
+        msg: businessMsg[businessCode.accountKicked] || 'Token 已过期，请重新登录'
       }
+    }
+  })
+)
+
+// 登出（清除用户 currentRefreshToken）
+adminRouter.post(
+  '/user/auth/logout',
+  authenticate,
+  errorControllerWrapper(async (ctx) => {
+    const userId = ctx.state.user?.userId
+    if (userId) {
+      await authDao.updateUserRefreshToken(userId, null)
+    }
+    ctx.status = httpCode.ok
+    ctx.body = {
+      code: businessCode.success,
+      msg: '退出成功'
     }
   })
 )

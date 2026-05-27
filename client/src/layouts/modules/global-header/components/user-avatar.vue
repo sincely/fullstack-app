@@ -2,6 +2,7 @@
 import { Modal } from 'ant-design-vue'
 
 import { useRouterPush } from '@/hooks/common/router'
+import { fetchLogout } from '@/service/api'
 import { useAuthStore } from '@/store/modules/auth'
 
 defineOptions({
@@ -15,14 +16,20 @@ function loginOrRegister() {
   toLogin()
 }
 
-function logout() {
+async function logout() {
   Modal.confirm({
     title: '提示',
     content: '确认退出登录吗？',
     okText: '确认',
     cancelText: '取消',
-    onOk: () => {
-      authStore.resetStore()
+    async onOk() {
+      try {
+        await fetchLogout()
+      } catch (error) {
+        console.error('Logout failed:', error)
+      } finally {
+        authStore.resetStore()
+      }
     }
   })
 }

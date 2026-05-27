@@ -66,6 +66,7 @@ CREATE TABLE `Users` (
   `address` varchar(255) DEFAULT NULL COMMENT '地址',
   `avatar` varchar(255) DEFAULT NULL COMMENT '头像地址',
   `password` varchar(255) NOT NULL COMMENT '登录密码（加密后）',
+  `currentRefreshToken` varchar(512) DEFAULT NULL COMMENT '当前有效的 Refresh Token（用于单设备登录控制）',
   `createBy` varchar(50) DEFAULT '' COMMENT '创建人',
   `createTime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `updateBy` varchar(50) DEFAULT '' COMMENT '更新人',

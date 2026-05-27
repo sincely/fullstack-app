@@ -102,6 +102,12 @@ export const request = createFlatRequest(
         }
       }
 
+      // 针对 1002 (accountKicked) 等特殊登出码，即使不在 expiredTokenCodes 中也触发登出
+      if (backendCode === '1002') {
+        handleLogout()
+        return null
+      }
+
       return null
     },
     transformBackendResponse(response) {

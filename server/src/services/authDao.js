@@ -67,6 +67,28 @@ const findAdminUserById = async (userId) => {
 }
 
 /**
+ * 更新用户的 currentRefreshToken。
+ * @param {number} userId
+ * @param {string|null} refreshToken
+ * @returns {Promise<void>}
+ */
+const updateUserRefreshToken = async (userId, refreshToken) => {
+  const sql = 'update Users set currentRefreshToken = ? where id = ?'
+  await query(sql, [refreshToken, userId])
+}
+
+/**
+ * 根据用户 ID 查询当前 Refresh Token。
+ * @param {number} userId
+ * @returns {Promise<string|null>}
+ */
+const getUserRefreshToken = async (userId) => {
+  const sql = 'select currentRefreshToken from Users where id = ? limit 1'
+  const rows = await query(sql, [userId])
+  return rows[0]?.currentRefreshToken || null
+}
+
+/**
  * 根据角色名查询角色信息。
  * @param {string} roleName
  * @returns {Promise<any | null>}
@@ -121,6 +143,8 @@ export default {
   findAdminUserByUsername,
   findAdminUserByEmail,
   findAdminUserById,
+  updateUserRefreshToken,
+  getUserRefreshToken,
   findRoleByName,
   createAdminUser
 }

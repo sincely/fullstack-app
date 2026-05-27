@@ -32,8 +32,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "prettier:fix": "prettier --write .",
-    "lint-staged": "lint-staged",
-    "prepare": "node scripts/prepare.js"
+    "lint-staged": "lint-staged"
   },
   "dependencies": {
     "@koa/bodyparser": "6.1.0",
@@ -42,7 +41,7 @@
     "bcrypt": "6.0.0",
     "bull": "4.16.5",
     "dotenv": "17.2.4",
-    "ioredis": "^5.9.2",
+    "ioredis": "5.10.1",
     "jsonwebtoken": "9.0.3",
     "koa": "3.2.0",
     "koa-compress": "5.1.1",
@@ -59,8 +58,6 @@
     "zod": "4.3.6"
   },
   "devDependencies": {
-    "@commitlint/cli": "17.8.1",
-    "@commitlint/config-conventional": "17.8.1",
     "@eslint/js": "9.39.4",
     "@release-it/conventional-changelog": "10.0.4",
     "conventional-changelog-angular": "8.1.0",
