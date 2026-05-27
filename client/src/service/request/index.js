@@ -41,7 +41,6 @@ export const request = createFlatRequest(
       return backendCode === toCodeString(import.meta.env.VITE_SERVICE_SUCCESS_CODE)
     },
     async onBackendFail(response, instance) {
-      debugger
       const authStore = useAuthStore()
       const backendCode = toCodeString(response.data.code)
 
