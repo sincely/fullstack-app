@@ -1,5 +1,6 @@
 import { verifyToken } from '../utils/jwt.js'
 import { createErrorResponse } from '../utils/createResponse.js'
+import { businessCode } from '../config/businessCode.js'
 
 async function authenticate(ctx, next) {
   // 从请求头获取 Token
@@ -7,7 +8,7 @@ async function authenticate(ctx, next) {
 
   if (!authorization) {
     ctx.status = 200
-    ctx.body = createErrorResponse(401, '未登录或登录已过期')
+    ctx.body = createErrorResponse(businessCode.unAuthorized, '未登录或登录已过期')
     return
   }
 
@@ -15,7 +16,7 @@ async function authenticate(ctx, next) {
   const token = authorization.toLowerCase().startsWith('bearer ') ? authorization.slice(7) : undefined
   if (!token) {
     ctx.status = 200
-    ctx.body = createErrorResponse(401, 'Token 格式错误，应为 Bearer <token>')
+    ctx.body = createErrorResponse(businessCode.unAuthorized, 'Token 格式错误，应为 Bearer <token>')
     return
   }
 
@@ -25,7 +26,7 @@ async function authenticate(ctx, next) {
     decoded = verifyToken(token)
   } catch (err) {
     ctx.status = 200
-    ctx.body = createErrorResponse(err.code || 401, err.message)
+    ctx.body = createErrorResponse(err.code || businessCode.unAuthorized, err.message)
     return
   }
 

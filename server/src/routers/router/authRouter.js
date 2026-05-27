@@ -8,7 +8,7 @@ import { loginBodySchema } from '../../schemas/models/authSchema.js'
 import { httpCode } from '../../config/httpError.js'
 import { businessCode, businessMsg } from '../../config/businessCode.js'
 import { comparePassword } from '../../utils/password.js'
-import { generateToken, verifyToken } from '../../utils/jwt.js'
+import { generateToken, generateRefreshToken, verifyRefreshToken } from '../../utils/jwt.js'
 
 const adminRouter = new Router()
 
@@ -80,7 +80,7 @@ const frontendLogin = async (ctx) => {
     return
   }
 
-  const token = generateToken({
+  const payload = {
     userId: user.id,
     username: user.username,
     roleId: user.roleId,
@@ -89,7 +89,10 @@ const frontendLogin = async (ctx) => {
     roleCodes: parseRoleCodes(user.roleCodes, user.roleCode),
     roleName: user.roleName,
     roleNames: parseRoleNames(user.roleNames, user.roleName)
-  })
+  }
+
+  const token = generateToken(payload)
+  const refreshToken = generateRefreshToken(payload)
 
   ctx.status = httpCode.ok
   ctx.body = {
@@ -97,7 +100,7 @@ const frontendLogin = async (ctx) => {
     msg: '登录成功',
     data: {
       token,
-      refreshToken: token
+      refreshToken
     }
   }
 }
@@ -142,9 +145,22 @@ adminRouter.post(
   '/user/auth/refreshToken',
   errorControllerWrapper((ctx) => {
     const { refreshToken } = ctx.request.body
+
+    // 检查是否提供了refreshToken
+    if (!refreshToken) {
+      ctx.status = httpCode.ok
+      ctx.body = {
+        code: businessCode.paramError,
+        msg: '缺少refreshToken参数'
+      }
+      return
+    }
+
     try {
-      const decoded = verifyToken(refreshToken)
-      const newToken = generateToken({
+      // 验证refreshToken是否有效
+      const decoded = verifyRefreshToken(refreshToken)
+
+      const payload = {
         userId: decoded.userId,
         username: decoded.username,
         roleId: decoded.roleId,
@@ -153,21 +169,27 @@ adminRouter.post(
         roleCodes: decoded.roleCodes,
         roleName: decoded.roleName,
         roleNames: decoded.roleNames
-      })
+      }
+
+      // 生成新的token和refreshToken
+      const newToken = generateToken(payload)
+      const newRefreshToken = generateRefreshToken(payload)
+
       ctx.status = httpCode.ok
       ctx.body = {
         code: businessCode.success,
         msg: '刷新成功',
         data: {
           token: newToken,
-          refreshToken: newToken
+          refreshToken: newRefreshToken
         }
       }
     } catch (err) {
+      // 如果refreshToken过期或无效，返回登出类错误码，避免前端无限重试
       ctx.status = httpCode.ok
       ctx.body = {
-        code: businessCode.unAuthorized,
-        msg: 'Token 已过期，请重新登录'
+        code: businessCode.unAuthorized, // 使用 unAuthorized 而不是 tokenExpired，避免前端再次尝试刷新
+        msg: businessMsg[businessCode.unAuthorized] || 'Token 已过期，请重新登录'
       }
     }
   })

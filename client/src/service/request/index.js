@@ -41,6 +41,7 @@ export const request = createFlatRequest(
       return backendCode === toCodeString(import.meta.env.VITE_SERVICE_SUCCESS_CODE)
     },
     async onBackendFail(response, instance) {
+      debugger
       const authStore = useAuthStore()
       const backendCode = toCodeString(response.data.code)
 
@@ -88,12 +89,17 @@ export const request = createFlatRequest(
       if (expiredTokenCodes.includes(backendCode) && !request.state.isRefreshingToken) {
         request.state.isRefreshingToken = true
 
-        const refreshConfig = await handleRefreshToken(response.config)
+        try {
+          const refreshConfig = await handleRefreshToken(response.config)
 
-        request.state.isRefreshingToken = false
+          request.state.isRefreshingToken = false
 
-        if (refreshConfig) {
-          return instance.request(refreshConfig)
+          if (refreshConfig) {
+            return instance.request(refreshConfig)
+          }
+        } catch (err) {
+          request.state.isRefreshingToken = false
+          console.error('Token refresh failed:', err)
         }
       }
 

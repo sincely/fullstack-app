@@ -11,20 +11,37 @@ export async function handleRefreshToken(axiosConfig) {
   const { resetStore } = useAuthStore()
 
   const refreshToken = localStg.get('refreshToken') || ''
-  const { error, data } = await fetchRefreshToken(refreshToken)
-  if (!error) {
-    localStg.set('token', data.token)
-    localStg.set('refreshToken', data.refreshToken)
 
-    const config = { ...axiosConfig }
-    if (config.headers) {
-      config.headers.Authorization = data.token
-    }
-
-    return config
+  // 如果没有refreshToken，直接重置store并返回null
+  if (!refreshToken) {
+    resetStore()
+    return null
   }
 
-  resetStore()
+  try {
+    const { error, data } = await fetchRefreshToken(refreshToken)
 
-  return null
+    // 如果刷新成功，更新本地存储的token
+    if (!error && data) {
+      localStg.set('token', data.token)
+      localStg.set('refreshToken', data.refreshToken)
+
+      // 更新原始请求的Authorization头
+      const config = { ...axiosConfig }
+      if (config.headers) {
+        config.headers.Authorization = `Bearer ${data.token}`
+      }
+
+      return config
+    }
+
+    // 如果刷新失败，重置store
+    resetStore()
+    return null
+  } catch (err) {
+    // 如果请求过程中发生异常，重置store
+    console.error('Refresh token failed:', err)
+    resetStore()
+    return null
+  }
 }

@@ -31,7 +31,7 @@ export const authorizeRoute = (routePath) => {
 
     if (roleIds.length === 0) {
       ctx.status = httpCode.ok
-      ctx.body = createErrorResponse(401, '未登录或登录已过期')
+      ctx.body = createErrorResponse(businessCode.unAuthorized, '未登录或登录已过期')
       return
     }
 

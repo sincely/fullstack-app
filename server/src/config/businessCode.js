@@ -11,6 +11,9 @@ export const businessCode = {
   error: 500,
   paramError: 400, // 参数错误
 
+  unAuthorized: 401, // 未授权
+  // token失效
+  tokenExpired: 1001, // Token 过期（与前端 VITE_SERVICE_EXPIRED_TOKEN_CODES 保持一致）
   // 用户模块
   userParamMissing: 40001, // 用户名或密码为空
   userNameInvalid: 40002, // 用户名格式错误
@@ -35,6 +38,8 @@ export const businessMsg = {
   [businessCode.success]: '操作成功',
   [businessCode.error]: '操作失败',
   [businessCode.paramError]: '参数错误',
+  [businessCode.unAuthorized]: '未授权',
+  [businessCode.tokenExpired]: 'Token 过期，请重新登录',
   [businessCode.userParamMissing]: '用户名或密码不能为空',
   [businessCode.userNameInvalid]: '用户名不合法(以字母开头，允许5-16字节，允许字母数字下划线)',
   [businessCode.passwordInvalid]: '密码不合法(以字母开头，长度在6~18之间，只能包含字母、数字和下划线)',
