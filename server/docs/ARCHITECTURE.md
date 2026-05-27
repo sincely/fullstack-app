@@ -12,6 +12,7 @@
 | **日志系统** | Pino | 10.x | 高性能 JSON 日志 |
 | **密码加密** | bcryptjs | 2.x | 密码哈希 |
 | **认证** | JWT | 9.x | JSON Web Token (双 Token: Access + Refresh) |
+| **会话控制** | SessionId | - | UUID 会话标识（单设备登录控制） |
 | **权限控制** | RBAC | - | 基于角色的访问控制 |
 | **缓存** | Redis | - | 会话缓存 / 限流 / 任务队列 |
 | **进程管理** | PM2 | - | 生产环境进程管理 |
@@ -347,6 +348,119 @@ sequenceDiagram
     end
 ```
 
+**单设备登录控制（SessionId 方案）**:
+
+**核心原理**: 每次登录生成唯一 sessionId，保存到数据库和 JWT payload，authenticate 中间件验证匹配性。
+
+```javascript
+// 登录时生成 sessionId
+import { randomUUID } from 'crypto'
+
+const sessionId = randomUUID() // 生成 UUID
+const sessionExpire = new Date()
+sessionExpire.setDate(sessionExpire.getDate() + 7) // 7天过期
+
+// JWT payload 包含 sessionId
+const payload = {
+  userId: user.id,
+  username: user.username,
+  sessionId, // 关键：用于单设备控制
+  // ... 其他字段
+}
+
+// 保存到数据库
+await query(`
+  UPDATE Users SET
+    sessionId = ?,
+    currentRefreshToken = ?,
+    loginIp = ?,
+    loginTime = NOW(),
+    sessionExpire = ?
+  WHERE id = ?
+`, [sessionId, refreshToken, loginIp, sessionExpire, user.id])
+```
+
+**authenticate 中间件验证逻辑**:
+
+```javascript
+// middleware/authenticate.js
+const userId = decoded.userId
+const jwtSessionId = decoded.sessionId
+
+if (userId && jwtSessionId) {
+  // 查询数据库中的 sessionId
+  const rows = await query(
+    'SELECT sessionId, sessionExpire FROM Users WHERE id = ? LIMIT 1',
+    [userId]
+  )
+  const dbSessionId = rows[0]?.sessionId
+  const sessionExpire = rows[0]?.sessionExpire
+
+  // 1. 检查会话是否过期
+  if (sessionExpire && Date.now() > new Date(sessionExpire).getTime()) {
+    ctx.body = createErrorResponse(businessCode.accountKicked, '会话已过期，请重新登录')
+    return
+  }
+
+  // 2. 检查 sessionId 是否匹配
+  if (!dbSessionId || dbSessionId !== jwtSessionId) {
+    // 不匹配说明用户在新设备登录了
+    ctx.body = createErrorResponse(businessCode.accountKicked, '账号在其他设备登录，请重新登录')
+    return
+  }
+}
+```
+
+**数据库字段**:
+
+```sql
+CREATE TABLE `Users` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `username` varchar(50) NOT NULL,
+  `currentRefreshToken` varchar(512) DEFAULT NULL,
+  `sessionId` varchar(36) DEFAULT NULL COMMENT '当前会话 ID（UUID）',
+  `loginIp` varchar(45) DEFAULT NULL COMMENT '登录 IP 地址',
+  `loginTime` datetime DEFAULT NULL COMMENT '登录时间',
+  `sessionExpire` datetime DEFAULT NULL COMMENT '会话过期时间',
+  PRIMARY KEY (`id`)
+)
+```
+
+**踢人流程**:
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant DA as 设备A
+    participant DB as 设备B
+    participant S as 后端服务
+    participant DB_SQL as MySQL
+
+    DA->>S: 登录请求
+    S->>S: 生成 sessionId-A
+    S->>DB_SQL: 保存 sessionId-A
+    S-->>DA: 返回 Token（包含 sessionId-A）
+
+    DB->>S: 登录请求
+    S->>S: 生成 sessionId-B
+    S->>DB_SQL: 更新 sessionId-B（覆盖 sessionId-A）
+    S-->>DB: 返回 Token（包含 sessionId-B）
+
+    DA->>S: API 请求（携带 Token-A）
+    S->>S: 解析 Token-A → sessionId-A
+    S->>DB_SQL: 查询当前 sessionId
+    DB_SQL-->>S: sessionId-B
+    S->>S: 对比: sessionId-A ≠ sessionId-B
+    S-->>DA: 返回 1002（账号被踢出）
+
+    DB->>S: API 请求（携带 Token-B）
+    S->>S: 解析 Token-B → sessionId-B
+    S->>DB_SQL: 查询当前 sessionId
+    DB_SQL-->>S: sessionId-B
+    S->>S: 对比: sessionId-B = sessionId-B ✓
+    S-->>DB: 返回正常数据
+```
+
 ---
 
 ### 5.4 响应格式化
@@ -523,6 +637,7 @@ export default async function (job) {
 | 400 | businessCode.paramError | 参数错误 |
 | 401 | businessCode.unAuthorized | 未授权 / Refresh Token 过期 |
 | 1001 | businessCode.tokenExpired | Access Token 过期（触发前端无感刷新） |
+| 1002 | businessCode.accountKicked | 账号在其他设备登录（被踢出） |
 | 40001 | businessCode.userParamMissing | 用户名或密码为空 |
 | 40002 | businessCode.userNameInvalid | 用户名格式错误 |
 | 40003 | businessCode.passwordInvalid | 密码格式错误 |
