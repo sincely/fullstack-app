@@ -2,6 +2,7 @@ import Router from '@koa/router'
 import { randomUUID } from 'crypto'
 import authDao from '../../services/authDao.js'
 import permissionDao from '../../services/permissionDao.js'
+import loginLogDao from '../../services/loginLogDao.js'
 import authenticate from '../../middleware/authenticate.js'
 import { validateBody } from '../../middleware/validationMiddleware.js'
 import { errorControllerWrapper } from '../../utils/errorHandler.js'
@@ -52,9 +53,27 @@ const frontendLogin = async (ctx) => {
   // 前端发送 userName 参数，后端使用 username
   const { userName, password } = ctx.request.body
   const username = userName
+  const loginType = 'password'
+  const loginIp = ctx.ip || ctx.request.ip || 'unknown'
+  const userAgent = ctx.headers['user-agent'] || ''
 
   const user = await authDao.findAdminUserByUsername(username)
   if (!user) {
+    // 记录登录失败日志
+    await loginLogDao.createLoginLog({
+      userId: null,
+      username,
+      loginType,
+      ipAddress: loginIp,
+      location: '',
+      browser: detectBrowser(userAgent),
+      os: detectOS(userAgent),
+      userAgent,
+      status: 0,
+      message: businessMsg[businessCode.userLoginFail],
+      sessionId: null
+    })
+
     ctx.status = httpCode.ok
     ctx.body = {
       code: businessCode.userLoginFail,
@@ -64,6 +83,21 @@ const frontendLogin = async (ctx) => {
   }
 
   if (Number(user.status) !== 1) {
+    // 记录账号禁用登录失败日志
+    await loginLogDao.createLoginLog({
+      userId: user.id,
+      username,
+      loginType,
+      ipAddress: loginIp,
+      location: '',
+      browser: detectBrowser(userAgent),
+      os: detectOS(userAgent),
+      userAgent,
+      status: 0,
+      message: businessMsg[businessCode.adminUserDisabled],
+      sessionId: null
+    })
+
     ctx.status = httpCode.ok
     ctx.body = {
       code: businessCode.adminUserDisabled,
@@ -74,6 +108,21 @@ const frontendLogin = async (ctx) => {
 
   const passwordMatched = await comparePassword(password, user.password)
   if (!passwordMatched) {
+    // 记录密码错误日志
+    await loginLogDao.createLoginLog({
+      userId: user.id,
+      username,
+      loginType,
+      ipAddress: loginIp,
+      location: '',
+      browser: detectBrowser(userAgent),
+      os: detectOS(userAgent),
+      userAgent,
+      status: 0,
+      message: businessMsg[businessCode.userLoginFail],
+      sessionId: null
+    })
+
     ctx.status = httpCode.ok
     ctx.body = {
       code: businessCode.userLoginFail,
@@ -84,7 +133,6 @@ const frontendLogin = async (ctx) => {
 
   // 生成会话 ID 和记录登录信息
   const sessionId = randomUUID()
-  const loginIp = ctx.ip || ctx.request.ip || 'unknown'
 
   // 计算会话过期时间（默认 7 天）
   const sessionExpire = new Date()
@@ -128,10 +176,57 @@ const frontendLogin = async (ctx) => {
     code: businessCode.success,
     msg: '登录成功',
     data: {
+      userId: user.id,
       token,
-      refreshToken
+      refreshToken,
+      sessionId
     }
   }
+
+  // 记录登录成功日志
+  await loginLogDao.createLoginLog({
+    userId: user.id,
+    username,
+    loginType,
+    ipAddress: loginIp,
+    location: '',
+    browser: detectBrowser(userAgent),
+    os: detectOS(userAgent),
+    userAgent,
+    status: 1,
+    message: '登录成功',
+    sessionId
+  })
+}
+
+// 解析 User-Agent 的辅助函数
+const detectBrowser = (ua) => {
+  if (!ua) return 'Unknown'
+  if (ua.includes('Edg/')) return 'Microsoft Edge'
+  if (ua.includes('Chrome/')) return 'Google Chrome'
+  if (ua.includes('Firefox/')) return 'Mozilla Firefox'
+  if (ua.includes('Safari/') && !ua.includes('Chrome/')) return 'Safari'
+  if (ua.includes('MSIE') || ua.includes('Trident/')) return 'Internet Explorer'
+  return 'Unknown'
+}
+
+const detectOS = (ua) => {
+  if (!ua) return 'Unknown'
+  if (ua.includes('Windows NT')) {
+    const version = ua.match(/Windows NT (\d+\.\d+)/)?.[1]
+    const versionMap = {
+      '10.0': 'Windows 10/11',
+      '6.3': 'Windows 8.1',
+      '6.2': 'Windows 8',
+      '6.1': 'Windows 7'
+    }
+    return versionMap[version] || 'Windows'
+  }
+  if (ua.includes('Macintosh') || ua.includes('Mac OS X')) return 'macOS'
+  if (ua.includes('Linux')) return 'Linux'
+  if (ua.includes('Android')) return 'Android'
+  if (ua.includes('iPhone') || ua.includes('iPad')) return 'iOS'
+  return 'Unknown'
 }
 
 adminRouter.post('/user/auth/login', validateBody(loginBodySchema), errorControllerWrapper(frontendLogin))

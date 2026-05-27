@@ -325,3 +325,87 @@ export function fetchDeleteMenu(data) {
     data
   })
 }
+
+// ==================== 操作日志 ====================
+
+/**
+ * 获取操作日志列表
+ * @description 分页查询操作日志
+ * @param {Record<string, any>} params 查询参数
+ * @returns {Promise<any>} 请求结果
+ */
+export function fetchGetOperationLogList(params) {
+  return request({
+    url: '/log/getOperationLogList',
+    method: 'get',
+    params
+  })
+}
+
+/**
+ * 批量删除操作日志
+ * @description 批量删除操作日志
+ * @param {Record<string, any>} data 请求体 {ids: number[]}
+ * @returns {Promise<any>} 请求结果
+ */
+export function fetchBatchDeleteOperationLog(data) {
+  return request({
+    url: '/log/batchDeleteOperationLog',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 清空操作日志
+ * @description 清空所有操作日志
+ * @returns {Promise<any>} 请求结果
+ */
+export function fetchClearOperationLogs() {
+  return request({
+    url: '/log/clearOperationLogs',
+    method: 'post'
+  })
+}
+
+// ==================== 登录日志 ====================
+
+/**
+ * 获取登录日志列表
+ * @description 分页查询登录日志
+ * @param {Record<string, any>} params 查询参数
+ * @returns {Promise<any>} 请求结果
+ */
+export function fetchGetLoginLogList(params) {
+  return request({
+    url: '/log/getLoginLogList',
+    method: 'get',
+    params
+  })
+}
+
+/**
+ * 批量删除登录日志
+ * @description 批量删除登录日志
+ * @param {Record<string, any>} data 请求体 {ids: number[]}
+ * @returns {Promise<any>} 请求结果
+ */
+export function fetchBatchDeleteLoginLog(data) {
+  return request({
+    url: '/log/batchDeleteLoginLog',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 清空登录日志
+ * @description 清空所有登录日志
+ * @returns {Promise<any>} 请求结果
+ */
+export function fetchClearLoginLogs() {
+  return request({
+    url: '/log/clearLoginLogs',
+    method: 'post'
+  })
+}

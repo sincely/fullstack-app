@@ -228,6 +228,41 @@ export const generatedRoutes = [
     ]
   },
   {
+    name: 'log',
+    path: '/log',
+    component: 'layout.base',
+    meta: {
+      title: '日志管理',
+      icon: 'mdi:file-document-outline',
+      order: 8,
+      roles: ['admin']
+    },
+    children: [
+      {
+        name: 'log_operation',
+        path: '/log/operation',
+        component: 'view.manage_log_operation',
+        meta: {
+          title: '操作日志',
+          icon: 'mdi:clipboard-text',
+          order: 1,
+          roles: ['admin']
+        }
+      },
+      {
+        name: 'log_login',
+        path: '/log/login',
+        component: 'view.manage_log_login',
+        meta: {
+          title: '登录日志',
+          icon: 'mdi:login-variant',
+          order: 2,
+          roles: ['admin']
+        }
+      }
+    ]
+  },
+  {
     name: 'multi-menu',
     path: '/multi-menu',
     component: 'layout.base',
