@@ -1,4 +1,5 @@
 import Router from '@koa/router'
+import { randomUUID } from 'crypto'
 import authDao from '../../services/authDao.js'
 import permissionDao from '../../services/permissionDao.js'
 import authenticate from '../../middleware/authenticate.js'
@@ -81,7 +82,13 @@ const frontendLogin = async (ctx) => {
     return
   }
 
-  const loginTime = Date.now().toString() // 生成登录时间戳作为会话标识
+  // 生成会话 ID 和记录登录信息
+  const sessionId = randomUUID()
+  const loginIp = ctx.ip || ctx.request.ip || 'unknown'
+
+  // 计算会话过期时间（默认 7 天）
+  const sessionExpire = new Date()
+  sessionExpire.setDate(sessionExpire.getDate() + 7)
 
   const payload = {
     userId: user.id,
@@ -92,15 +99,29 @@ const frontendLogin = async (ctx) => {
     roleCodes: parseRoleCodes(user.roleCodes, user.roleCode),
     roleName: user.roleName,
     roleNames: parseRoleNames(user.roleNames, user.roleName),
-    loginTime // 添加 loginTime 到 JWT payload，用于单设备登录控制
+    sessionId // 添加 sessionId 到 JWT payload，用于单设备登录控制
   }
 
   const token = generateToken(payload)
   const refreshToken = generateRefreshToken(payload)
 
-  // 将 loginTime 和 refreshToken 写入用户表，实现单设备登录控制
-  const sql = 'UPDATE Users SET loginTime = ?, currentRefreshToken = ? WHERE id = ?'
-  await query(sql, [loginTime, refreshToken, user.id])
+  // 将 sessionId、登录信息等写入用户表，实现单设备登录控制
+  const sql = `
+    UPDATE Users SET
+      sessionId = ?,
+      currentRefreshToken = ?,
+      loginIp = ?,
+      loginTime = NOW(),
+      sessionExpire = ?
+    WHERE id = ?
+  `
+  await query(sql, [
+    sessionId,
+    refreshToken,
+    loginIp,
+    sessionExpire,
+    user.id
+  ])
 
   ctx.status = httpCode.ok
   ctx.body = {
@@ -217,14 +238,24 @@ adminRouter.post(
   })
 )
 
-// 登出（清除用户 currentRefreshToken）
+// 登出（清除用户 sessionId 和 currentRefreshToken）
 adminRouter.post(
   '/user/auth/logout',
   authenticate,
   errorControllerWrapper(async (ctx) => {
     const userId = ctx.state.user?.userId
     if (userId) {
-      await authDao.updateUserRefreshToken(userId, null)
+      // 清除 sessionId、refreshToken 和会话信息
+      const sql = `
+        UPDATE Users SET
+          sessionId = NULL,
+          currentRefreshToken = NULL,
+          loginIp = NULL,
+          loginTime = NULL,
+          sessionExpire = NULL
+        WHERE id = ?
+      `
+      await query(sql, [userId])
     }
     ctx.status = httpCode.ok
     ctx.body = {

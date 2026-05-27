@@ -36,19 +36,36 @@ async function authenticate(ctx, next) {
   // 存储原始 token，供 logout 等接口使用
   ctx.state.token = token
 
-  // 单设备登录控制：验证 JWT 中的 loginTime 与数据库中的一致
-  // 每次登录时会生成新的 loginTime 并保存到数据库和 JWT
-  // 如果 JWT 中的 loginTime 与数据库不匹配，说明用户在新设备登录了
+  // 单设备登录控制：验证 JWT 中的 sessionId 与数据库中的一致
+  // 每次登录时会生成新的 sessionId 并保存到数据库和 JWT
+  // 如果 JWT 中的 sessionId 与数据库不匹配，说明用户在新设备登录了
   const userId = decoded.userId
-  const jwtLoginTime = decoded.loginTime
+  const jwtSessionId = decoded.sessionId
 
-  if (userId && jwtLoginTime) {
-    const sql = 'SELECT loginTime FROM Users WHERE id = ? LIMIT 1'
+  if (userId && jwtSessionId) {
+    const sql = `
+      SELECT sessionId, sessionExpire
+      FROM Users
+      WHERE id = ?
+      LIMIT 1
+    `
     const rows = await query(sql, [userId])
-    const dbLoginTime = rows[0]?.loginTime
+    const dbSessionId = rows[0]?.sessionId
+    const sessionExpire = rows[0]?.sessionExpire
 
-    // 如果数据库中的 loginTime 与 JWT 中的不匹配，说明已被踢出
-    if (!dbLoginTime || dbLoginTime !== jwtLoginTime) {
+    // 1. 检查会话是否过期
+    if (sessionExpire) {
+      const expireTime = new Date(sessionExpire).getTime()
+      const now = Date.now()
+      if (now > expireTime) {
+        ctx.status = 200
+        ctx.body = createErrorResponse(businessCode.accountKicked, '会话已过期，请重新登录')
+        return
+      }
+    }
+
+    // 2. 检查 sessionId 是否匹配
+    if (!dbSessionId || dbSessionId !== jwtSessionId) {
       ctx.status = 200
       ctx.body = createErrorResponse(businessCode.accountKicked, businessMsg[businessCode.accountKicked])
       return
