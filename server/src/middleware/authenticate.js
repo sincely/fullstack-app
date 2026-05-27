@@ -1,6 +1,7 @@
 import { verifyToken } from '../utils/jwt.js'
 import { createErrorResponse } from '../utils/createResponse.js'
-import { businessCode } from '../config/businessCode.js'
+import { businessCode, businessMsg } from '../config/businessCode.js'
+import { query } from '../utils/db.js'
 
 async function authenticate(ctx, next) {
   // 从请求头获取 Token
@@ -34,6 +35,26 @@ async function authenticate(ctx, next) {
   ctx.state.user = decoded
   // 存储原始 token，供 logout 等接口使用
   ctx.state.token = token
+
+  // 单设备登录控制：验证 JWT 中的 loginTime 与数据库中的一致
+  // 每次登录时会生成新的 loginTime 并保存到数据库和 JWT
+  // 如果 JWT 中的 loginTime 与数据库不匹配，说明用户在新设备登录了
+  const userId = decoded.userId
+  const jwtLoginTime = decoded.loginTime
+
+  if (userId && jwtLoginTime) {
+    const sql = 'SELECT loginTime FROM Users WHERE id = ? LIMIT 1'
+    const rows = await query(sql, [userId])
+    const dbLoginTime = rows[0]?.loginTime
+
+    // 如果数据库中的 loginTime 与 JWT 中的不匹配，说明已被踢出
+    if (!dbLoginTime || dbLoginTime !== jwtLoginTime) {
+      ctx.status = 200
+      ctx.body = createErrorResponse(businessCode.accountKicked, businessMsg[businessCode.accountKicked])
+      return
+    }
+  }
+
   await next()
 }
 

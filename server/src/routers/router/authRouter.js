@@ -9,6 +9,7 @@ import { httpCode } from '../../config/httpError.js'
 import { businessCode, businessMsg } from '../../config/businessCode.js'
 import { comparePassword } from '../../utils/password.js'
 import { generateToken, generateRefreshToken, verifyRefreshToken } from '../../utils/jwt.js'
+import { query } from '../../utils/db.js'
 
 const adminRouter = new Router()
 
@@ -80,6 +81,8 @@ const frontendLogin = async (ctx) => {
     return
   }
 
+  const loginTime = Date.now().toString() // 生成登录时间戳作为会话标识
+
   const payload = {
     userId: user.id,
     username: user.username,
@@ -88,14 +91,16 @@ const frontendLogin = async (ctx) => {
     roleCode: user.roleCode,
     roleCodes: parseRoleCodes(user.roleCodes, user.roleCode),
     roleName: user.roleName,
-    roleNames: parseRoleNames(user.roleNames, user.roleName)
+    roleNames: parseRoleNames(user.roleNames, user.roleName),
+    loginTime // 添加 loginTime 到 JWT payload，用于单设备登录控制
   }
 
   const token = generateToken(payload)
   const refreshToken = generateRefreshToken(payload)
 
-  // 将当前 Refresh Token 写入用户表，实现单设备登录控制
-  await authDao.updateUserRefreshToken(user.id, refreshToken)
+  // 将 loginTime 和 refreshToken 写入用户表，实现单设备登录控制
+  const sql = 'UPDATE Users SET loginTime = ?, currentRefreshToken = ? WHERE id = ?'
+  await query(sql, [loginTime, refreshToken, user.id])
 
   ctx.status = httpCode.ok
   ctx.body = {
