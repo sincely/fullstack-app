@@ -18,7 +18,10 @@ export const dbConfig = {
 
   // 保活，防止长时间空闲后被服务端断开（ECONNRESET）
   enableKeepAlive: true,
-  keepAliveInitialDelay: 30_000
+  keepAliveInitialDelay: 30_000,
+
+  // 将 DATETIME / TIMESTAMP 类型解析为字符串，避免返回 Date 对象导致时区/格式问题
+  dateStrings: true
 }
 
 export const redisConfig = {
