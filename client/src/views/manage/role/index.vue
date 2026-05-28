@@ -20,8 +20,17 @@ const scrollConfig = computed(() => {
   }
 })
 
-const { columns, columnChecks, data, loading, getData, getDataByPage, mobilePagination, searchParams, resetSearchParams } =
-  useTable({
+const {
+  columns,
+  columnChecks,
+  data,
+  loading,
+  getData,
+  getDataByPage,
+  mobilePagination,
+  searchParams,
+  resetSearchParams
+} = useTable({
   apiFn: fetchGetRoleList,
   apiParams: {
     current: 1,
@@ -98,7 +107,7 @@ const { columns, columnChecks, data, loading, getData, getDataByPage, mobilePagi
       )
     }
   ]
-  })
+})
 
 const {
   drawerVisible,
@@ -169,7 +178,7 @@ function edit(id) {
         v-model:visible="drawerVisible"
         :operate-type="operateType"
         :row-data="editingData"
-          @submitted="getData"
+        @submitted="getData"
       />
     </ACard>
   </div>

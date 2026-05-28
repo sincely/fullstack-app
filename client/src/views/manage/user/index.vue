@@ -1,5 +1,5 @@
 <script setup lang="jsx">
-import { Button, Popconfirm, Switch, Tag, message } from 'ant-design-vue'
+import { Button, message, Popconfirm, Switch, Tag } from 'ant-design-vue'
 
 import { enableStatusRecord, userGenderRecord } from '@/constants/business'
 import { useTable, useTableOperate, useTableScroll } from '@/hooks/common/table'

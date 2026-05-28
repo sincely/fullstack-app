@@ -1,5 +1,6 @@
 <script setup lang="jsx">
-import { Button, Popconfirm, Tag, message } from 'ant-design-vue'
+import { Button, message, Popconfirm, Tag } from 'ant-design-vue'
+
 import { useTable, useTableOperate, useTableScroll } from '@/hooks/common/table'
 import { fetchBatchDeleteLoginLog, fetchClearLoginLogs, fetchGetLoginLogList } from '@/service/api'
 
@@ -150,12 +151,10 @@ async function handleClearAll() {
       <template #extra>
         <div class="flex gap-8px">
           <APopconfirm title="确认批量删除选中的日志吗？" @confirm="handleBatchDelete">
-            <AButton :disabled="checkedRowKeys.length === 0" danger size="small">
-              批量删除
-            </AButton>
+            <AButton :disabled="checkedRowKeys.length === 0" danger size="small">批量删除</AButton>
           </APopconfirm>
           <APopconfirm title="确认清空所有登录日志吗？此操作不可恢复！" @confirm="handleClearAll">
-            <AButton danger size="small"> 清空日志 </AButton>
+            <AButton danger size="small">清空日志</AButton>
           </APopconfirm>
           <AButton size="small" @click="getData">刷新</AButton>
         </div>
