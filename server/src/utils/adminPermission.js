@@ -18,6 +18,7 @@ const normalizeMenu = (menu) => {
 
   return {
     id: menu.id,
+    parentId: menu.parentId,
     path: menu.routePath,
     name: menu.routeName,
     component: menu.component,
