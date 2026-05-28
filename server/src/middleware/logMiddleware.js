@@ -78,9 +78,10 @@ export const operationLogMiddleware = async (ctx, next) => {
     return
   }
 
-  // 忽略健康检查和静态资源
+  // 忽略健康检查、静态资源和操作日志相关接口（避免循环记录）
   const path = ctx.path
-  if (path.startsWith('/api/health') || path.includes('/static/')) {
+  const whitelist = ['/api/health', '/api/log/']
+  if (path.includes('/static/') || whitelist.some((p) => path.startsWith(p))) {
     return
   }
 
