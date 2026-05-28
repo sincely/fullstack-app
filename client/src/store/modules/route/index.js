@@ -64,6 +64,13 @@ export const useRouteStore = defineStore(SetupStoreId.Route, () => {
     authRoutes.value = Array.from(authRoutesMap.values())
   }
 
+  /**
+   * 清空旧的非常量权限路由
+   */
+  function clearAuthRoutes() {
+    authRoutes.value = authRoutes.value.filter((route) => route.meta?.constant)
+  }
+
   const removeRouteFns = []
 
   /** 全局菜单 */
@@ -196,7 +203,7 @@ export const useRouteStore = defineStore(SetupStoreId.Route, () => {
   /** 初始化静态权限路由 */
   async function initStaticAuthRoute() {
     const { authRoutes: staticAuthRoutes } = createStaticRoutes()
-
+    clearAuthRoutes()
     if (authStore.isStaticSuper) {
       addAuthRoutes(staticAuthRoutes)
     } else {
@@ -213,7 +220,7 @@ export const useRouteStore = defineStore(SetupStoreId.Route, () => {
   /** 初始化动态权限路由 */
   async function initDynamicAuthRoute() {
     const { data, error } = await fetchGetUserRoutes()
-
+    clearAuthRoutes()
     if (!error) {
       const { routes, home } = data
 

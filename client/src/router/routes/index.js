@@ -55,13 +55,15 @@ export function createStaticRoutes() {
 
   const authRoutes = []
 
-  ;[...customRoutes, ...generatedRoutes].forEach((item) => {
+  console.log('合并路由', [...customRoutes, ...generatedRoutes])
+
+  for (const item of [...customRoutes, ...generatedRoutes]) {
     if (item.meta?.constant) {
       constantRoutes.push(item)
     } else {
       authRoutes.push(item)
     }
-  })
+  }
 
   return {
     constantRoutes,
