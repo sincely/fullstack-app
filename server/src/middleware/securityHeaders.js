@@ -20,14 +20,17 @@ export const securityHeaders = async (ctx, next) => {
   ctx.set('Referrer-Policy', 'strict-origin-when-cross-origin')
 
   // 6. Content-Security-Policy - 内容安全策略（防止 XSS 等攻击）
-  // 根据实际需求调整策略
+  // Swagger UI 需要加载 CDN 资源，对 /docs 路径放宽策略
+  const isDocsPage = ctx.path === '/docs' || ctx.path.startsWith('/docs/')
   ctx.set(
     'Content-Security-Policy',
     "default-src 'self'; " +
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
-      "style-src 'self' 'unsafe-inline'; " +
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval'" + (isDocsPage ? " https://cdnjs.cloudflare.com" : "") + "; " +
+      "script-src-elem 'self' 'unsafe-inline'" + (isDocsPage ? " https://cdnjs.cloudflare.com" : "") + "; " +
+      "style-src 'self' 'unsafe-inline'" + (isDocsPage ? " https://fonts.googleapis.com https://cdnjs.cloudflare.com" : "") + "; " +
+      "style-src-elem 'self' 'unsafe-inline'" + (isDocsPage ? " https://fonts.googleapis.com https://cdnjs.cloudflare.com" : "") + "; " +
       "img-src 'self' data: https:; " +
-      "font-src 'self' data:; " +
+      "font-src 'self' data:" + (isDocsPage ? " https://fonts.gstatic.com" : "") + "; " +
       "connect-src 'self' https:; " +
       "frame-ancestors 'none'; " +
       "base-uri 'self'; " +

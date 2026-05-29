@@ -49,6 +49,7 @@ async function authenticate(ctx, next) {
       WHERE id = ?
       LIMIT 1
     `
+    console.log(sql);
     const rows = await query(sql, [userId])
     const dbSessionId = rows[0]?.sessionId
     const sessionExpire = rows[0]?.sessionExpire

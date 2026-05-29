@@ -7,7 +7,8 @@
   "scripts": {
     "dev": "cross-env NODE_ENV=development nodemon src/app.js",
     "dev:win": "chcp 65001>nul & cross-env NODE_ENV=development nodemon src/app.js",
-    "worker": "cross-env NODE_ENV=development node src/worker.js",
+    "dev:prod": "chcp 65001>nul & cross-env NODE_ENV=production nodemon src/app.js",
+    "worker": "cross-env NODE_ENV=development node --enable-source-maps src/worker.js",
     "worker:dev": "cross-env NODE_ENV=development nodemon src/worker.js",
     "build": "node scripts/build.js",
     "build:test": "npm run build --mode test",

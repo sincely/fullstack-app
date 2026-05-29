@@ -40,14 +40,31 @@ export const errorControllerWrapper = (controller) => {
         const status = err.status ?? err.statusCode
         ctx.status = httpCode.ok
         ctx.body = createFailResponse(status, err.message || 'Request failed')
-        logger.warn({ err, status, ...requestInfo }, `HTTP ${status}: ${err.message}`)
+        logger.warn(
+          {
+            err: { message: err.message, stack: err.stack },
+            status,
+            ...requestInfo
+          },
+          `HTTP ${status}: ${err.message}`
+        )
         return
       }
 
       // 非预期异常（5xx）：error 级别，记录完整堆栈方便定位崩溃位置
+      // 使用 Error.cause 保留原始错误上下文（Node 16.9+）
+      const wrappedErr = new Error(`Unhandled error: ${err.message || 'Unknown error'}`, { cause: err })
+
       ctx.status = httpCode.ok
-      ctx.body = createErrorResponse(500, 'Something went wrong', null, err)
-      logger.error({ err, status: 500, ...requestInfo }, `Unhandled error: ${err.message || 'Unknown error'}`)
+      ctx.body = createErrorResponse(500, 'Something went wrong', null, wrappedErr)
+      logger.error(
+        {
+          err: wrappedErr,
+          status: 500,
+          ...requestInfo
+        },
+        wrappedErr.message
+      )
     }
   }
 }

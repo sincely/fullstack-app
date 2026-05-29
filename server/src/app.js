@@ -12,9 +12,10 @@ import corsConfig from './config/cors.js'
 import { bodyParserConfig } from './config/koaBodyConfig.js'
 
 // 中间件
+import errorCatch from './middleware/errorCatch.js'
 import requestId from './middleware/requestId.js'
 import loggerMiddleware from './middleware/logger.js'
-import error from './middleware/error.js'
+import errorHandler from './middleware/error.js'
 import rewriteUrl from './middleware/rewriteUrl.js'
 import compress from './middleware/compress.js'
 import { securityHeaders } from './middleware/securityHeaders.js'
@@ -29,7 +30,14 @@ import { registerSwagger } from './plugins/swagger.js'
 const app = new Koa()
 app.keys = [process.env.SESSION_SECRET || process.env.JWT_SECRET || 'koa-app-template-session-secret']
 
-// 请求 ID 中间件（最先注册，确保后续所有中间件都能读取到 requestId）
+// ========== 全局错误捕获（必须在最前注册）==========
+// 1. 全局异常捕获中间件 - 使用 AsyncLocalStorage 绑定请求上下文
+app.use(errorCatch)
+
+// 2. 应用级错误监听 - 统一处理所有未捕获异常日志
+app.on('error', errorHandler())
+
+// 请求 ID 中间件（确保后续所有中间件都能读取到 requestId）
 app.use(requestId)
 
 // HTTP请求日志中间件
@@ -40,9 +48,6 @@ app.use(securityHeaders)
 
 // 速率限制（防止暴力攻击和频繁请求）
 app.use(rateLimiter)
-
-// 异常处理中间件
-app.use(error)
 
 // 跨域处理
 app.use(cors(corsConfig))
@@ -93,6 +98,19 @@ if (!process.env.VERCEL) {
     logger.info(`Swagger 文档地址 http://localhost:${Port}/docs`)
   })
 }
+
+// ========== 进程级未捕获异常处理 ==========
+// 防止未捕获的 Promise rejection 或异常导致进程直接退出
+process.on('unhandledRejection', (reason, promise) => {
+  logger.fatal({ reason, promise }, 'Unhandled Rejection')
+  // 优雅退出，让 Docker/K8s/PM2 重启
+  process.exit(1)
+})
+
+process.on('uncaughtException', (err) => {
+  logger.fatal({ err }, 'Uncaught Exception')
+  process.exit(1)
+})
 
 // 导出 app 实例，用于 Vercel 等 serverless 平台部署
 export default app

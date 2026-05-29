@@ -12,6 +12,7 @@
     "REMOTE_ADDR": ""
   },
   "ext": "ejs js json",
+  "nodeArgs": ["--async-stack-traces", "--enable-source-maps"],
   "events": {
     "start": "echo [nodemon] dev server started",
     "restart": "echo [nodemon] restarting after file changes",
