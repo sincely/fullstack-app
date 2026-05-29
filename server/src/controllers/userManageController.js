@@ -83,7 +83,7 @@ const formatUserRow = (row) => {
 
 /**
  * 获取用户列表 - 分页查询并返回角色选项
- * @api GET /admin/system/users
+ * @api GET /system/users
  * @description 用户管理 - 后台用户管理相关的增删改查
  * @query {integer} page - 当前页码
  * @query {integer} pageSize - 每页数量
@@ -140,7 +140,7 @@ const listUsers = async (ctx) => {
 
 /**
  * 创建用户 - 新增后台用户并绑定角色
- * @api POST /admin/system/users
+ * @api POST /system/users
  * @description 用户管理
  * @body {string} username - 用户名
  * @body {string} password - 登录密码
@@ -215,7 +215,7 @@ const createUser = async (ctx) => {
 
 /**
  * 更新用户 - 更新资料、角色或密码
- * @api PUT /admin/system/users
+ * @api PUT /system/users
  * @description 用户管理
  * @body {integer} id - 用户 ID
  * @body {string} [password] - 新密码
@@ -296,7 +296,7 @@ const updateUser = async (ctx) => {
 
 /**
  * 删除用户
- * @api DELETE /admin/system/users
+ * @api DELETE /system/users
  * @description 用户管理
  * @body {integer} id - 用户 ID
  */
@@ -330,7 +330,7 @@ const deleteUser = async (ctx) => {
 
 /**
  * 批量删除用户
- * @api POST /admin/systemManage/batchDeleteUser
+ * @api POST /systemManage/batchDeleteUser
  * @description 批量删除用户
  * @body {integer[]} ids - 用户 ID 数组
  */
@@ -374,7 +374,7 @@ const batchDeleteUsers = async (ctx) => {
 
 /**
  * 更新用户状态
- * @api POST /admin/systemManage/updateUserStatus
+ * @api POST /systemManage/updateUserStatus
  * @description 更新用户状态(启用/禁用)
  * @body {integer} id - 用户 ID
  * @body {string} status - 用户状态(1=启用 2=禁用)
@@ -410,7 +410,7 @@ const updateUserStatus = async (ctx) => {
 
 /**
  * 重置用户密码
- * @api POST /admin/systemManage/resetUserPassword
+ * @api POST /systemManage/resetUserPassword
  * @description 重置用户密码为默认密码 123456
  * @body {integer} id - 用户 ID
  */

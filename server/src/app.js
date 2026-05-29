@@ -95,7 +95,7 @@ registerSwagger(app)
 if (!process.env.VERCEL) {
   app.listen(Port, () => {
     logger.info(`服务器启动在 http://localhost:${Port}`)
-    logger.info(`Swagger 文档地址 http://localhost:${Port}/docs`)
+    logger.info(`Swagger 接口文档地址 http://localhost:${Port}/docs`)
   })
 }
 

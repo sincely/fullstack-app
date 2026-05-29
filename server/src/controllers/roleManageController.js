@@ -38,7 +38,7 @@ const formatRoleRow = (role) => {
 
 /**
  * 获取角色列表 - 含绑定的菜单 ID 和菜单选项
- * @api GET /admin/system/roles
+ * @api GET /system/roles
  * @description 角色管理 - 后台角色及角色菜单权限的增删改查
  */
 const listRoles = async (ctx) => {
@@ -87,7 +87,7 @@ const listRoles = async (ctx) => {
 
 /**
  * 创建角色 - 并绑定菜单权限
- * @api POST /admin/system/roles
+ * @api POST /system/roles
  * @description 角色管理
  * @body {string} roleName - 角色名称
  * @body {string} description - 角色描述
@@ -124,7 +124,7 @@ const createRole = async (ctx) => {
 
 /**
  * 更新角色 - 重置角色菜单权限
- * @api PUT /admin/system/roles
+ * @api PUT /system/roles
  * @description 角色管理
  * @body {integer} roleId - 角色 ID
  * @body {string} roleName - 角色名称
@@ -168,7 +168,7 @@ const updateRole = async (ctx) => {
 
 /**
  * 删除角色 - 清理角色菜单权限绑定
- * @api DELETE /admin/system/roles
+ * @api DELETE /system/roles
  * @description 角色管理
  * @body {integer} roleId - 角色 ID
  */

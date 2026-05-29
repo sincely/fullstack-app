@@ -46,7 +46,7 @@
 
 - JWT 登录鉴权：`src/middleware/authenticate.js`
 - 路由级权限判断：`src/middleware/authorize.js`
-- 后台登录接口：`src/controllers/admin/authController.js`
+- 后台登录接口：`src/controllers/authController.js`
 - 角色菜单查询：`src/models/dao/adminPermissionDao.js`
 - 管理接口已接入部分权限校验：`src/routers/router/adminManageRouter.js`
 
@@ -550,7 +550,7 @@ if (buttons.includes('user:delete')) {
 
 ```js
 router.post(
-  '/admin/system/users',
+  '/system/users',
   authenticate,
   authorizePermission('system:user:create'),
   controller
@@ -767,7 +767,7 @@ authorizePermission('system:user:list')
 
 ```js
 router.get(
-  '/admin/system/users',
+  '/system/users',
   authenticate,
   authorizePermission('system:user:list'),
   validateQuery(...),

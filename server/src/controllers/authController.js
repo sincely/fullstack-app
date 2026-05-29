@@ -7,7 +7,7 @@ import adminAuthDao from '../services/authDao.js'
 import adminPermissionDao from '../services/permissionDao.js'
 import { httpCode } from '../config/httpError.js'
 import { businessCode, businessMsg } from '../config/businessCode.js'
-import { defaultAdminRoleName } from '../config/admin.js'
+import { defaultAdminRoleName } from '../config.js'
 import { hashPassword, comparePassword } from '../utils/password.js'
 import { generateToken } from '../utils/jwt.js'
 import { buildMenuTree, extractPermissionCodes } from '../utils/adminPermission.js'
@@ -75,7 +75,7 @@ const buildPermissionSnapshot = async (roleIds) => {
 
 /**
  * 后台注册 - 注册后台账号并绑定默认角色
- * @api POST /admin/auth/register
+ * @api POST /auth/register
  * @description 后台认证 - 后台登录、注册、退出和权限信息获取
  * @auth public
  * @body {string} username - 登录用户名
@@ -147,7 +147,7 @@ const register = async (ctx) => {
 
 /**
  * 后台登录 - 返回 token、用户信息、菜单和权限数据
- * @api POST /admin/auth/login
+ * @api POST /auth/login
  * @description 后台认证
  * @auth public
  * @body {string} username - 登录用户名
@@ -216,7 +216,7 @@ const login = async (ctx) => {
 
 /**
  * 获取当前用户信息
- * @api GET /admin/auth/profile
+ * @api GET /auth/profile
  * @description 后台认证
  */
 const getProfile = async (ctx) => {
@@ -240,7 +240,7 @@ const getProfile = async (ctx) => {
 
 /**
  * 获取当前用户菜单
- * @api GET /admin/auth/menus
+ * @api GET /auth/menus
  * @description 后台认证
  */
 const getMenus = async (ctx) => {
@@ -256,7 +256,7 @@ const getMenus = async (ctx) => {
 
 /**
  * 获取当前用户权限
- * @api GET /admin/auth/permissions
+ * @api GET /auth/permissions
  * @description 后台认证
  */
 const getPermissions = async (ctx) => {
@@ -276,7 +276,7 @@ const getPermissions = async (ctx) => {
 
 /**
  * 后台退出登录
- * @api POST /admin/auth/logout
+ * @api POST /auth/logout
  * @description 后台认证
  */
 const logout = async (ctx) => {

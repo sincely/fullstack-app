@@ -13,7 +13,7 @@ import { comparePassword } from '../../utils/password.js'
 import { generateToken, generateRefreshToken, verifyRefreshToken } from '../../utils/jwt.js'
 import { query } from '../../utils/db.js'
 
-const adminRouter = new Router()
+const authRouter = new Router()
 
 const parseRoleIds = (value, fallbackRoleId) => {
   if (typeof value === 'string' && value.trim()) {
@@ -238,7 +238,7 @@ const detectOS = (ua) => {
   return 'Unknown'
 }
 
-adminRouter.post('/user/auth/login', validateBody(loginBodySchema), errorControllerWrapper(frontendLogin))
+authRouter.post('/user/auth/login', validateBody(loginBodySchema), errorControllerWrapper(frontendLogin))
 
 // 前端兼容接口 - 获取用户信息
 const frontendGetUserInfo = async (ctx) => {
@@ -271,10 +271,10 @@ const frontendGetUserInfo = async (ctx) => {
   }
 }
 
-adminRouter.get('/user/getUserInfo', authenticate, errorControllerWrapper(frontendGetUserInfo))
+authRouter.get('/user/getUserInfo', authenticate, errorControllerWrapper(frontendGetUserInfo))
 
 // 前端兼容接口 - 刷新 token
-adminRouter.post(
+authRouter.post(
   '/user/auth/refreshToken',
   errorControllerWrapper(async (ctx) => {
     const { refreshToken } = ctx.request.body
@@ -343,7 +343,7 @@ adminRouter.post(
 )
 
 // 登出（清除用户 sessionId 和 currentRefreshToken）
-adminRouter.post(
+authRouter.post(
   '/user/auth/logout',
   authenticate,
   errorControllerWrapper(async (ctx) => {
@@ -370,7 +370,7 @@ adminRouter.post(
 )
 
 // 前端兼容接口 - 自定义后端错误
-adminRouter.get(
+authRouter.get(
   '/user/auth/error',
   errorControllerWrapper((ctx) => {
     const { code, msg } = ctx.query
@@ -383,4 +383,4 @@ adminRouter.get(
   })
 )
 
-export default adminRouter
+export default authRouter

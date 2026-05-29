@@ -51,7 +51,7 @@
     }
   ],
   "paths": {
-    "/api/admin/auth/register": {
+    "/api/auth/register": {
       "post": {
         "tags": ["后台认证"],
         "summary": "后台注册",
@@ -125,7 +125,7 @@
         "operationId": "post_admin_auth_register"
       }
     },
-    "/api/admin/auth/login": {
+    "/api/auth/login": {
       "post": {
         "tags": ["后台认证"],
         "summary": "后台登录",
@@ -187,7 +187,7 @@
         "operationId": "post_admin_auth_login"
       }
     },
-    "/api/admin/auth/profile": {
+    "/api/auth/profile": {
       "get": {
         "tags": ["后台认证"],
         "summary": "获取当前用户信息",
@@ -225,7 +225,7 @@
         "operationId": "get_admin_auth_profile"
       }
     },
-    "/api/admin/auth/menus": {
+    "/api/auth/menus": {
       "get": {
         "tags": ["后台认证"],
         "summary": "获取当前用户菜单",
@@ -263,7 +263,7 @@
         "operationId": "get_admin_auth_menus"
       }
     },
-    "/api/admin/auth/permissions": {
+    "/api/auth/permissions": {
       "get": {
         "tags": ["后台认证"],
         "summary": "获取当前用户权限",
@@ -301,7 +301,7 @@
         "operationId": "get_admin_auth_permissions"
       }
     },
-    "/api/admin/auth/logout": {
+    "/api/auth/logout": {
       "post": {
         "tags": ["后台认证"],
         "summary": "后台退出登录",
@@ -340,7 +340,7 @@
         "operationId": "post_admin_auth_logout"
       }
     },
-    "/api/admin/system/menus": {
+    "/api/system/menus": {
       "get": {
         "tags": ["菜单管理"],
         "summary": "获取菜单列表",
@@ -616,7 +616,7 @@
         "operationId": "delete_admin_system_menus"
       }
     },
-    "/api/admin/system/roles": {
+    "/api/system/roles": {
       "get": {
         "tags": ["角色管理"],
         "summary": "获取角色列表",
@@ -859,7 +859,7 @@
         "operationId": "delete_admin_system_roles"
       }
     },
-    "/api/admin/system/users": {
+    "/api/system/users": {
       "get": {
         "tags": ["用户管理"],
         "summary": "获取用户列表",

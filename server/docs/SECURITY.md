@@ -122,7 +122,7 @@ const PROD_WHITELIST = [
   'http://localhost:3000',
   'http://127.0.0.1:9528',
   'https://yourdomain.com',           // 替换为你的域名
-  'https://admin.yourdomain.com'      // 后台管理域名
+  'https:/.yourdomain.com'      // 后台管理域名
 ]
 ```
 
@@ -130,7 +130,7 @@ const PROD_WHITELIST = [
 
 ```bash
 # .env 文件
-CORS_WHITELIST=https://yourdomain.com,https://admin.yourdomain.com
+CORS_WHITELIST=https://yourdomain.com,https:/.yourdomain.com
 ```
 
 ### 允许的请求方法和头

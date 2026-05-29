@@ -160,9 +160,9 @@ graph TD
 
 控制接口是否可调用，例如：
 
-- `GET /api/admin/system/users`
-- `POST /api/admin/system/users`
-- `DELETE /api/admin/system/menus`
+- `GET /api/system/users`
+- `POST /api/system/users`
+- `DELETE /api/system/menus`
 
 实际项目里，推荐后端必须做接口权限校验，不能只依赖前端菜单显隐。
 

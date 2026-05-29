@@ -110,7 +110,7 @@ const buildMenuRecordTree = (rows) => {
 
 /**
  * 获取菜单列表 - 分页查询
- * @api GET /admin/system/menus
+ * @api GET /system/menus
  * @description 菜单管理 - 后台菜单管理相关的增删改查
  * @query {integer} page - 当前页码
  * @query {integer} pageSize - 每页数量
@@ -182,7 +182,7 @@ const listMenus = async (ctx) => {
 
 /**
  * 获取菜单树 - 全量查询构建树形结构
- * @api GET /admin/system/menus/tree
+ * @api GET /system/menus/tree
  * @description 菜单管理 - 用于角色菜单权限选择
  */
 const getMenuTree = async (ctx) => {
@@ -198,7 +198,7 @@ const getMenuTree = async (ctx) => {
 
 /**
  * 创建菜单
- * @api POST /admin/system/menus
+ * @api POST /system/menus
  * @description 菜单管理
  * @body {string} menuName - 菜单名称
  * @body {string} routeName - 路由名称
@@ -258,7 +258,7 @@ const createMenu = async (ctx) => {
 
 /**
  * 更新菜单
- * @api PUT /admin/system/menus
+ * @api PUT /system/menus
  * @description 菜单管理
  * @body {integer} id - 菜单 ID
  * @body {string} [menuName] - 菜单名称
@@ -373,7 +373,7 @@ const updateMenu = async (ctx) => {
 
 /**
  * 删除菜单
- * @api DELETE /admin/system/menus
+ * @api DELETE /system/menus
  * @description 菜单管理
  * @body {integer} id - 菜单 ID
  */
