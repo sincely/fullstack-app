@@ -1,11 +1,11 @@
 import Router from '@koa/router'
-import usersRouter from './router/userRouter.js'
-import authRouter from './router/authRouter.js'
+import usersRouter from './modules/userRouter.js'
+import authRouter from './modules/authRouter.js'
 
-import routeRouter from './router/routeRouter.js'
-import systemManageRouter from './router/systemManageRouter.js'
-import operationLogRouter from './router/operationLogRouter.js'
-import loginLogRouter from './router/loginLogRouter.js'
+import routeRouter from './modules/routeRouter.js'
+import systemManageRouter from './modules/systemManageRouter.js'
+import operationLogRouter from './modules/operationLogRouter.js'
+import loginLogRouter from './modules/loginLogRouter.js'
 import { operationLogMiddleware } from '../middleware/logMiddleware.js'
 
 const router = new Router({ prefix: '/api' })
