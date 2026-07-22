@@ -1,7 +1,7 @@
 import Router from '@koa/router'
-import roleManageRouter from './roleManageRouter.js'
-import userManageRouter from './userManageRouter.js'
-import menuManageRouter from './menuManageRouter.js'
+import roleManageRouter from '../../modules/role/roleManageRouter.js'
+import userManageRouter from '../../modules/user/userManageRouter.js'
+import menuManageRouter from '../../modules/menu/menuManageRouter.js'
 
 const systemManageRouter = new Router()
 

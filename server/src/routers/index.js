@@ -1,11 +1,11 @@
 import Router from '@koa/router'
-import usersRouter from './modules/userRouter.js'
-import authRouter from './modules/authRouter.js'
+import loginRouter from '../modules/login/loginRouter.js'
+import authRouter from '../modules/auth/authRouter.js'
 
-import routeRouter from './modules/routeRouter.js'
+import routeRouter from '../modules/route/routeRouter.js'
 import systemManageRouter from './modules/systemManageRouter.js'
-import operationLogRouter from './modules/operationLogRouter.js'
-import loginLogRouter from './modules/loginLogRouter.js'
+import operationLogRouter from '../modules/log/operationLogRouter.js'
+import loginLogRouter from '../modules/log/loginLogRouter.js'
 import { operationLogMiddleware } from '../middleware/logMiddleware.js'
 
 const router = new Router({ prefix: '/api' })
@@ -17,7 +17,7 @@ router.get('/health', (ctx) => {
   }
 })
 
-router.use(usersRouter.routes(), usersRouter.allowedMethods())
+router.use(loginRouter.routes(), loginRouter.allowedMethods())
 router.use(authRouter.routes(), authRouter.allowedMethods())
 
 // 应用操作日志中间件（记录所有写操作）

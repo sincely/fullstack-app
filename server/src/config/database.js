@@ -32,3 +32,10 @@ export const redisConfig = {
   // 自动重连
   retryStrategy: (times) => Math.min(times * 100, 3000)
 }
+
+/**
+ * Redis 开关控制
+ * 通过环境变量 REDIS_ENABLED 控制是否启用 Redis
+ * 默认关闭，避免本地开发时强制依赖 Redis
+ */
+export const redisEnabled = process.env.REDIS_ENABLED === 'true'

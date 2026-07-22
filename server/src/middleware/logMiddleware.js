@@ -1,5 +1,5 @@
-import operationLogDao from '../services/operationLogDao.js'
-import loginLogDao from '../services/loginLogDao.js'
+import operationLogDao from '../modules/log/operationLogDao.js'
+import loginLogDao from '../modules/log/loginLogDao.js'
 import { randomUUID } from 'crypto'
 
 /**

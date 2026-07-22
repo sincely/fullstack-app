@@ -33,7 +33,14 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "prettier:fix": "prettier --write .",
-    "lint-staged": "lint-staged"
+    "lint-staged": "lint-staged",
+    "db:migrate": "node scripts/db-cli.js migrate",
+    "db:rollback": "node scripts/db-cli.js rollback",
+    "db:status": "node scripts/db-cli.js status",
+    "db:backup": "node scripts/db-cli.js backup",
+    "db:restore": "node scripts/db-cli.js restore",
+    "db:list": "node scripts/db-cli.js list",
+    "db:verify": "node scripts/db-cli.js verify"
   },
   "dependencies": {
     "@koa/bodyparser": "6.1.0",
