@@ -54,9 +54,9 @@ const frontendLogin = async (ctx) => {
   const { userName, password } = ctx.request.body
   const username = userName
   const loginType = 'password'
-  // 注意： 如果应用部署在Nginx后面，需要确保Nginx正确配置了转发请求头：
-//   proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-//  proxy_set_header X-Real-IP $remote_addr;
+  //  注意： 如果应用部署在Nginx后面，需要确保Nginx正确配置了转发请求头：
+  //  proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+  //  proxy_set_header X-Real-IP $remote_addr;
 
   const loginIp =
       ctx.headers['x-forwarded-for'] ||

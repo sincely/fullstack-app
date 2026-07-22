@@ -7,9 +7,6 @@ import logger from '../config/logger.js'
  * @param {string} msg - 错误信息
  * @param {any} data - 错误详情
  * @param {Error} [cause] - 原始错误对象（可选，传入时自动记录完整堆栈）
- * @example
- * createErrorResponse(400, '参数错误');
- * createErrorResponse(500, '服务器错误', null, new Error('DB failed'));
  */
 export function createErrorResponse(code, msg, data, cause) {
   // 联动日志：记录完整的错误堆栈，方便定位代码崩溃位置
@@ -38,8 +35,6 @@ export function createErrorResponse(code, msg, data, cause) {
  * @param {number} code - 业务错误码
  * @param {string} msg - 失败信息
  * @param {any} data - 响应数据
- * @example
- * createFailResponse(400, '参数错误');
  */
 export function createFailResponse(code, msg, data) {
   return { code, msg, data }
@@ -51,8 +46,6 @@ export function createFailResponse(code, msg, data) {
  * @param {number} code - 业务成功码
  * @param {string} msg - 成功信息
  * @param {any} data - 响应数据
- * @example
- * createSuccessResponse(200, '操作成功', { id: 1 });
  */
 export function createSuccessResponse(code, msg, data) {
   return { code, msg, data }
