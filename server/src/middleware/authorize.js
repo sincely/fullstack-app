@@ -1,7 +1,6 @@
 import adminPermissionDao from '../modules/permission/permissionDao.js'
-import { businessCode, businessMsg } from '../config/businessCode.js'
-import { createErrorResponse } from '../utils/createResponse.js'
-import { httpCode } from '../config/httpError.js'
+import { businessCode } from '../config/businessCode.js'
+import { setBody } from '../utils/response.js'
 
 const parseRoleIds = (value, fallbackRoleId) => {
   if (typeof value === 'string' && value.trim()) {
@@ -30,8 +29,7 @@ export const authorizeRoute = (routePath) => {
     const roleIds = parseRoleIds(currentUser?.roleIds, currentUser?.roleId)
 
     if (roleIds.length === 0) {
-      ctx.status = httpCode.ok
-      ctx.body = createErrorResponse(businessCode.unAuthorized, '未登录或登录已过期')
+      setBody(ctx, businessCode.unAuthorized, 401)
       return
     }
 
@@ -39,11 +37,7 @@ export const authorizeRoute = (routePath) => {
     const allowed = menus.some((menu) => allowedRoutePaths.includes(menu.routePath))
 
     if (!allowed) {
-      ctx.status = httpCode.forbidden
-      ctx.body = {
-        code: businessCode.permissionDenied,
-        msg: businessMsg[businessCode.permissionDenied]
-      }
+      setBody(ctx, businessCode.permissionDenied, 403)
       return
     }
 

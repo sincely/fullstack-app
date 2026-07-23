@@ -1,4 +1,4 @@
-import { getConnection, query } from '../../utils/db.js'
+import { getConnection, query } from '../../db/connection.js'
 
 const buildRoleCode = (roleName) => {
   const normalized = String(roleName || '')

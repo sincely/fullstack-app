@@ -7,6 +7,9 @@
 // 导出控制器
 export { default as userManageController } from './userManageController.js'
 
+// 导出 Service
+export * as userService from './userService.js'
+
 // 导出 DAO
 export { default as userDao } from './userDao.js'
 

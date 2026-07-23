@@ -7,6 +7,9 @@
 // 导出控制器
 export { default as menuManageController } from './menuManageController.js'
 
+// 导出 Service
+export * as menuService from './menuService.js'
+
 // 导出 DAO
 export { default as menuDao } from './menuDao.js'
 

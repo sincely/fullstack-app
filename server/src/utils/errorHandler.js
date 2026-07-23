@@ -1,6 +1,6 @@
 import logger from '../config/logger.js'
-import { httpCode } from '../config/httpError.js'
-import { createErrorResponse, createFailResponse } from './createResponse.js'
+import { setBody } from './response.js'
+import { businessCode } from '../config/businessCode.js'
 
 /**
  * 判断错误对象是否为 HTTP 错误（包含可用状态码）。
@@ -18,8 +18,8 @@ const isHttpError = (err) => {
 
 /**
  * 包装 controller，统一捕获异常并输出标准响应。
- * - HTTP 异常（4xx）：记录 warn 日志，返回失败响应
- * - 非 HTTP 异常（5xx）：记录完整错误堆栈 error 日志，返回 500 错误响应
+ * - HTTP 异常（4xx）：记录 warn 日志，返回对应 HTTP 状态码
+ * - 非 HTTP 异常（5xx）：记录完整错误堆栈 error 日志，返回 500
  */
 export const errorControllerWrapper = (controller) => {
   return async (ctx, next) => {
@@ -38,8 +38,7 @@ export const errorControllerWrapper = (controller) => {
       if (isHttpError(err)) {
         // HTTP 业务异常（4xx）：warn 级别，不需要完整堆栈
         const status = err.status ?? err.statusCode
-        ctx.status = httpCode.ok
-        ctx.body = createFailResponse(status, err.message || 'Request failed')
+        setBody(ctx, status, status, null, err.message || 'Request failed')
         logger.warn(
           {
             err: { message: err.message, stack: err.stack },
@@ -52,11 +51,9 @@ export const errorControllerWrapper = (controller) => {
       }
 
       // 非预期异常（5xx）：error 级别，记录完整堆栈方便定位崩溃位置
-      // 使用 Error.cause 保留原始错误上下文（Node 16.9+）
       const wrappedErr = new Error(`Unhandled error: ${err.message || 'Unknown error'}`, { cause: err })
 
-      ctx.status = httpCode.ok
-      ctx.body = createErrorResponse(500, 'Something went wrong', null, wrappedErr)
+      setBody(ctx, businessCode.error, 500, null, 'Something went wrong')
       logger.error(
         {
           err: wrappedErr,

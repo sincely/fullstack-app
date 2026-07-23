@@ -1,4 +1,4 @@
-import { getConnection, query } from '../../utils/db.js'
+import { getConnection, query } from '../../db/connection.js'
 
 /**
  * 菜单列表查询的公共字段（适配新表结构，不再依赖 meta JSON）。

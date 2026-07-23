@@ -1,290 +1,62 @@
 /**
- * @module 后台认证
- * @description 处理后台登录、注册、退出和权限信息获取
+ * @module 后台认证 Controller
+ * @description HTTP 适配层，负责请求/响应转换，业务逻辑委托给 Service
  */
 
-import adminAuthDao from './authDao.js'
-import adminPermissionDao from '../permission/permissionDao.js'
-import { httpCode } from '../../config/httpError.js'
-import { businessCode, businessMsg } from '../../config/businessCode.js'
-import { defaultAdminRoleName } from '../../config/admin.js'
-import { hashPassword, comparePassword } from '../../utils/password.js'
-import { generateToken } from '../../utils/jwt.js'
-import { buildMenuTree, extractPermissionCodes } from '../../utils/adminPermission.js'
-
-const parseRoleIds = (value, fallbackRoleId) => {
-  if (typeof value === 'string' && value.trim()) {
-    return value
-      .split(',')
-      .map((item) => Number(item))
-      .filter(Boolean)
-  }
-
-  return fallbackRoleId ? [Number(fallbackRoleId)] : []
-}
-
-const parseRoleNames = (value, fallbackRoleName) => {
-  if (typeof value === 'string' && value.trim()) {
-    return value
-      .split(',')
-      .map((item) => item.trim())
-      .filter(Boolean)
-  }
-
-  return fallbackRoleName ? [fallbackRoleName] : []
-}
-
-const parseRoleCodes = (value, fallbackRoleCode) => {
-  if (typeof value === 'string' && value.trim()) {
-    return value
-      .split(',')
-      .map((item) => item.trim())
-      .filter(Boolean)
-  }
-
-  return fallbackRoleCode ? [fallbackRoleCode] : []
-}
-
-const formatUserInfo = (user) => {
-  return {
-    id: user.id,
-    username: user.username,
-    email: user.email,
-    status: user.status,
-    avatar: user.avatar,
-    roleId: user.roleId,
-    roleIds: parseRoleIds(user.roleIds, user.roleId),
-    roleCode: user.roleCode,
-    roleCodes: parseRoleCodes(user.roleCodes, user.roleCode),
-    roleName: user.roleName,
-    roleNames: parseRoleNames(user.roleNames, user.roleName),
-    roleDescription: user.roleDescription
-  }
-}
-
-const buildPermissionSnapshot = async (roleIds) => {
-  const menus = await adminPermissionDao.findMenusByRoleId(roleIds)
-  const buttons = await adminPermissionDao.findButtonsByRoleId(roleIds)
-
-  return {
-    menuTree: buildMenuTree(menus),
-    buttons,
-    permissionCodes: extractPermissionCodes(menus, buttons)
-  }
-}
+import * as authService from './authService.js'
+import { businessCode } from '../../config/businessCode.js'
+import { setBody, success } from '../../utils/response.js'
 
 /**
- * 后台注册 - 注册后台账号并绑定默认角色
- * @api POST /auth/register
- * @description 后台认证 - 后台登录、注册、退出和权限信息获取
- * @auth public
- * @body {string} username - 登录用户名
- * @body {string} password - 登录密码
- * @body {string} confirmPassword - 确认密码
- * @body {string} email - 邮箱地址
+ * 后台注册
  */
 const register = async (ctx) => {
-  const { username, password, email } = ctx.request.body
-
-  const existedUser = await adminAuthDao.findAdminUserByUsername(username)
-  if (existedUser) {
-    ctx.status = httpCode.ok
-    ctx.body = {
-      code: businessCode.userExist,
-      msg: businessMsg[businessCode.userExist]
-    }
-    return
-  }
-
-  const existedEmail = await adminAuthDao.findAdminUserByEmail(email)
-  if (existedEmail) {
-    ctx.status = httpCode.ok
-    ctx.body = {
-      code: businessCode.emailExist,
-      msg: businessMsg[businessCode.emailExist]
-    }
-    return
-  }
-
-  const defaultRole = await adminAuthDao.findRoleByName(defaultAdminRoleName)
-  if (!defaultRole) {
-    ctx.status = httpCode.internalServerError
-    ctx.body = {
-      code: businessCode.roleNotFound,
-      msg: businessMsg[businessCode.roleNotFound]
-    }
-    return
-  }
-
-  const passwordHash = await hashPassword(password)
-  const registerResult = await adminAuthDao.createAdminUser({
-    username,
-    email,
-    passwordHash,
-    roleId: defaultRole.roleId
-  })
-
-  if (registerResult.affectedRows !== 1) {
-    ctx.status = httpCode.internalServerError
-    ctx.body = {
-      code: businessCode.error,
-      msg: '注册失败'
-    }
-    return
-  }
-
-  ctx.status = httpCode.ok
-  ctx.body = {
-    code: businessCode.success,
-    msg: '注册成功',
-    data: {
-      username,
-      email,
-      roleName: defaultRole.roleName
-    }
-  }
+  const result = await authService.register(ctx.request.body)
+  if (!result.success) return setBody(ctx, result.code, undefined, null, result.msg)
+  success(ctx, result.data, '注册成功')
 }
 
 /**
- * 后台登录 - 返回 token、用户信息、菜单和权限数据
- * @api POST /auth/login
- * @description 后台认证
- * @auth public
- * @body {string} username - 登录用户名
- * @body {string} password - 登录密码
+ * 后台登录
  */
 const login = async (ctx) => {
-  const { username, password } = ctx.request.body
-
-  const user = await adminAuthDao.findAdminUserByUsername(username)
-  if (!user) {
-    ctx.status = httpCode.ok
-    ctx.body = {
-      code: businessCode.userLoginFail,
-      msg: businessMsg[businessCode.userLoginFail]
-    }
-    return
-  }
-
-  if (Number(user.status) !== 1) {
-    ctx.status = httpCode.ok
-    ctx.body = {
-      code: businessCode.adminUserDisabled,
-      msg: businessMsg[businessCode.adminUserDisabled]
-    }
-    return
-  }
-
-  const passwordMatched = await comparePassword(password, user.password)
-  if (!passwordMatched) {
-    ctx.status = httpCode.ok
-    ctx.body = {
-      code: businessCode.userLoginFail,
-      msg: businessMsg[businessCode.userLoginFail]
-    }
-    return
-  }
-
-  const roleIds = parseRoleIds(user.roleIds, user.roleId)
-  const roleCodes = parseRoleCodes(user.roleCodes, user.roleCode)
-  const roleNames = parseRoleNames(user.roleNames, user.roleName)
-  const permissionSnapshot = await buildPermissionSnapshot(roleIds)
-  const token = generateToken({
-    userId: user.id,
-    username: user.username,
-    roleId: user.roleId,
-    roleIds,
-    roleCode: user.roleCode,
-    roleCodes,
-    roleName: user.roleName,
-    roleNames
-  })
-
-  ctx.status = httpCode.ok
-  ctx.body = {
-    code: businessCode.success,
-    msg: '登录成功',
-    data: {
-      token,
-      user: formatUserInfo(user),
-      menus: permissionSnapshot.menuTree,
-      permissions: permissionSnapshot.permissionCodes,
-      buttons: permissionSnapshot.buttons
-    }
-  }
+  const result = await authService.login(ctx.request.body)
+  if (!result.success) return setBody(ctx, result.code)
+  success(ctx, result.data, '登录成功')
 }
 
 /**
  * 获取当前用户信息
- * @api GET /auth/profile
- * @description 后台认证
  */
 const getProfile = async (ctx) => {
-  const currentUser = await adminAuthDao.findAdminUserById(ctx.state.user.userId)
-  if (!currentUser) {
-    ctx.status = httpCode.unauthorized
-    ctx.body = {
-      code: businessCode.userNotFound,
-      msg: businessMsg[businessCode.userNotFound]
-    }
-    return
-  }
-
-  ctx.status = httpCode.ok
-  ctx.body = {
-    code: businessCode.success,
-    msg: '获取用户信息成功',
-    data: formatUserInfo(currentUser)
-  }
+  const result = await authService.getProfile(ctx.state.user.userId)
+  if (!result.success) return setBody(ctx, result.code)
+  success(ctx, result.data, '获取用户信息成功')
 }
 
 /**
  * 获取当前用户菜单
- * @api GET /auth/menus
- * @description 后台认证
  */
 const getMenus = async (ctx) => {
-  const permissionSnapshot = await buildPermissionSnapshot(parseRoleIds(ctx.state.user.roleIds, ctx.state.user.roleId))
-
-  ctx.status = httpCode.ok
-  ctx.body = {
-    code: businessCode.success,
-    msg: '获取菜单成功',
-    data: permissionSnapshot.menuTree
-  }
+  const result = await authService.getMenus(ctx.state.user.roleIds, ctx.state.user.roleId)
+  if (!result.success) return setBody(ctx, result.code)
+  success(ctx, result.data, '获取菜单成功')
 }
 
 /**
  * 获取当前用户权限
- * @api GET /auth/permissions
- * @description 后台认证
  */
 const getPermissions = async (ctx) => {
-  const permissionSnapshot = await buildPermissionSnapshot(parseRoleIds(ctx.state.user.roleIds, ctx.state.user.roleId))
-
-  ctx.status = httpCode.ok
-  ctx.body = {
-    code: businessCode.success,
-    msg: '获取权限成功',
-    data: {
-      menus: permissionSnapshot.menuTree,
-      buttons: permissionSnapshot.buttons,
-      permissions: permissionSnapshot.permissionCodes
-    }
-  }
+  const result = await authService.getPermissions(ctx.state.user.roleIds, ctx.state.user.roleId)
+  if (!result.success) return setBody(ctx, result.code)
+  success(ctx, result.data, '获取权限成功')
 }
 
 /**
  * 后台退出登录
- * @api POST /auth/logout
- * @description 后台认证
  */
 const logout = async (ctx) => {
-  ctx.status = httpCode.ok
-  ctx.body = {
-    code: businessCode.success,
-    msg: '退出成功'
-  }
+  success(ctx, null, '退出成功')
 }
 
 export default {

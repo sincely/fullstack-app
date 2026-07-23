@@ -1,5 +1,4 @@
 import Router from '@koa/router'
-import loginRouter from '../modules/login/loginRouter.js'
 import authRouter from '../modules/auth/authRouter.js'
 
 import routeRouter from '../modules/route/routeRouter.js'
@@ -17,7 +16,6 @@ router.get('/health', (ctx) => {
   }
 })
 
-router.use(loginRouter.routes(), loginRouter.allowedMethods())
 router.use(authRouter.routes(), authRouter.allowedMethods())
 
 // 应用操作日志中间件（记录所有写操作）

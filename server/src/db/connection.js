@@ -1,5 +1,7 @@
 import mysql from 'mysql2/promise'
+import { format } from 'mysql2'
 import { dbConfig } from '../config/database.js'
+import logger from '../config/logger.js'
 
 // 创建数据库连接
 const pool = mysql.createPool(dbConfig)
@@ -12,6 +14,7 @@ const pool = mysql.createPool(dbConfig)
  */
 // 封装查询函数
 const query = async (sql, params = []) => {
+  logger.info(format(sql.trim(), params), 'SQL')
   const [result] = await pool.query(sql, params)
   return result
 }

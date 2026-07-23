@@ -8,6 +8,10 @@
 export { default as operationLogController } from './operationLogController.js'
 export { default as loginLogController } from './loginLogController.js'
 
+// 导出 Service
+export * as operationLogService from './operationLogService.js'
+export * as loginLogService from './loginLogService.js'
+
 // 导出 DAO
 export { default as operationLogDao } from './operationLogDao.js'
 export { default as loginLogDao } from './loginLogDao.js'

@@ -7,6 +7,9 @@
 // 导出控制器
 export { default as roleManageController } from './roleManageController.js'
 
+// 导出 Service
+export * as roleService from './roleService.js'
+
 // 导出 DAO
 export { default as roleDao } from './roleDao.js'
 

@@ -42,8 +42,6 @@ export const buildMenuTree = (menuList) => {
   }
 
   for (const menu of menuMap.values()) {
-    console.log(menu)
-
     if (menu.parentId && menuMap.has(menu.parentId)) {
       menuMap.get(menu.parentId).children.push(menu)
       continue

@@ -9,7 +9,7 @@ import {
   MenuDeleteBodySchema,
   MenuListQuerySchema,
   MenuUpdateBodySchema
-} from '../../schemas/models/systemManageSchema.js'
+} from '../../schemas/menu/menuSchema.js'
 
 const menuManageRouter = new Router()
 

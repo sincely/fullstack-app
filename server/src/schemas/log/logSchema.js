@@ -1,13 +1,10 @@
 import { z } from 'zod'
+import { createPaginatedQuerySchema } from '../common/paginationSchema.js'
 
 const statusEnum = z.enum(['0', '1'])
 
 // 操作日志列表查询参数
-export const OperationLogListQuerySchema = z.object({
-  current: z.coerce.number().int().min(1).default(1),
-  size: z.coerce.number().int().min(1).max(100).default(10),
-  page: z.coerce.number().int().min(1).optional(),
-  pageSize: z.coerce.number().int().min(1).max(100).optional(),
+export const OperationLogListQuerySchema = createPaginatedQuerySchema({
   username: z.string().max(50).optional(),
   action: z.string().max(100).optional(),
   status: statusEnum.optional(),
@@ -16,11 +13,7 @@ export const OperationLogListQuerySchema = z.object({
 })
 
 // 登录日志列表查询参数
-export const LoginLogListQuerySchema = z.object({
-  current: z.coerce.number().int().min(1).default(1),
-  size: z.coerce.number().int().min(1).max(100).default(10),
-  page: z.coerce.number().int().min(1).optional(),
-  pageSize: z.coerce.number().int().min(1).max(100).optional(),
+export const LoginLogListQuerySchema = createPaginatedQuerySchema({
   username: z.string().max(50).optional(),
   ipAddress: z.string().max(45).optional(),
   status: statusEnum.optional(),

@@ -1,50 +1,18 @@
 /**
- * @module 登录日志管理
- * @description 处理登录日志的查询、删除等操作
+ * @module 登录日志管理 Controller
+ * @description HTTP 适配层，业务逻辑委托给 loginLogService
  */
 
-import loginLogDao from './loginLogDao.js'
+import * as loginLogService from './loginLogService.js'
 import { businessCode } from '../../config/businessCode.js'
-import { httpCode } from '../../config/httpError.js'
+import { setBody, success } from '../../utils/response.js'
 
 /**
- * 获取登录日志列表 - 分页查询
+ * 获取登录日志列表
  */
 const listLoginLogs = async (ctx) => {
-  const { current, size, page, pageSize, username, ipAddress, status, startTime, endTime } = ctx.query
-  const actualPage = Number(page || current || 1)
-  const actualPageSize = Number(pageSize || size || 10)
-
-  const [list, total] = await Promise.all([
-    loginLogDao.listLoginLogs({
-      page: actualPage,
-      pageSize: actualPageSize,
-      username,
-      ipAddress,
-      status,
-      startTime,
-      endTime
-    }),
-    loginLogDao.countLoginLogs({
-      username,
-      ipAddress,
-      status,
-      startTime,
-      endTime
-    })
-  ])
-
-  ctx.status = httpCode.ok
-  ctx.body = {
-    code: businessCode.success,
-    msg: '获取登录日志列表成功',
-    data: {
-      records: list,
-      current: actualPage,
-      size: actualPageSize,
-      total: Number(total)
-    }
-  }
+  const data = await loginLogService.listLoginLogs(ctx.query)
+  success(ctx, data, '获取登录日志列表成功')
 }
 
 /**
@@ -54,31 +22,16 @@ const getLoginLogDetail = async (ctx) => {
   const { id } = ctx.query
 
   if (!id) {
-    ctx.status = httpCode.ok
-    ctx.body = {
-      code: businessCode.paramError,
-      msg: '日志ID不能为空'
-    }
-    return
+    return setBody(ctx, businessCode.paramError, 400, null, '日志ID不能为空')
   }
 
-  const log = await loginLogDao.getLoginLogById(Number(id))
+  const log = await loginLogService.getLoginLogDetail(Number(id))
 
   if (!log) {
-    ctx.status = httpCode.ok
-    ctx.body = {
-      code: businessCode.error,
-      msg: '日志不存在'
-    }
-    return
+    return setBody(ctx, businessCode.error, 404, null, '日志不存在')
   }
 
-  ctx.status = httpCode.ok
-  ctx.body = {
-    code: businessCode.success,
-    msg: '获取日志详情成功',
-    data: log
-  }
+  success(ctx, log, '获取日志详情成功')
 }
 
 /**
@@ -88,34 +41,19 @@ const batchDeleteLoginLogs = async (ctx) => {
   const { ids } = ctx.request.body
 
   if (!ids || ids.length === 0) {
-    ctx.status = httpCode.ok
-    ctx.body = {
-      code: businessCode.paramError,
-      msg: '请选择要删除的日志'
-    }
-    return
+    return setBody(ctx, businessCode.paramError, 400, null, '请选择要删除的日志')
   }
 
-  await loginLogDao.batchDeleteLoginLogs(ids)
-
-  ctx.status = httpCode.ok
-  ctx.body = {
-    code: businessCode.success,
-    msg: `成功删除 ${ids.length} 条日志`
-  }
+  await loginLogService.batchDeleteLoginLogs(ids)
+  success(ctx, null, `成功删除 ${ids.length} 条日志`)
 }
 
 /**
  * 清空登录日志
  */
 const clearLoginLogs = async (ctx) => {
-  await loginLogDao.clearLoginLogs()
-
-  ctx.status = httpCode.ok
-  ctx.body = {
-    code: businessCode.success,
-    msg: '登录日志已清空'
-  }
+  await loginLogService.clearLoginLogs()
+  success(ctx, null, '登录日志已清空')
 }
 
 export default {

@@ -32,6 +32,7 @@ export function createErrorResponse(code, msg, data, cause) {
 /**
  * 创建失败响应对象（业务预期内的失败，不记录堆栈）
  * 统一返回 { code, msg, data } 格式
+ * @deprecated 请使用 utils/response.js 的 setBody / fail 替代
  * @param {number} code - 业务错误码
  * @param {string} msg - 失败信息
  * @param {any} data - 响应数据
@@ -43,6 +44,7 @@ export function createFailResponse(code, msg, data) {
 /**
  * 创建成功响应对象
  * 统一返回 { code, msg, data } 格式
+ * @deprecated 请使用 utils/response.js 的 setBody / success 替代
  * @param {number} code - 业务成功码
  * @param {string} msg - 成功信息
  * @param {any} data - 响应数据
@@ -52,25 +54,23 @@ export function createSuccessResponse(code, msg, data) {
 }
 
 /**
- * 分页响应
- * @param {Array} list - 数据列表
+ * 分页响应 - 统一使用 records/current/size/total 结构
+ * @deprecated 请在 service 层直接构造分页对象，或使用 utils/response.js 的 success
+ * @param {Array} records - 数据列表
  * @param {number} total - 总数
- * @param {number} page - 当前页
- * @param {number} pageSize - 每页数量
+ * @param {number} current - 当前页码
+ * @param {number} size - 每页数量
  * @returns {Object} 响应对象
  */
-export function createPaginatedResponse(list, total, page, pageSize) {
+export function createPaginatedResponse(records, total, current, size) {
   return {
     code: 200,
     msg: 'Success',
     data: {
-      list,
-      pagination: {
-        total,
-        page,
-        pageSize,
-        totalPages: Math.ceil(total / pageSize)
-      }
+      records,
+      current,
+      size,
+      total: Number(total)
     }
   }
 }

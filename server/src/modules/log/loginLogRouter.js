@@ -7,7 +7,7 @@ import { errorControllerWrapper } from '../../utils/errorHandler.js'
 import {
   LoginLogListQuerySchema,
   LogBatchDeleteBodySchema
-} from '../../schemas/models/logSchema.js'
+} from '../../schemas/log/logSchema.js'
 
 const loginLogRouter = new Router()
 

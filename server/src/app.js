@@ -24,34 +24,38 @@ import { rateLimiter } from './middleware/rateLimiter.js'
 // 路由
 import Routers from './routers/index.js'
 
-// 插件
-import { registerSwagger } from './plugins/swagger.js'
 
 const app = new Koa()
 app.keys = [process.env.SESSION_SECRET || process.env.JWT_SECRET || 'koa-app-template-session-secret']
 
-// ========== 全局错误捕获（必须在最前注册）==========
-// 1. 全局异常捕获中间件 - 使用 AsyncLocalStorage 绑定请求上下文
+// ========== 阶段 A：基础设施层 ==========
+// 1. 全局异常捕获中间件 - 使用 AsyncLocalStorage 绑定请求上下文（洋葱模型最外层）
 app.use(errorCatch)
 
 // 2. 应用级错误监听 - 统一处理所有未捕获异常日志
 app.on('error', errorHandler())
 
-// 请求 ID 中间件（确保后续所有中间件都能读取到 requestId）
+// 3. 请求 ID 中间件（确保后续所有中间件都能读取到 requestId）
 app.use(requestId)
 
-// HTTP请求日志中间件
+// 4. HTTP 请求日志中间件
 app.use(loggerMiddleware)
 
-// 安全响应头（设置各种 HTTP 安全头）
+// ========== 阶段 B：安全层 ==========
+// 5. 安全响应头（HSTS、CSP、X-Frame-Options 等）
 app.use(securityHeaders)
 
-// 速率限制（防止暴力攻击和频繁请求）
-app.use(rateLimiter)
-
-// 跨域处理
+// 6. 跨域处理
 app.use(cors(corsConfig))
 
+// 7. 限流（在请求体解析前执行，快速拒绝超限请求）
+app.use(rateLimiter)
+
+// ========== 阶段 C：请求处理层 ==========
+// 8. 请求体解析（JSON、表单、文本、XML）
+app.use(KoaBodyParser(bodyParserConfig))
+
+// 9. 会话管理（cookie-based session）
 app.use(
   session(
     {
@@ -65,37 +69,36 @@ app.use(
   )
 )
 
-// 为静态资源请求重写url
+// 10. 为静态资源请求重写 URL（去除 /public 前缀）
 app.use(rewriteUrl)
 
-// 响应压缩
+// 11. 响应压缩（gzip/deflate）
 app.use(compress)
 
-// 使用koa-static处理静态资源
+// 12. 静态资源服务
 app.use(KoaStatic(staticDir))
 
+// 13. 会话用户传播（将 session.user 复制到 ctx.state.user）
 app.use(async (ctx, next) => {
   ctx.state.user = ctx.session?.user
   await next()
 })
 
-// 处理请求体数据（必须在路由之前注册）
-app.use(KoaBodyParser(bodyParserConfig))
-
-// 使用路由中间件
+// ========== 阶段 D：业务层 ==========
+// 14. API 路由
 app.use(Routers.routes()).use(Routers.allowedMethods())
 
-// 注册 Swagger API 文档（替代原 docsify 文档服务）
-registerSwagger(app)
+// 15. Swagger API 文档
+// registerSwagger(app)
 
-// 监听服务器启动端口
+// ========== 服务器启动 ==========
 // 仅在非 Vercel 环境下启动服务器
 // 本地开发：process.env.VERCEL 为 undefined（falsy），!process.env.VERCEL 为 true → 执行 app.listen()
 // Vercel 部署：process.env.VERCEL 为 "1"（truthy），!process.env.VERCEL 为 false → 跳过 app.listen()
 if (!process.env.VERCEL) {
   app.listen(Port, () => {
     logger.info(`服务器启动在 http://localhost:${Port}`)
-    logger.info(`Swagger 接口文档地址 http://localhost:${Port}/docs`)
+    // logger.info(`Swagger 接口文档地址 http://localhost:${Port}/docs`)
   })
 }
 

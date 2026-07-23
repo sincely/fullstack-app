@@ -2,7 +2,6 @@ import fs from 'node:fs'
 import path from 'node:path'
 import pino from 'pino'
 
-console.log('process.env.NODE_ENV:', process.env.NODE_ENV)
 const isDev = process.env.NODE_ENV === 'development'
 
 // 日志目录：项目根目录下的 logs 文件夹
@@ -83,17 +82,16 @@ const logger = pino(
           }
         },
     serializers: {
-      req(req) {
+      // 键名需与 pino-http 的 customAttributeKeys 保持一致
+      request(req) {
         return {
           method: req.method,
           url: req.url,
-          query: req.query,
-          body: req.body,
           remoteAddress: req.remoteAddress,
           remotePort: req.remotePort
         }
       },
-      res(res) {
+      response(res) {
         return {
           statusCode: res.statusCode
         }
@@ -101,9 +99,7 @@ const logger = pino(
       // 使用 errWithCause 保留错误因果链（Node 16.9+ Error.cause 支持）
       err: pino.stdSerializers.errWithCause
     }
-  },
-  // 同步写入文件，确保异常日志不丢失
-  pino.destination({ sync: true, dest: getLogFileName() })
+  }
 )
 
 export default logger

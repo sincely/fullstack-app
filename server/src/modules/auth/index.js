@@ -7,6 +7,9 @@
 // 导出控制器
 export { default as authController } from './authController.js'
 
+// 导出 Service
+export * as authService from './authService.js'
+
 // 导出 DAO
 export { default as authDao } from './authDao.js'
 

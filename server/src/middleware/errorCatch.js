@@ -1,4 +1,5 @@
 import { AsyncLocalStorage } from 'node:async_hooks'
+import { businessCode, businessMsg } from '../config/businessCode.js'
 
 /**
  * 请求级异步上下文存储（Node 16.4+ 原生）
@@ -26,13 +27,17 @@ export default async function errorCatch(ctx, next) {
     } catch (err) {
       // 标记已处理，防止 Koa 默认 500 响应覆盖
       const status = err.statusCode || err.status || 500
-      ctx.status = status
 
       // 5xx 错误不暴露内部细节，防止泄露数据库结构/文件路径等敏感信息
       const isServerError = status >= 500
+      const msg = isServerError
+        ? businessMsg[businessCode.error] || '服务器内部错误，请联系管理员'
+        : err.message || '请求处理失败'
+
+      ctx.status = status
       ctx.body = {
         code: err.code || String(status),
-        msg: isServerError ? '服务器内部错误，请联系管理员' : err.message || '请求处理失败',
+        msg,
         requestId
       }
 

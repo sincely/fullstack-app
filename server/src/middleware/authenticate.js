@@ -1,23 +1,21 @@
 import { verifyToken } from '../utils/jwt.js'
-import { createErrorResponse } from '../utils/createResponse.js'
 import { businessCode, businessMsg } from '../config/businessCode.js'
-import { query } from '../utils/db.js'
+import { setBody } from '../utils/response.js'
+import { query } from '../db/connection.js'
 
 async function authenticate(ctx, next) {
   // 从请求头获取 Token
   const authorization = ctx.headers.authorization
 
   if (!authorization) {
-    ctx.status = 200
-    ctx.body = createErrorResponse(businessCode.unAuthorized, '未登录或登录已过期')
+    setBody(ctx, businessCode.unAuthorized, 401)
     return
   }
 
   // 校验 Token 格式 (Bearer <token>)
   const token = authorization.toLowerCase().startsWith('bearer ') ? authorization.slice(7) : undefined
   if (!token) {
-    ctx.status = 200
-    ctx.body = createErrorResponse(businessCode.unAuthorized, 'Token 格式错误，应为 Bearer <token>')
+    setBody(ctx, businessCode.unAuthorized, 401, null, 'Token 格式错误，应为 Bearer <token>')
     return
   }
 
@@ -26,8 +24,8 @@ async function authenticate(ctx, next) {
   try {
     decoded = verifyToken(token)
   } catch (err) {
-    ctx.status = 200
-    ctx.body = createErrorResponse(err.code || businessCode.unAuthorized, err.message)
+    const code = err.code || businessCode.unAuthorized
+    setBody(ctx, code, 401, null, err.message)
     return
   }
 
@@ -49,7 +47,6 @@ async function authenticate(ctx, next) {
       WHERE id = ?
       LIMIT 1
     `
-    console.log(sql);
     const rows = await query(sql, [userId])
     const dbSessionId = rows[0]?.sessionId
     const sessionExpire = rows[0]?.sessionExpire
@@ -59,16 +56,14 @@ async function authenticate(ctx, next) {
       const expireTime = new Date(sessionExpire).getTime()
       const now = Date.now()
       if (now > expireTime) {
-        ctx.status = 200
-        ctx.body = createErrorResponse(businessCode.accountKicked, '会话已过期，请重新登录')
+        setBody(ctx, businessCode.accountKicked, 401, null, '会话已过期，请重新登录')
         return
       }
     }
 
     // 2. 检查 sessionId 是否匹配
     if (!dbSessionId || dbSessionId !== jwtSessionId) {
-      ctx.status = 200
-      ctx.body = createErrorResponse(businessCode.accountKicked, businessMsg[businessCode.accountKicked])
+      setBody(ctx, businessCode.accountKicked, 401)
       return
     }
   }

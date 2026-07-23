@@ -1,4 +1,4 @@
-import { getConnection, query } from '../../utils/db.js'
+import { getConnection, query } from '../../db/connection.js'
 
 /**
  * 用户查询公共字段（适配新表结构，多角色通过 UserRole 关联）。
@@ -283,17 +283,6 @@ const listRoleOptions = async () => {
   return query(sql)
 }
 
-/**
- * 检查角色是否存在。
- * @param {number} roleId
- * @returns {Promise<any|null>}
- */
-const findRoleById = async (roleId) => {
-  const sql = 'select roleId, roleName from Roles where roleId = ? limit 1'
-  const rows = await query(sql, [roleId])
-  return rows[0] || null
-}
-
 export default {
   listUsers,
   countUsers,
@@ -306,6 +295,5 @@ export default {
   updateUserRoles,
   deleteUser,
   getRoleIdsByUserId,
-  listRoleOptions,
-  findRoleById
+  listRoleOptions
 }

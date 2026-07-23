@@ -1,6 +1,5 @@
-import { createErrorResponse } from '../utils/createResponse.js'
-import { httpCode } from '../config/httpError.js'
 import { businessCode } from '../config/businessCode.js'
+import { setBody } from '../utils/response.js'
 
 /**
  * 将 Zod 错误对象转换为统一的错误详情结构。
@@ -36,10 +35,7 @@ const firstZodMessage = (error) => {
 export const validateBody = (schema) => async (ctx, next) => {
   const parsed = schema.safeParse(ctx.request.body)
   if (!parsed.success) {
-    // 业务校验失败返回 HTTP 200，通过 code 字段表达业务错误
-    // 统一返回 { code, msg, data } 格式，与 Controller 中的业务错误保持一致
-    ctx.status = httpCode.ok
-    ctx.body = createErrorResponse(businessCode.paramError, firstZodMessage(parsed.error))
+    setBody(ctx, businessCode.paramError, 400, null, firstZodMessage(parsed.error))
     return
   }
 
@@ -58,10 +54,7 @@ export const validateQuery = (schema) => async (ctx, next) => {
   const parsed = schema.safeParse(ctx.query)
 
   if (!parsed.success) {
-    // 业务校验失败返回 HTTP 200，通过 code 字段表达业务错误
-    // 统一返回 { code, msg, data } 格式，与 Controller 中的业务错误保持一致
-    ctx.status = httpCode.ok
-    ctx.body = createErrorResponse(businessCode.paramError, firstZodMessage(parsed.error))
+    setBody(ctx, businessCode.paramError, 400, null, firstZodMessage(parsed.error))
     return
   }
 

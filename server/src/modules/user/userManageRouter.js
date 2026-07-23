@@ -12,7 +12,7 @@ import {
   UserBatchDeleteBodySchema,
   UserStatusUpdateBodySchema,
   UserPasswordResetBodySchema
-} from '../../schemas/models/systemManageSchema.js'
+} from '../../schemas/user/userSchema.js'
 
 const userManageRouter = new Router()
 

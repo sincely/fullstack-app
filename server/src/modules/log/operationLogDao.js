@@ -1,4 +1,4 @@
-import { query } from '../../utils/db.js'
+import { query } from '../../db/connection.js'
 
 /**
  * 操作日志 DAO

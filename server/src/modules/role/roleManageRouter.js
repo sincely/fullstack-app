@@ -9,7 +9,7 @@ import {
   RoleDeleteBodySchema,
   RoleListQuerySchema,
   RoleUpdateBodySchema
-} from '../../schemas/models/systemManageSchema.js'
+} from '../../schemas/role/roleSchema.js'
 
 const roleManageRouter = new Router()
 

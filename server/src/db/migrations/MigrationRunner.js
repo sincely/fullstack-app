@@ -7,7 +7,7 @@
  * - 团队协作：迁移文件纳入版本控制，保证一致性
  */
 
-import { query, getConnection } from '../../utils/db.js'
+import { query, getConnection } from '../connection.js'
 import { readFileSync, readdirSync } from 'fs'
 import { join, basename } from 'path'
 import logger from '../../config/logger.js'
