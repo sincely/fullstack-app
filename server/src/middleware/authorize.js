@@ -1,6 +1,7 @@
 import adminPermissionDao from '../modules/permission/permissionDao.js'
 import { businessCode } from '../config/businessCode.js'
 import { setBody } from '../utils/response.js'
+import { getPermCache, setPermCache } from '../utils/redisCache.js'
 
 const parseRoleIds = (value, fallbackRoleId) => {
   if (typeof value === 'string' && value.trim()) {
@@ -14,11 +15,28 @@ const parseRoleIds = (value, fallbackRoleId) => {
 }
 
 /**
- * 获取角色菜单（直接从数据库获取，已禁用 Redis 缓存）
- * @param {number|string|number[]} roleId
+ * 获取角色的菜单路径列表（带 Redis 缓存）
+ * 
+ * 流程：Redis 缓存 → miss → 查 MySQL → 回填缓存（5 分钟 TTL）
+ * 
+ * @param {number|string|number[]} roleIds
+ * @returns {Promise<string[]>} routePath 数组
  */
-async function getMenusByRoleId(roleId) {
-  return await adminPermissionDao.findMenusByRoleId(roleId)
+async function getMenuPathsByRoleId(roleIds) {
+  // 1. 尝试 Redis 缓存
+  const cached = await getPermCache(roleIds)
+  if (cached) {
+    return cached
+  }
+
+  // 2. 回退 MySQL
+  const menus = await adminPermissionDao.findMenusByRoleId(roleIds)
+  const routePaths = menus.map((menu) => menu.routePath)
+
+  // 3. 回填缓存
+  await setPermCache(roleIds, routePaths)
+
+  return routePaths
 }
 
 export const authorizeRoute = (routePath) => {
@@ -33,8 +51,9 @@ export const authorizeRoute = (routePath) => {
       return
     }
 
-    const menus = await getMenusByRoleId(roleIds)
-    const allowed = menus.some((menu) => allowedRoutePaths.includes(menu.routePath))
+    // 从缓存/数据库获取用户拥有的菜单路径
+    const menuPaths = await getMenuPathsByRoleId(roleIds)
+    const allowed = menuPaths.some((path) => allowedRoutePaths.includes(path))
 
     if (!allowed) {
       setBody(ctx, businessCode.permissionDenied, 403)

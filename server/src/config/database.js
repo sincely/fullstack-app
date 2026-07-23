@@ -29,8 +29,27 @@ export const redisConfig = {
   port: Number.parseInt(process.env.REDIS_PORT || '6379', 10),
   password: process.env.REDIS_PASSWORD || undefined,
   db: Number.parseInt(process.env.REDIS_DB || '0', 10),
-  // 自动重连
-  retryStrategy: (times) => Math.min(times * 100, 3000)
+
+  // 连接超时（ms）
+  connectTimeout: 5_000,
+
+  // 命令执行超时（ms），防止慢查询阻塞
+  commandTimeout: 3_000,
+
+  // 单次请求最大重试次数（超过后不再自动重连，直接报错）
+  maxRetriesPerRequest: 3,
+
+  // 自动重连策略：指数退避，上限 3s
+  retryStrategy: (times) => {
+    if (times > 10) return null // 超过 10 次重连后放弃
+    return Math.min(times * 200, 3000)
+  },
+
+  // 延迟连接：由应用显式调用 connect()，便于启动时统一检测和错误处理
+  lazyConnect: true,
+
+  // 启用离线队列：连接断开期间的命令会排队，重连后自动执行
+  enableOfflineQueue: true
 }
 
 /**

@@ -8,6 +8,7 @@ import adminPermissionDao from '../permission/permissionDao.js'
 import { getConnection } from '../../db/connection.js'
 import { businessCode } from '../../config/businessCode.js'
 import { normalizePagination } from '../../schemas/common/paginationSchema.js'
+import { delPermCacheByRole } from '../../utils/redisCache.js'
 
 const toDbStatus = (status) => {
   if (status === '2' || Number(status) === 0) return 0
@@ -174,6 +175,10 @@ export const updateRoleRouteIds = async ({ roleId, routeIds }) => {
       await connection.execute(`insert into RoleRoute (roleId, routeId) values ${valuesSql}`, values)
     }
     await connection.commit()
+    
+    // 清除该角色的权限缓存
+    await delPermCacheByRole(roleId)
+    
     return { success: true }
   } catch (error) {
     await connection.rollback()
@@ -200,6 +205,10 @@ export const updateRoleButtonIds = async ({ roleId, buttonIds }) => {
   if (!currentRole) return { success: false, code: businessCode.roleNotFound }
 
   await adminPermissionDao.replaceRoleButtons(roleId, buttonIds)
+  
+  // 清除该角色的权限缓存
+  await delPermCacheByRole(roleId)
+  
   return { success: true }
 }
 

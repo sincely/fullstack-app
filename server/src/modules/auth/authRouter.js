@@ -26,6 +26,15 @@ const frontendLogin = async (ctx) => {
   })
 
   if (!result.success) return setBody(ctx, result.code)
+
+  // 写入 Session（Redis Store 会在响应结束时自动持久化）
+  ctx.session.user = {
+    userId: result.data.userId,
+    token: result.data.token,
+    refreshToken: result.data.refreshToken,
+    sessionId: result.data.sessionId
+  }
+
   success(ctx, result.data, '登录成功')
 }
 
@@ -60,6 +69,10 @@ authRouter.post(
   errorControllerWrapper(async (ctx) => {
     const userId = ctx.state.user?.userId
     await authService.frontendLogout(userId)
+
+    // 清除 Session（Redis Store 会在响应结束时删除对应 key）
+    ctx.session = null
+
     success(ctx, null, '退出成功')
   })
 )
