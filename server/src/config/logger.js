@@ -1,4 +1,3 @@
-import { log } from 'node:console'
 import fs from 'node:fs'
 import path from 'node:path'
 import pino from 'pino'
@@ -30,7 +29,6 @@ const logger = pino({
         50: '🚨', // ERROR
         60: '💀' // FATAL
       }
-      log(...inputArgs)
       const icon = levelIcons[level] || '📝'
 
       // Handle case: logger.info('message')

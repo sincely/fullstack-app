@@ -1,8 +1,18 @@
 import pinoHttp from 'pino-http'
 import logger from '../config/logger.js'
+import { log } from 'node:console'
 
 const httpLogger = pinoHttp({
   logger,
+  // 直接传给 pino-http 的序列化器，覆盖 pino-std-serializers 的默认行为（避免输出完整 headers）
+  serializers: {
+    req(req) {
+      return { method: req.method, url: req.url, remoteAddress: req.remoteAddress, remotePort: req.remotePort }
+    },
+    res(res) {
+      return { statusCode: res.statusCode, statusMessage: res.statusMessage, body: res._body }
+    }
+  },
   customLogLevel: function (req, res, err) {
     // 不记录 /docs（Swagger UI）相关的访问日志
     if (req.url && req.url.startsWith('/docs')) {
