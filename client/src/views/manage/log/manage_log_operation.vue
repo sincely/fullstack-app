@@ -13,14 +13,6 @@ const statusRecord = {
   0: { text: '失败', color: 'error' }
 }
 
-const methodColorMap = {
-  GET: 'blue',
-  POST: 'green',
-  PUT: 'orange',
-  DELETE: 'red',
-  PATCH: 'purple'
-}
-
 const {
   columns,
   columnChecks,
@@ -66,22 +58,11 @@ const {
       width: 100
     },
     {
-      key: 'method',
-      dataIndex: 'method',
-      title: '请求方法',
+      key: 'module',
+      dataIndex: 'module',
+      title: '系统模块',
       align: 'center',
-      width: 100,
-      customRender: ({ record }) => {
-        return <Tag color={methodColorMap[record.method] || 'default'}>{record.method}</Tag>
-      }
-    },
-    {
-      key: 'requestUrl',
-      dataIndex: 'requestUrl',
-      title: '请求URL',
-      align: 'center',
-      minWidth: 200,
-      ellipsis: true
+      width: 120
     },
     {
       key: 'ipAddress',

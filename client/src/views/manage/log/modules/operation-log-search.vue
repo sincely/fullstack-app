@@ -26,6 +26,18 @@ function search() {
           </AFormItem>
         </ACol>
         <ACol :span="24" :md="12" :lg="6">
+          <AFormItem :label="'系统模块'" name="module" class="m-0">
+            <ASelect v-model:value="model.module" :placeholder="'请选择系统模块'" allow-clear>
+              <ASelectOption value="用户管理">用户管理</ASelectOption>
+              <ASelectOption value="角色管理">角色管理</ASelectOption>
+              <ASelectOption value="菜单管理">菜单管理</ASelectOption>
+              <ASelectOption value="用户认证">用户认证</ASelectOption>
+              <ASelectOption value="路由管理">路由管理</ASelectOption>
+              <ASelectOption value="日志管理">日志管理</ASelectOption>
+            </ASelect>
+          </AFormItem>
+        </ACol>
+        <ACol :span="24" :md="12" :lg="6">
           <AFormItem :label="'操作状态'" name="status" class="m-0">
             <ASelect v-model:value="model.status" :placeholder="'请选择操作状态'" allow-clear>
               <ASelectOption value="1">成功</ASelectOption>
