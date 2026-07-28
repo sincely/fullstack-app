@@ -1,5 +1,5 @@
 import logger from '../config/logger.js'
-import { setBody } from './response.js'
+import { createErrorResponse } from '../utils/createResponse.js'
 import { businessCode } from '../config/businessCode.js'
 
 /**
@@ -38,7 +38,8 @@ export const errorControllerWrapper = (controller) => {
       if (isHttpError(err)) {
         // HTTP 业务异常（4xx）：warn 级别，不需要完整堆栈
         const status = err.status ?? err.statusCode
-        setBody(ctx, status, status, null, err.message || 'Request failed')
+        ctx.status = status
+        ctx.body = createErrorResponse(status, err.message || 'Request failed', null, err)
         logger.warn(
           {
             err: { message: err.message, stack: err.stack },
@@ -53,7 +54,8 @@ export const errorControllerWrapper = (controller) => {
       // 非预期异常（5xx）：error 级别，记录完整堆栈方便定位崩溃位置
       const wrappedErr = new Error(`Unhandled error: ${err.message || 'Unknown error'}`, { cause: err })
 
-      setBody(ctx, businessCode.error, 500, null, 'Something went wrong')
+      ctx.status = 500
+      ctx.body = createErrorResponse(businessCode.error, 'Something went wrong', null, wrappedErr)
       logger.error(
         {
           err: wrappedErr,

@@ -4,15 +4,15 @@
  */
 
 import * as roleService from './roleService.js'
-import { businessCode } from '../../config/businessCode.js'
-import { setBody, success } from '../../utils/response.js'
+import { businessCode, businessMsg } from '../../config/businessCode.js'
+import { createSuccessResponse, createFailResponse } from '../../utils/createResponse.js'
 
 /**
  * 获取角色列表
  */
 const listRoles = async (ctx) => {
   const data = await roleService.listRoles(ctx.query)
-  success(ctx, data, '获取角色列表成功')
+  ctx.body = createSuccessResponse(businessCode.success, '获取角色列表成功', data)
 }
 
 /**
@@ -20,8 +20,8 @@ const listRoles = async (ctx) => {
  */
 const createRole = async (ctx) => {
   const result = await roleService.createRole(ctx.request.body)
-  if (!result.success) return setBody(ctx, result.code)
-  success(ctx, result.data, '创建角色成功')
+  if (!result.success) return (ctx.body = createFailResponse(result.code, businessMsg[result.code]))
+  ctx.body = createSuccessResponse(businessCode.success, '创建角色成功', result.data)
 }
 
 /**
@@ -29,8 +29,8 @@ const createRole = async (ctx) => {
  */
 const updateRole = async (ctx) => {
   const result = await roleService.updateRole(ctx.request.body)
-  if (!result.success) return setBody(ctx, result.code)
-  success(ctx, null, '更新角色成功')
+  if (!result.success) return (ctx.body = createFailResponse(result.code, businessMsg[result.code]))
+  ctx.body = createSuccessResponse(businessCode.success, '更新角色成功')
 }
 
 /**
@@ -39,8 +39,8 @@ const updateRole = async (ctx) => {
 const deleteRole = async (ctx) => {
   const roleId = ctx.request.body.roleId || ctx.request.body.id
   const result = await roleService.deleteRole(roleId)
-  if (!result.success) return setBody(ctx, result.code)
-  success(ctx, null, '删除角色成功')
+  if (!result.success) return (ctx.body = createFailResponse(result.code, businessMsg[result.code]))
+  ctx.body = createSuccessResponse(businessCode.success, '删除角色成功')
 }
 
 /**
@@ -48,7 +48,7 @@ const deleteRole = async (ctx) => {
  */
 const getAllRoles = async (ctx) => {
   const result = await roleService.getAllRoles()
-  success(ctx, result.data, '获取全部角色成功')
+  ctx.body = createSuccessResponse(businessCode.success, '获取全部角色成功', result.data)
 }
 
 /**
@@ -57,7 +57,7 @@ const getAllRoles = async (ctx) => {
 const getRoleRouteIds = async (ctx) => {
   const { roleId } = ctx.query
   const result = await roleService.getRoleRouteIds(roleId)
-  success(ctx, result.data, '请求成功')
+  ctx.body = createSuccessResponse(businessCode.success, '请求成功', result.data)
 }
 
 /**
@@ -65,8 +65,8 @@ const getRoleRouteIds = async (ctx) => {
  */
 const updateRoleRouteIds = async (ctx) => {
   const result = await roleService.updateRoleRouteIds(ctx.request.body)
-  if (!result.success) return setBody(ctx, result.code)
-  success(ctx, null, '更新角色菜单成功')
+  if (!result.success) return (ctx.body = createFailResponse(result.code, businessMsg[result.code]))
+  ctx.body = createSuccessResponse(businessCode.success, '更新角色菜单成功')
 }
 
 /**
@@ -75,7 +75,7 @@ const updateRoleRouteIds = async (ctx) => {
 const getRoleButtonIds = async (ctx) => {
   const { roleId } = ctx.query
   const result = await roleService.getRoleButtonIds(roleId)
-  success(ctx, result.data, '请求成功')
+  ctx.body = createSuccessResponse(businessCode.success, '请求成功', result.data)
 }
 
 /**
@@ -83,8 +83,8 @@ const getRoleButtonIds = async (ctx) => {
  */
 const updateRoleButtonIds = async (ctx) => {
   const result = await roleService.updateRoleButtonIds(ctx.request.body)
-  if (!result.success) return setBody(ctx, result.code)
-  success(ctx, null, '更新角色按钮成功')
+  if (!result.success) return (ctx.body = createFailResponse(result.code, businessMsg[result.code]))
+  ctx.body = createSuccessResponse(businessCode.success, '更新角色按钮成功')
 }
 
 /**
@@ -92,7 +92,7 @@ const updateRoleButtonIds = async (ctx) => {
  */
 const getAllButtons = async (ctx) => {
   const result = await roleService.getAllButtons()
-  success(ctx, result.data, '请求成功')
+  ctx.body = createSuccessResponse(businessCode.success, '请求成功', result.data)
 }
 
 export default {

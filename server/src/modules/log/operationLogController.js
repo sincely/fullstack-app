@@ -5,14 +5,14 @@
 
 import * as operationLogService from './operationLogService.js'
 import { businessCode } from '../../config/businessCode.js'
-import { setBody, success } from '../../utils/response.js'
+import { createSuccessResponse, createFailResponse } from '../../utils/createResponse.js'
 
 /**
  * 获取操作日志列表
  */
 const listOperationLogs = async (ctx) => {
   const data = await operationLogService.listOperationLogs(ctx.query)
-  success(ctx, data, '获取操作日志列表成功')
+  ctx.body = createSuccessResponse(businessCode.success, '获取操作日志列表成功', data)
 }
 
 /**
@@ -22,16 +22,18 @@ const getOperationLogDetail = async (ctx) => {
   const { id } = ctx.query
 
   if (!id) {
-    return setBody(ctx, businessCode.paramError, 400, null, '日志ID不能为空')
+    ctx.status = 400
+    return (ctx.body = createFailResponse(businessCode.paramError, '日志ID不能为空'))
   }
 
   const log = await operationLogService.getOperationLogDetail(Number(id))
 
   if (!log) {
-    return setBody(ctx, businessCode.error, 404, null, '日志不存在')
+    ctx.status = 404
+    return (ctx.body = createFailResponse(businessCode.error, '日志不存在'))
   }
 
-  success(ctx, log, '获取日志详情成功')
+  ctx.body = createSuccessResponse(businessCode.success, '获取日志详情成功', log)
 }
 
 /**
@@ -41,11 +43,12 @@ const batchDeleteOperationLogs = async (ctx) => {
   const { ids } = ctx.request.body
 
   if (!ids || ids.length === 0) {
-    return setBody(ctx, businessCode.paramError, 400, null, '请选择要删除的日志')
+    ctx.status = 400
+    return (ctx.body = createFailResponse(businessCode.paramError, '请选择要删除的日志'))
   }
 
   await operationLogService.batchDeleteOperationLogs(ids)
-  success(ctx, null, `成功删除 ${ids.length} 条日志`)
+  ctx.body = createSuccessResponse(businessCode.success, `成功删除 ${ids.length} 条日志`)
 }
 
 /**
@@ -53,7 +56,7 @@ const batchDeleteOperationLogs = async (ctx) => {
  */
 const clearOperationLogs = async (ctx) => {
   await operationLogService.clearOperationLogs()
-  success(ctx, null, '操作日志已清空')
+  ctx.body = createSuccessResponse(businessCode.success, '操作日志已清空')
 }
 
 export default {

@@ -7,7 +7,6 @@ import adminMenuDao from './menuDao.js'
 import { buildMenuTree } from '../../utils/adminPermission.js'
 import { businessCode } from '../../config/businessCode.js'
 import { normalizePagination } from '../../schemas/common/paginationSchema.js'
-import { delAllPermCache } from '../../utils/redisCache.js'
 
 const toDbStatus = (status) => {
   if (status === '2' || Number(status) === 0) return 0
@@ -183,9 +182,6 @@ export const createMenu = async (body) => {
 
   const result = await adminMenuDao.createMenu(toMenuPayload(body))
   await adminMenuDao.replaceMenuButtons(result.insertId, routeName, buttons)
-  
-  // 菜单结构变化，清除所有角色的权限缓存
-  await delAllPermCache()
 
   return { success: true, data: { id: result.insertId } }
 }
@@ -262,9 +258,6 @@ export const updateMenu = async (body) => {
   } else if (routeName && routeName !== currentMenu.routeName) {
     await adminMenuDao.updateMenuButtonRouteName(id, routeName)
   }
-  
-  // 菜单结构变化，清除所有角色的权限缓存
-  await delAllPermCache()
 
   return { success: true }
 }
@@ -294,9 +287,6 @@ export const deleteMenu = async (body) => {
   } else {
     await adminMenuDao.deleteMenu(Number(ids[0]))
   }
-  
-  // 菜单结构变化，清除所有角色的权限缓存
-  await delAllPermCache()
 
   return { success: true }
 }

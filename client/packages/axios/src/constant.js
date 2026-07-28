@@ -8,4 +8,4 @@ export const REQUEST_ID_KEY = 'X-Request-Id'
  * 后端业务错误的错误码标识。
  * 用于与网络错误等其他 AxiosError 区分。
  */
-export const BACKEND_ERROR_CODE = 'BACKEND_ERROR'
+export const BACKEND_ERROR_CODE = 'ERR_BAD_REQUEST'

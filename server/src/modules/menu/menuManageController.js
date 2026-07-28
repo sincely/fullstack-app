@@ -5,7 +5,7 @@
 
 import * as menuService from './menuService.js'
 import { businessCode } from '../../config/businessCode.js'
-import { setBody, success } from '../../utils/response.js'
+import { createSuccessResponse, createFailResponse } from '../../utils/createResponse.js'
 
 /**
  * 获取菜单列表
@@ -13,7 +13,7 @@ import { setBody, success } from '../../utils/response.js'
 const listMenus = async (ctx) => {
   const isV2 = ctx.path.endsWith('/v2')
   const data = await menuService.listMenus(ctx.query, isV2)
-  success(ctx, data, '获取菜单列表成功')
+  ctx.body = createSuccessResponse(businessCode.success, '获取菜单列表成功', data)
 }
 
 /**
@@ -21,7 +21,7 @@ const listMenus = async (ctx) => {
  */
 const getMenuTree = async (ctx) => {
   const result = await menuService.getMenuTree()
-  success(ctx, result.data, '获取菜单树成功')
+  ctx.body = createSuccessResponse(businessCode.success, '获取菜单树成功', result.data)
 }
 
 /**
@@ -29,8 +29,8 @@ const getMenuTree = async (ctx) => {
  */
 const createMenu = async (ctx) => {
   const result = await menuService.createMenu(ctx.request.body)
-  if (!result.success) return setBody(ctx, result.code, undefined, null, result.msg)
-  success(ctx, result.data, '创建菜单成功')
+  if (!result.success) return (ctx.body = createFailResponse(result.code, result.msg))
+  ctx.body = createSuccessResponse(businessCode.success, '创建菜单成功', result.data)
 }
 
 /**
@@ -38,8 +38,8 @@ const createMenu = async (ctx) => {
  */
 const updateMenu = async (ctx) => {
   const result = await menuService.updateMenu(ctx.request.body)
-  if (!result.success) return setBody(ctx, result.code, undefined, null, result.msg)
-  success(ctx, null, '更新菜单成功')
+  if (!result.success) return (ctx.body = createFailResponse(result.code, result.msg))
+  ctx.body = createSuccessResponse(businessCode.success, '更新菜单成功')
 }
 
 /**
@@ -47,8 +47,8 @@ const updateMenu = async (ctx) => {
  */
 const deleteMenu = async (ctx) => {
   const result = await menuService.deleteMenu(ctx.request.body)
-  if (!result.success) return setBody(ctx, result.code, undefined, null, result.msg)
-  success(ctx, null, '删除菜单成功')
+  if (!result.success) return (ctx.body = createFailResponse(result.code, result.msg))
+  ctx.body = createSuccessResponse(businessCode.success, '删除菜单成功')
 }
 
 /**
@@ -56,7 +56,7 @@ const deleteMenu = async (ctx) => {
  */
 const getAllPages = async (ctx) => {
   const result = await menuService.getAllPages()
-  success(ctx, result.data, '请求成功')
+  ctx.body = createSuccessResponse(businessCode.success, '请求成功', result.data)
 }
 
 export default {

@@ -4,16 +4,16 @@
  */
 
 import * as authService from './authService.js'
-import { businessCode } from '../../config/businessCode.js'
-import { setBody, success } from '../../utils/response.js'
+import { businessCode, businessMsg } from '../../config/businessCode.js'
+import { createSuccessResponse, createFailResponse } from '../../utils/createResponse.js'
 
 /**
  * 后台注册
  */
 const register = async (ctx) => {
   const result = await authService.register(ctx.request.body)
-  if (!result.success) return setBody(ctx, result.code, undefined, null, result.msg)
-  success(ctx, result.data, '注册成功')
+  if (!result.success) return (ctx.body = createFailResponse(result.code, result.msg))
+  ctx.body = createSuccessResponse(businessCode.success, '注册成功', result.data)
 }
 
 /**
@@ -21,8 +21,8 @@ const register = async (ctx) => {
  */
 const login = async (ctx) => {
   const result = await authService.login(ctx.request.body)
-  if (!result.success) return setBody(ctx, result.code)
-  success(ctx, result.data, '登录成功')
+  if (!result.success) return (ctx.body = createFailResponse(result.code, businessMsg[result.code]))
+  ctx.body = createSuccessResponse(businessCode.success, '登录成功', result.data)
 }
 
 /**
@@ -30,8 +30,8 @@ const login = async (ctx) => {
  */
 const getProfile = async (ctx) => {
   const result = await authService.getProfile(ctx.state.user.userId)
-  if (!result.success) return setBody(ctx, result.code)
-  success(ctx, result.data, '获取用户信息成功')
+  if (!result.success) return (ctx.body = createFailResponse(result.code, businessMsg[result.code]))
+  ctx.body = createSuccessResponse(businessCode.success, '获取用户信息成功', result.data)
 }
 
 /**
@@ -39,8 +39,8 @@ const getProfile = async (ctx) => {
  */
 const getMenus = async (ctx) => {
   const result = await authService.getMenus(ctx.state.user.roleIds, ctx.state.user.roleId)
-  if (!result.success) return setBody(ctx, result.code)
-  success(ctx, result.data, '获取菜单成功')
+  if (!result.success) return (ctx.body = createFailResponse(result.code, businessMsg[result.code]))
+  ctx.body = createSuccessResponse(businessCode.success, '获取菜单成功', result.data)
 }
 
 /**
@@ -48,15 +48,15 @@ const getMenus = async (ctx) => {
  */
 const getPermissions = async (ctx) => {
   const result = await authService.getPermissions(ctx.state.user.roleIds, ctx.state.user.roleId)
-  if (!result.success) return setBody(ctx, result.code)
-  success(ctx, result.data, '获取权限成功')
+  if (!result.success) return (ctx.body = createFailResponse(result.code, businessMsg[result.code]))
+  ctx.body = createSuccessResponse(businessCode.success, '获取权限成功', result.data)
 }
 
 /**
  * 后台退出登录
  */
 const logout = async (ctx) => {
-  success(ctx, null, '退出成功')
+  ctx.body = createSuccessResponse(businessCode.success, '退出成功')
 }
 
 export default {

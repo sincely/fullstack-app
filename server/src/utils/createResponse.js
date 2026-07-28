@@ -32,10 +32,9 @@ export function createErrorResponse(code, msg, data, cause) {
 /**
  * 创建失败响应对象（业务预期内的失败，不记录堆栈）
  * 统一返回 { code, msg, data } 格式
- * @deprecated 请使用 utils/response.js 的 setBody / fail 替代
  * @param {number} code - 业务错误码
  * @param {string} msg - 失败信息
- * @param {any} data - 响应数据
+ * @param {any} [data] - 响应数据
  */
 export function createFailResponse(code, msg, data) {
   return { code, msg, data }
@@ -44,10 +43,9 @@ export function createFailResponse(code, msg, data) {
 /**
  * 创建成功响应对象
  * 统一返回 { code, msg, data } 格式
- * @deprecated 请使用 utils/response.js 的 setBody / success 替代
  * @param {number} code - 业务成功码
  * @param {string} msg - 成功信息
- * @param {any} data - 响应数据
+ * @param {any} [data] - 响应数据
  */
 export function createSuccessResponse(code, msg, data) {
   return { code, msg, data }
@@ -55,7 +53,6 @@ export function createSuccessResponse(code, msg, data) {
 
 /**
  * 分页响应 - 统一使用 records/current/size/total 结构
- * @deprecated 请在 service 层直接构造分页对象，或使用 utils/response.js 的 success
  * @param {Array} records - 数据列表
  * @param {number} total - 总数
  * @param {number} current - 当前页码

@@ -1,5 +1,5 @@
 import { businessCode } from '../config/businessCode.js'
-import { setBody } from '../utils/response.js'
+import { createFailResponse } from '../utils/createResponse.js'
 
 /**
  * 将 Zod 错误对象转换为统一的错误详情结构。
@@ -35,7 +35,8 @@ const firstZodMessage = (error) => {
 export const validateBody = (schema) => async (ctx, next) => {
   const parsed = schema.safeParse(ctx.request.body)
   if (!parsed.success) {
-    setBody(ctx, businessCode.paramError, 400, null, firstZodMessage(parsed.error))
+    ctx.status = 400
+    ctx.body = createFailResponse(businessCode.paramError, firstZodMessage(parsed.error))
     return
   }
 
@@ -54,7 +55,8 @@ export const validateQuery = (schema) => async (ctx, next) => {
   const parsed = schema.safeParse(ctx.query)
 
   if (!parsed.success) {
-    setBody(ctx, businessCode.paramError, 400, null, firstZodMessage(parsed.error))
+    ctx.status = 400
+    ctx.body = createFailResponse(businessCode.paramError, firstZodMessage(parsed.error))
     return
   }
 

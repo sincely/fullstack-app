@@ -2,7 +2,7 @@ import adminPermissionDao from '../permission/permissionDao.js'
 import adminMenuDao from '../menu/menuDao.js'
 import { buildMenuTree } from '../../utils/adminPermission.js'
 import { businessCode } from '../../config/businessCode.js'
-import { success } from '../../utils/response.js'
+import { createSuccessResponse } from '../../utils/createResponse.js'
 
 const parseRoleIds = (value, fallbackRoleId) => {
   if (typeof value === 'string' && value.trim()) {
@@ -19,7 +19,7 @@ const parseRoleIds = (value, fallbackRoleId) => {
  * 获取常量路由
  */
 const getConstantRoutes = (ctx) => {
-  success(ctx, [
+  ctx.body = createSuccessResponse(businessCode.success, '请求成功', [
     {
       name: 'login',
       path: '/login/:module(pwd-login|code-login|register|reset-pwd|bind-wechat)?',
@@ -61,7 +61,7 @@ const getConstantRoutes = (ctx) => {
         hideInMenu: true
       }
     }
-  ], '请求成功')
+  ])
 }
 
 /**
@@ -74,7 +74,7 @@ const getUserRoutes = async (ctx) => {
     menus = await adminPermissionDao.findMenusByRoleId(roleIds)
   }
   const routeTree = buildMenuTree(menus)
-  success(ctx, { routes: routeTree, home: 'home' }, '请求成功')
+  ctx.body = createSuccessResponse(businessCode.success, '请求成功', { routes: routeTree, home: 'home' })
 }
 
 /**
@@ -83,7 +83,7 @@ const getUserRoutes = async (ctx) => {
 const isRouteExist = async (ctx) => {
   const { routeName } = ctx.query
   const menu = await adminMenuDao.findMenuByName(routeName)
-  success(ctx, !!menu, '请求成功')
+  ctx.body = createSuccessResponse(businessCode.success, '请求成功', !!menu)
 }
 
 export default {

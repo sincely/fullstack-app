@@ -13,7 +13,6 @@ import { hashPassword, comparePassword } from '../../utils/password.js'
 import { generateToken, generateRefreshToken, verifyRefreshToken } from '../../utils/jwt.js'
 import { buildMenuTree, extractPermissionCodes } from '../../utils/adminPermission.js'
 import { query } from '../../db/connection.js'
-import { delAuthCache } from '../../utils/redisCache.js'
 
 const parseRoleIds = (value, fallbackRoleId) => {
   if (typeof value === 'string' && value.trim()) {
@@ -305,9 +304,6 @@ export const frontendLogin = async ({ userName, password, loginIp, userAgent }) 
   const token = generateToken(payload)
   const refreshToken = generateRefreshToken(payload)
 
-  // 失效旧设备的认证缓存（新 sessionId 写入 MySQL 后，旧缓存中的旧 sessionId 不再匹配）
-  await delAuthCache(user.id)
-
   // 将 sessionId、登录信息写入用户表
   const sql = `
     UPDATE Users SET
@@ -429,8 +425,5 @@ export const frontendLogout = async (userId) => {
       WHERE id = ?
     `
     await query(sql, [userId])
-
-    // 清除认证缓存，确保登出后立即生效
-    await delAuthCache(userId)
   }
 }

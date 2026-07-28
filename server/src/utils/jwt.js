@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken'
 import { TokenSecret, TokenExpire, RefreshTokenSecret, RefreshTokenExpire } from '../config/jwt.js'
+import { businessCode } from '../config/businessCode.js'
 
 /**
  * 生成 Access Token
@@ -34,15 +35,20 @@ export function verifyToken(token) {
     return jwt.verify(token, TokenSecret)
   } catch (error) {
     if (error.name === 'TokenExpiredError') {
-      const err = new Error('Token 已过期，请重新登录')
-      err.code = 1001 // 与前端 VITE_SERVICE_EXPIRED_TOKEN_CODES 保持一致
-      err.status = 401
+      let err = {
+        code: businessCode.tokenExpired,
+        message: 'Token 已过期，请重新登录',
+        status: 200
+      }
       throw err
+    } else {
+      let err = {
+        code: businessCode.unAuthorized,
+        message: 'Token 无效',
+        status: 200
+      }
+        throw err
     }
-    const err = new Error('Token 无效')
-    err.code = 1001 // 与前端 VITE_SERVICE_EXPIRED_TOKEN_CODES 保持一致
-    err.status = 401
-    throw err
   }
 }
 
@@ -57,14 +63,17 @@ export function verifyRefreshToken(token) {
     return jwt.verify(token, RefreshTokenSecret)
   } catch (error) {
     if (error.name === 'TokenExpiredError') {
-      const err = new Error('Refresh Token 已过期，请重新登录')
-      err.code = 1001 // 与前端 VITE_SERVICE_EXPIRED_TOKEN_CODES 保持一致
-      err.status = 401
+      let err = {
+        code: businessCode.tokenExpired,
+        message: 'Refresh Token 已过期，请重新登录',
+        status: 200
+      }
       throw err
     }
-    const err = new Error('Refresh Token 无效')
-    err.code = 1001 // 与前端 VITE_SERVICE_EXPIRED_TOKEN_CODES 保持一致
-    err.status = 401
+    let err = {
+      code: businessCode.tokenExpired,
+      message: 'Refresh Token 无效'
+    }
     throw err
   }
 }

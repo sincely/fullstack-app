@@ -102,19 +102,14 @@ export const request = createFlatRequest(
         }
       }
 
-      // 针对 1002 (accountKicked) 等特殊登出码，即使不在 expiredTokenCodes 中也触发登出
-      if (backendCode === '1002') {
-        handleLogout()
-        return null
-      }
-
       return null
     },
     transformBackendResponse(response) {
       return response.data.data
     },
-    onError(error) {
+    async onError(error) {
       // 请求失败时统一错误提示
+      const authStore = useAuthStore()
 
       let { message } = error
       console.log('error', error)
@@ -126,15 +121,45 @@ export const request = createFlatRequest(
         backendErrorCode = toCodeString(error.response?.data?.code)
       }
 
+      // ── HTTP 4xx/5xx 错误处理（onBackendFail 仅在 HTTP 2xx 时触发）──
+
+      // 命中 logoutCodes 时，直接登出
+      const logoutCodes = parseCodeList(import.meta.env.VITE_SERVICE_LOGOUT_CODES)
+      if (logoutCodes.includes(backendErrorCode)) {
+        authStore.resetStore()
+        return
+      }
+
       // 弹窗登出类错误已在弹窗中处理，这里不重复提示
       const modalLogoutCodes = parseCodeList(import.meta.env.VITE_SERVICE_MODAL_LOGOUT_CODES)
       if (modalLogoutCodes.includes(backendErrorCode)) {
         return
       }
 
-      // token 过期会走刷新并重试，无需重复提示
+      // 命中 expiredTokenCodes 时，刷新 token 并重试请求
+      // __tokenRefreshRetry 防止刷新后重试仍返回 1001 时陷入死循环
       const expiredTokenCodes = parseCodeList(import.meta.env.VITE_SERVICE_EXPIRED_TOKEN_CODES)
-      if (expiredTokenCodes.includes(backendErrorCode)) {
+      if (
+        expiredTokenCodes.includes(backendErrorCode) &&
+        !request.state.isRefreshingToken &&
+        !error.config?.__tokenRefreshRetry
+      ) {
+        request.state.isRefreshingToken = true
+
+        try {
+          const refreshConfig = await handleRefreshToken(error.config)
+
+          request.state.isRefreshingToken = false
+
+          if (refreshConfig) {
+            refreshConfig.__tokenRefreshRetry = true
+            return request.instance.request(refreshConfig)
+          }
+        } catch (err) {
+          request.state.isRefreshingToken = false
+          console.error('Token refresh failed:', err)
+        }
+
         return
       }
 

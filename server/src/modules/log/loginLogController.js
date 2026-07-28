@@ -5,14 +5,14 @@
 
 import * as loginLogService from './loginLogService.js'
 import { businessCode } from '../../config/businessCode.js'
-import { setBody, success } from '../../utils/response.js'
+import { createSuccessResponse, createFailResponse } from '../../utils/createResponse.js'
 
 /**
  * 获取登录日志列表
  */
 const listLoginLogs = async (ctx) => {
   const data = await loginLogService.listLoginLogs(ctx.query)
-  success(ctx, data, '获取登录日志列表成功')
+  ctx.body = createSuccessResponse(businessCode.success, '获取登录日志列表成功', data)
 }
 
 /**
@@ -22,16 +22,18 @@ const getLoginLogDetail = async (ctx) => {
   const { id } = ctx.query
 
   if (!id) {
-    return setBody(ctx, businessCode.paramError, 400, null, '日志ID不能为空')
+    ctx.status = 400
+    return (ctx.body = createFailResponse(businessCode.paramError, '日志ID不能为空'))
   }
 
   const log = await loginLogService.getLoginLogDetail(Number(id))
 
   if (!log) {
-    return setBody(ctx, businessCode.error, 404, null, '日志不存在')
+    ctx.status = 404
+    return (ctx.body = createFailResponse(businessCode.error, '日志不存在'))
   }
 
-  success(ctx, log, '获取日志详情成功')
+  ctx.body = createSuccessResponse(businessCode.success, '获取日志详情成功', log)
 }
 
 /**
@@ -41,11 +43,12 @@ const batchDeleteLoginLogs = async (ctx) => {
   const { ids } = ctx.request.body
 
   if (!ids || ids.length === 0) {
-    return setBody(ctx, businessCode.paramError, 400, null, '请选择要删除的日志')
+    ctx.status = 400
+    return (ctx.body = createFailResponse(businessCode.paramError, '请选择要删除的日志'))
   }
 
   await loginLogService.batchDeleteLoginLogs(ids)
-  success(ctx, null, `成功删除 ${ids.length} 条日志`)
+  ctx.body = createSuccessResponse(businessCode.success, `成功删除 ${ids.length} 条日志`)
 }
 
 /**
@@ -53,7 +56,7 @@ const batchDeleteLoginLogs = async (ctx) => {
  */
 const clearLoginLogs = async (ctx) => {
   await loginLogService.clearLoginLogs()
-  success(ctx, null, '登录日志已清空')
+  ctx.body = createSuccessResponse(businessCode.success, '登录日志已清空')
 }
 
 export default {

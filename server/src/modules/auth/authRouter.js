@@ -3,7 +3,7 @@ import { validateBody } from '../../middleware/validationMiddleware.js'
 import { errorControllerWrapper } from '../../utils/errorHandler.js'
 import { loginBodySchema } from '../../schemas/auth/authSchema.js'
 import { businessCode, businessMsg } from '../../config/businessCode.js'
-import { setBody, success } from '../../utils/response.js'
+import { createSuccessResponse, createFailResponse } from '../../utils/createResponse.js'
 import authenticate from '../../middleware/authenticate.js'
 import * as authService from './authService.js'
 
@@ -25,7 +25,7 @@ const frontendLogin = async (ctx) => {
     userAgent
   })
 
-  if (!result.success) return setBody(ctx, result.code)
+  if (!result.success) return (ctx.body = createFailResponse(result.code, businessMsg[result.code]))
 
   // 写入 Session（Redis Store 会在响应结束时自动持久化）
   ctx.session.user = {
@@ -35,7 +35,7 @@ const frontendLogin = async (ctx) => {
     sessionId: result.data.sessionId
   }
 
-  success(ctx, result.data, '登录成功')
+  ctx.body = createSuccessResponse(businessCode.success, '登录成功', result.data)
 }
 
 authRouter.post('/user/auth/login', validateBody(loginBodySchema), errorControllerWrapper(frontendLogin))
@@ -43,8 +43,8 @@ authRouter.post('/user/auth/login', validateBody(loginBodySchema), errorControll
 // 前端兼容接口 - 获取用户信息
 const frontendGetUserInfo = async (ctx) => {
   const result = await authService.frontendGetUserInfo(ctx.state.user.userId)
-  if (!result.success) return setBody(ctx, result.code)
-  success(ctx, result.data, '获取用户信息成功')
+  if (!result.success) return (ctx.body = createFailResponse(result.code, businessMsg[result.code]))
+  ctx.body = createSuccessResponse(businessCode.success, '获取用户信息成功', result.data)
 }
 
 authRouter.get('/user/getUserInfo', authenticate, errorControllerWrapper(frontendGetUserInfo))
@@ -56,9 +56,9 @@ authRouter.post(
     const { refreshToken } = ctx.request.body
     const result = await authService.frontendRefreshToken(refreshToken)
     if (!result.success) {
-      return setBody(ctx, result.code, undefined, null, result.msg || businessMsg[result.code])
+      return (ctx.body = createFailResponse(result.code, result.msg || businessMsg[result.code]))
     }
-    success(ctx, result.data, '刷新成功')
+    ctx.body = createSuccessResponse(businessCode.success, '刷新成功', result.data)
   })
 )
 
@@ -73,7 +73,7 @@ authRouter.post(
     // 清除 Session（Redis Store 会在响应结束时删除对应 key）
     ctx.session = null
 
-    success(ctx, null, '退出成功')
+    ctx.body = createSuccessResponse(businessCode.success, '退出成功')
   })
 )
 
@@ -83,7 +83,7 @@ authRouter.get(
   errorControllerWrapper((ctx) => {
     const code = Number(ctx.query.code) || businessCode.error
     const msg = ctx.query.msg || '自定义后端错误'
-    setBody(ctx, code, 200, null, msg)
+    ctx.body = createFailResponse(code, msg)
   })
 )
 
