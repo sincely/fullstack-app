@@ -12,6 +12,7 @@ import { defaultAdminRoleName } from '../../config/admin.js'
 import { hashPassword, comparePassword } from '../../utils/password.js'
 import { generateToken, generateRefreshToken, verifyRefreshToken } from '../../utils/jwt.js'
 import { buildMenuTree, extractPermissionCodes } from '../../utils/adminPermission.js'
+import { checkLoginLock, recordLoginFailure, clearLoginLock } from '../../utils/loginLimiter.js'
 import { query } from '../../db/connection.js'
 
 const parseRoleIds = (value, fallbackRoleId) => {
@@ -240,8 +241,20 @@ const buildLoginLogData = ({ userId, username, loginIp, userAgent, status, messa
 export const frontendLogin = async ({ userName, password, loginIp, userAgent }) => {
   const username = userName
 
+  // ── 1. 检查用户名是否被锁定 ──
+  const lockStatus = await checkLoginLock(username)
+  if (lockStatus.locked) {
+    return {
+      success: false,
+      code: businessCode.accountLocked,
+      data: { retryAfter: lockStatus.retryAfter }
+    }
+  }
+
   const user = await adminAuthDao.findAdminUserByUsername(username)
   if (!user) {
+    // ── 记录失败并获取剩余次数 ──
+    const failResult = await recordLoginFailure(username)
     await loginLogDao.createLoginLog(
       buildLoginLogData({
         userId: null,
@@ -249,10 +262,16 @@ export const frontendLogin = async ({ userName, password, loginIp, userAgent }) 
         loginIp,
         userAgent,
         status: 0,
-        message: '用户名或密码错误'
+        message: failResult.locked
+          ? '登录失败次数过多，账号已锁定'
+          : '用户名或密码错误'
       })
     )
-    return { success: false, code: businessCode.userLoginFail }
+    return {
+      success: false,
+      code: failResult.locked ? businessCode.accountLocked : businessCode.userLoginFail,
+      data: { remainingAttempts: failResult.remaining, retryAfter: failResult.locked ? 15 * 60 : 0 }
+    }
   }
 
   if (Number(user.status) !== 1) {
@@ -271,6 +290,8 @@ export const frontendLogin = async ({ userName, password, loginIp, userAgent }) 
 
   const passwordMatched = await comparePassword(password, user.password)
   if (!passwordMatched) {
+    // ── 密码错误：记录失败 ──
+    const failResult = await recordLoginFailure(username)
     await loginLogDao.createLoginLog(
       buildLoginLogData({
         userId: user.id,
@@ -278,10 +299,16 @@ export const frontendLogin = async ({ userName, password, loginIp, userAgent }) 
         loginIp,
         userAgent,
         status: 0,
-        message: '用户名或密码错误'
+        message: failResult.locked
+          ? '登录失败次数过多，账号已锁定'
+          : '用户名或密码错误'
       })
     )
-    return { success: false, code: businessCode.userLoginFail }
+    return {
+      success: false,
+      code: failResult.locked ? businessCode.accountLocked : businessCode.userLoginFail,
+      data: { remainingAttempts: failResult.remaining, retryAfter: failResult.locked ? 15 * 60 : 0 }
+    }
   }
 
   // 生成会话 ID 和登录信息
@@ -328,6 +355,9 @@ export const frontendLogin = async ({ userName, password, loginIp, userAgent }) 
       sessionId
     })
   )
+
+  // 登录成功，清除锁定计数
+  await clearLoginLock(username)
 
   return {
     success: true,

@@ -33,7 +33,8 @@ export const businessCode = {
   menuHasChildren: 40018, // 菜单存在子节点
   userDeleteSelfDenied: 40019, // 不能删除自己
   idCardExist: 40020, // 身份证号已存在
-  userDisableSelfDenied: 40021 // 不能禁用自己
+  userDisableSelfDenied: 40021, // 不能禁用自己
+  accountLocked: 40022 // 账号已锁定（登录失败次数过多）
 }
 
 export const businessMsg = {
@@ -60,5 +61,6 @@ export const businessMsg = {
   [businessCode.menuHasChildren]: '当前菜单存在子菜单，无法删除',
   [businessCode.userDeleteSelfDenied]: '不能删除当前登录账号',
   [businessCode.idCardExist]: '身份证号已存在',
-  [businessCode.userDisableSelfDenied]: '不能禁用当前登录账号'
+  [businessCode.userDisableSelfDenied]: '不能禁用当前登录账号',
+  [businessCode.accountLocked]: '登录失败次数过多，账号已锁定，请稍后再试'
 }

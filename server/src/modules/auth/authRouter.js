@@ -25,7 +25,7 @@ const frontendLogin = async (ctx) => {
     userAgent
   })
 
-  if (!result.success) return (ctx.body = createFailResponse(result.code, businessMsg[result.code]))
+  if (!result.success) return (ctx.body = createFailResponse(result.code, businessMsg[result.code], result.data))
 
   // 写入 Session（Redis Store 会在响应结束时自动持久化）
   ctx.session.user = {
