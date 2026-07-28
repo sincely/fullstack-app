@@ -7,13 +7,18 @@ import { query } from '../../db/connection.js'
 /**
  * 分页查询操作日志列表
  */
-const listOperationLogs = async ({ page, pageSize, username, action, status, startTime, endTime }) => {
+const listOperationLogs = async ({ page, pageSize, username, module, action, status, startTime, endTime }) => {
   const where = []
   const params = []
 
   if (username) {
     where.push('ol.username LIKE ?')
     params.push(`%${username}%`)
+  }
+
+  if (module) {
+    where.push('ol.module = ?')
+    params.push(module)
   }
 
   if (action) {
@@ -47,8 +52,7 @@ const listOperationLogs = async ({ page, pageSize, username, action, status, sta
       ol.userId,
       ol.username,
       ol.action,
-      ol.method,
-      ol.requestUrl,
+      ol.module,
       ol.requestParams,
       ol.responseStatus,
       ol.responseMsg,
@@ -69,13 +73,18 @@ const listOperationLogs = async ({ page, pageSize, username, action, status, sta
 /**
  * 统计操作日志总数
  */
-const countOperationLogs = async ({ username, action, status, startTime, endTime }) => {
+const countOperationLogs = async ({ username, module, action, status, startTime, endTime }) => {
   const where = []
   const params = []
 
   if (username) {
     where.push('ol.username LIKE ?')
     params.push(`%${username}%`)
+  }
+
+  if (module) {
+    where.push('ol.module = ?')
+    params.push(module)
   }
 
   if (action) {
@@ -116,16 +125,17 @@ const countOperationLogs = async ({ username, action, status, startTime, endTime
 const createOperationLog = async (data) => {
   const sql = `
     INSERT INTO OperationLog (
-      userId, username, action, method, requestUrl,
+      userId, username, action, module, method, requestUrl,
       requestParams, responseStatus, responseMsg, ipAddress,
       userAgent, executeTime, status
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `
 
   return query(sql, [
     data.userId || null,
     data.username || '',
     data.action || '',
+    data.module || '',
     data.method || '',
     data.requestUrl || '',
     data.requestParams ? JSON.stringify(data.requestParams) : null,

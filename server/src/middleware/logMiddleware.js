@@ -92,6 +92,9 @@ export const operationLogMiddleware = async (ctx, next) => {
     // 提取操作类型
     const action = extractAction(path, method)
 
+    // 提取系统模块
+    const module = extractModule(path)
+
     // 获取请求参数（脱敏处理）
     let requestParams = null
     if (ctx.request.body && Object.keys(ctx.request.body).length > 0) {
@@ -111,8 +114,8 @@ export const operationLogMiddleware = async (ctx, next) => {
       userId,
       username,
       action,
+      module,
       method,
-      requestUrl: path,
       requestParams,
       responseStatus: String(responseBody?.code || ctx.status),
       responseMsg: responseBody?.msg || '',
@@ -167,6 +170,27 @@ export const loginLogMiddleware = async (ctx, next) => {
   } catch (error) {
     console.error('记录登录日志失败:', error)
   }
+}
+
+/**
+ * 从 URL 中提取系统模块
+ */
+const extractModule = (path) => {
+  const parts = path.split('/').filter(Boolean)
+  // /api/systemManage/xxx 根据子路径关键词区分
+  if (parts[1] === 'systemManage') {
+    const last = parts[parts.length - 1] || ''
+    if (last.toLowerCase().includes('user')) return '用户管理'
+    if (last.toLowerCase().includes('role')) return '角色管理'
+    if (last.toLowerCase().includes('menu')) return '菜单管理'
+    return '系统管理'
+  }
+  const moduleMap = {
+    user: '用户认证',
+    route: '路由管理',
+    log: '日志管理'
+  }
+  return moduleMap[parts[1]] || '其他'
 }
 
 /**

@@ -12,10 +12,10 @@ import { normalizePagination } from '../../schemas/common/paginationSchema.js'
  * @returns {Promise<{ records: Array, current: number, size: number, total: number }>}
  */
 export const listOperationLogs = async (query) => {
-  const { current, size, page, pageSize, username, action, status, startTime, endTime } = query
+  const { current, size, page, pageSize, username, module, action, status, startTime, endTime } = query
   const { actualPage, actualPageSize } = normalizePagination({ current, size, page, pageSize })
 
-  const filterParams = { username, action, status, startTime, endTime }
+  const filterParams = { username, module, action, status, startTime, endTime }
 
   const [list, total] = await Promise.all([
     operationLogDao.listOperationLogs({ page: actualPage, pageSize: actualPageSize, ...filterParams }),

@@ -106,6 +106,7 @@ CREATE TABLE `OperationLog` (
   `userId` int DEFAULT NULL COMMENT '操作用户ID',
   `username` varchar(50) DEFAULT NULL COMMENT '操作用户名',
   `action` varchar(100) DEFAULT NULL COMMENT '操作类型',
+  `module` varchar(50) DEFAULT NULL COMMENT '系统模块',
   `method` varchar(10) DEFAULT NULL COMMENT '请求方法 GET/POST/PUT/DELETE',
   `requestUrl` varchar(255) DEFAULT NULL COMMENT '请求URL',
   `requestParams` text COMMENT '请求参数(JSON)',
@@ -120,6 +121,7 @@ CREATE TABLE `OperationLog` (
   KEY `idx_user_id` (`userId`),
   KEY `idx_username` (`username`),
   KEY `idx_action` (`action`),
+  KEY `idx_module` (`module`),
   KEY `idx_create_time` (`createTime`),
   KEY `idx_status` (`status`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='操作日志表';

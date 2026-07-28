@@ -6,6 +6,7 @@ const statusEnum = z.enum(['0', '1'])
 // 操作日志列表查询参数
 export const OperationLogListQuerySchema = createPaginatedQuerySchema({
   username: z.string().max(50).optional(),
+  module: z.string().max(50).optional(),
   action: z.string().max(100).optional(),
   status: statusEnum.optional(),
   startTime: z.string().optional(),
