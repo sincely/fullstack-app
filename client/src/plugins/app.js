@@ -3,7 +3,6 @@ import { h } from 'vue'
 
 export function setupAppErrorHandle(app) {
   app.config.errorHandler = (err, vm, info) => {
-    // eslint-disable-next-line no-console
     console.error(err, vm, info)
   }
 }

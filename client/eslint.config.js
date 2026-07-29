@@ -1,11 +1,11 @@
 import js from '@eslint/js'
 import configPrettier from 'eslint-config-prettier'
-import { defineFlatConfig } from 'eslint-define-config'
 import pluginPrettier from 'eslint-plugin-prettier'
 import simpleImportSort from 'eslint-plugin-simple-import-sort'
 import pluginVue from 'eslint-plugin-vue'
 import * as parserVue from 'vue-eslint-parser'
-export default defineFlatConfig([
+
+export default [
   {
     ...js.configs.recommended,
     ignores: ['**/.*', 'src/assets/**', 'dist/**/*', 'public/*'],
@@ -118,4 +118,4 @@ export default defineFlatConfig([
       'vue/one-component-per-file': 0
     }
   }
-])
+]

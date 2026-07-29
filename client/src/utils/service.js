@@ -10,7 +10,6 @@ export function createServiceConfig(env) {
   try {
     other = JSON.parse(VITE_OTHER_SERVICE_BASE_URL)
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error('VITE_OTHER_SERVICE_BASE_URL is not a valid JSON string')
   }
 

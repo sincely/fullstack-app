@@ -4,6 +4,7 @@
 .editorconfig
 pnpm-lock.yaml
 .npmrc
+.nvmrc
 
 # Ignored suffix
 *.log

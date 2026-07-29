@@ -5,6 +5,7 @@ export default {
   printWidth: 120,
   singleQuote: true,
   bracketSpacing: true,
+  arrowParens: 'always',
   htmlWhitespaceSensitivity: 'ignore',
   endOfLine: 'lf'
 }
