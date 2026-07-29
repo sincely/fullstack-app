@@ -19,15 +19,16 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
 COPY packages ./packages
 
 # 安装 workspace 依赖（含内部包链接）
+# --ignore-scripts：跳过 prepare 脚本（husky 安装，容器内不需要）
 RUN pnpm config set registry https://registry.npmmirror.com \
-  && pnpm install --frozen-lockfile
+  && pnpm install --frozen-lockfile --ignore-scripts
 
 # 复制源码与构建配置
 COPY src ./src
 COPY build ./build
 COPY public ./public
 COPY index.html vite.config.js uno.config.js jsconfig.json ./
-COPY .env.test ./.env.test
+COPY .env .env.test ./
 
 # Vite 构建（测试环境模式，对应 package.json 的 build:test）
 RUN pnpm run build:test
