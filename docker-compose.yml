@@ -1,0 +1,138 @@
+# ============================================================================
+# Docker Compose — 全栈编排
+#
+# 服务拓扑：
+#   nginx (80) ──┬── client (80)     前端静态资源
+#                └── server (8080)   Koa API
+#                     ├── mysql (3306)
+#                     └── redis (6379)
+#
+# 使用方式：
+#   开发环境一键启动：  docker compose up -d
+#   查看日志：          docker compose logs -f server
+#   仅重建 server：     docker compose up -d --build server
+#   完全清理：          docker compose down -v
+# ============================================================================
+
+services:
+  # ── MySQL 数据库 ──
+  mysql:
+    image: mysql:8.4
+    container_name: cms-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-123456789}
+      MYSQL_DATABASE: ${DB_NAME:-new-cms}
+      TZ: Asia/Shanghai
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      # 首次启动时导入 schema（若文件存在）
+      - ./server/src/db/new-cms.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_PASSWORD:-123456789}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks:
+      - cms-network
+
+  # ── Redis 缓存 ──
+  redis:
+    image: redis:7-alpine
+    container_name: cms-redis
+    restart: unless-stopped
+    # 若设置了 REDIS_PASSWORD 则启用认证
+    command: >
+      sh -c '[ -n "$$REDIS_PASSWORD" ] && redis-server --requirepass "$$REDIS_PASSWORD" || redis-server'
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    networks:
+      - cms-network
+
+  # ── Koa 后端 API ──
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: cms-server
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 8080
+      # 数据库连接（指向 compose 内的 mysql 服务）
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: ${DB_PASSWORD:-123456789}
+      DB_NAME: ${DB_NAME:-new-cms}
+      # Redis 连接（指向 compose 内的 redis 服务）
+      REDIS_ENABLED: "true"
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+      REDIS_DB: 0
+      # JWT 密钥（生产环境务必通过 .env 或 -e 覆盖）
+      JWT_SECRET: ${JWT_SECRET:-change-me-in-production}
+      JWT_EXPIRES_IN: 15m
+      JWT_REFRESH_EXPIRES_IN: 7d
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    networks:
+      - cms-network
+
+  # ── 前端静态资源（nginx 服务 dist） ──
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: cms-client
+    restart: unless-stopped
+    depends_on:
+      - server
+    ports:
+      - "80:80"
+    networks:
+      - cms-network
+
+  # ── 反向代理网关（可选：当需要统一入口时启用） ──
+  # 将 client(80) 和 server(8080) 统一在 80 端口分流
+  nginx-gateway:
+    image: nginx:alpine
+    container_name: cms-gateway
+    restart: unless-stopped
+    volumes:
+      - ./server/nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "8000:80"
+    depends_on:
+      - client
+      - server
+    networks:
+      - cms-network
+    profiles:
+      - gateway  # 仅 docker compose --profile gateway up 时启用
+
+volumes:
+  mysql-data:
+  redis-data:
+
+networks:
+  cms-network:
+    driver: bridge

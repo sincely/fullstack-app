@@ -1,0 +1,59 @@
+# ============================================================================
+# Server Dockerfile — 多阶段构建
+#
+# 阶段 1 (builder)：安装全部依赖，执行 build.js 产出 dist
+# 阶段 2 (runtime)：仅复制 dist + 生产依赖，PM2 cluster 模式运行
+# ============================================================================
+
+# ── 阶段 1：构建 ──
+FROM node:20-alpine AS builder
+
+# bcrypt 等原生模块编译需要 python3/make/g++
+RUN apk add --no-cache python3 make g++
+
+WORKDIR /app
+
+# 先复制 lock 文件和 package.json，利用 Docker 层缓存
+COPY package.json pnpm-lock.yaml ./
+
+# 启用 Corepack 管理 pnpm 版本（与 packageManager 字段一致）
+RUN corepack enable && corepack prepare pnpm@8.15.7 --activate \
+  && pnpm install --frozen-lockfile
+
+# 复制源码与构建脚本
+COPY src ./src
+COPY scripts ./scripts
+COPY ecosystem.config.cjs ./
+COPY .env.production ./.env.production
+
+# 执行构建：src → dist（含 ecosystem 路径重写）
+RUN pnpm run build:prod
+
+# 裁剪为生产依赖（去除 devDependencies）
+RUN pnpm prune --prod
+
+# ── 阶段 2：运行时 ──
+FROM node:20-alpine AS runtime
+
+# PM2 进程管理
+RUN npm install -g pm2@6
+
+WORKDIR /app
+
+# 从 builder 复制构建产物与生产依赖
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/dist/ecosystem.config.cjs ./ecosystem.config.cjs
+
+# 静态资源目录
+COPY public ./public
+
+EXPOSE 8080
+
+# 健康检查（快速探针，不探测 DB/Redis）
+HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
+  CMD wget -qO- http://localhost:8080/api/health || exit 1
+
+# PM2 cluster 模式启动，支持优雅关闭
+CMD ["pm2-runtime", "ecosystem.config.cjs", "--only", "koa-app-prod"]
