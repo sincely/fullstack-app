@@ -194,7 +194,25 @@ export const updateUser = async (body) => {
     }
   }
 
-  const payload = { ...rest }
+  // 前端 camelCase → DB snake_case 字段映射（动态更新直接以 key 作为列名）
+  const fieldMap = {
+    username: 'username',
+    nickName: 'nick_name',
+    phone: 'phone',
+    gender: 'gender',
+    age: 'age',
+    address: 'address',
+    status: 'status',
+    avatar: 'avatar'
+  }
+
+  const payload = {}
+  for (const [bodyKey, colKey] of Object.entries(fieldMap)) {
+    if (rest[bodyKey] !== undefined) {
+      payload[colKey] = rest[bodyKey]
+    }
+  }
+
   if (payload.gender !== undefined) {
     payload.gender = toDbGender(payload.gender) || 'other'
   }
@@ -205,7 +223,7 @@ export const updateUser = async (body) => {
     payload.email = email
   }
   if (idCard !== undefined) {
-    payload.idCard = idCard
+    payload.id_card = idCard
   }
   if (password) {
     payload.password = await hashPassword(password)
