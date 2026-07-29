@@ -48,16 +48,18 @@ WORKDIR /app
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
-COPY --from=builder /app/dist/ecosystem.config.cjs ./ecosystem.config.cjs
 
-# 静态资源目录
+# 静态资源目录（server.js 中 staticDir 解析为 __dirname/../../public → /app/public）
 COPY public ./public
 
-EXPOSE 8080
+# ecosystem.config.cjs 中 koa-app-prod 监听 PORT=3000
+EXPOSE 3000
 
 # 健康检查（快速探针，不探测 DB/Redis）
 HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
-  CMD wget -qO- http://localhost:8080/api/health || exit 1
+  CMD wget -qO- http://localhost:3000/api/health || exit 1
 
-# PM2 cluster 模式启动，支持优雅关闭
-CMD ["pm2-runtime", "ecosystem.config.cjs", "--only", "koa-app-prod"]
+# PM2 cluster 模式启动
+# ecosystem.config.cjs 在 dist/ 内（build.js 已重写 script 路径为 ./app.js）
+# 先 cd dist 再启动，使 ./app.js 正确解析为 dist/app.js
+CMD ["sh", "-c", "cd dist && pm2-runtime ecosystem.config.cjs --only koa-app-prod"]

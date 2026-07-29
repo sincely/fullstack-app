@@ -24,8 +24,10 @@ services:
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-123456789}
       MYSQL_DATABASE: ${DB_NAME:-new-cms}
       TZ: Asia/Shanghai
-    ports:
-      - "3306:3306"
+    # 不暴露端口到宿主机（容器间通过 cms-network 内部通信）
+    # 如需外部访问调试，取消注释下方 ports
+    # ports:
+    #   - "13306:3306"
     volumes:
       - mysql-data:/var/lib/mysql
       # 首次启动时导入 schema（若文件存在）
@@ -49,8 +51,10 @@ services:
       sh -c '[ -n "$$REDIS_PASSWORD" ] && redis-server --requirepass "$$REDIS_PASSWORD" || redis-server'
     environment:
       REDIS_PASSWORD: ${REDIS_PASSWORD:-}
-    ports:
-      - "6379:6379"
+    # 不暴露端口到宿主机（容器间通过 cms-network 内部通信）
+    # 如需外部访问调试，取消注释下方 ports
+    # ports:
+    #   - "16379:6379"
     volumes:
       - redis-data:/data
     healthcheck:
@@ -92,8 +96,9 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+    # ecosystem.config.cjs 中 koa-app-prod 的 PORT=3000
     ports:
-      - "8080:8080"
+      - "8090:3000"
     networks:
       - cms-network
 
@@ -107,7 +112,7 @@ services:
     depends_on:
       - server
     ports:
-      - "80:80"
+      - "9528:80"
     networks:
       - cms-network
 
