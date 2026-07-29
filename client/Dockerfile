@@ -10,15 +10,17 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# 启用 Corepack 管理 pnpm
-RUN corepack enable && corepack prepare pnpm@8.15.7 --activate
+# 设置国内 npm 镜像源（容器内无法直连 registry.npmjs.org）
+RUN npm config set registry https://registry.npmmirror.com \
+  && npm install -g pnpm@9.15.9
 
 # 先复制 workspace 配置与 lock 文件，利用层缓存
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
 COPY packages ./packages
 
 # 安装 workspace 依赖（含内部包链接）
-RUN pnpm install --frozen-lockfile
+RUN pnpm config set registry https://registry.npmmirror.com \
+  && pnpm install --frozen-lockfile
 
 # 复制源码与构建配置
 COPY src ./src

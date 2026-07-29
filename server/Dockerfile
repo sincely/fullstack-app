@@ -13,11 +13,15 @@ RUN apk add --no-cache python3 make g++
 
 WORKDIR /app
 
+# 设置国内 npm 镜像源（容器内无法直连 registry.npmjs.org）
+RUN npm config set registry https://registry.npmmirror.com \
+  && npm install -g pnpm@9.15.9
+
 # 先复制 lock 文件和 package.json，利用 Docker 层缓存
 COPY package.json pnpm-lock.yaml ./
 
-# 启用 Corepack 管理 pnpm 版本（与 packageManager 字段一致）
-RUN corepack enable && corepack prepare pnpm@8.15.7 --activate \
+# 安装依赖（使用国内镜像源）
+RUN pnpm config set registry https://registry.npmmirror.com \
   && pnpm install --frozen-lockfile
 
 # 复制源码与构建脚本

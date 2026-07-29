@@ -827,7 +827,7 @@ services:
 
   # Redis 缓存
   redis:
-    image: redis:7-alpine
+    image: redis:8.8.0
     container_name: cms-redis
     ports:
       - "6379:6379"

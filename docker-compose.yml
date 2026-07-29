@@ -41,7 +41,7 @@ services:
 
   # ── Redis 缓存 ──
   redis:
-    image: redis:7-alpine
+    image: redis:8.8.0
     container_name: cms-redis
     restart: unless-stopped
     # 若设置了 REDIS_PASSWORD 则启用认证
