@@ -2,6 +2,7 @@ import { verifyToken } from '../utils/jwt.js'
 import { businessCode, businessMsg } from '../config/businessCode.js'
 import { createFailResponse } from '../utils/createResponse.js'
 import { query } from '../db/connection.js'
+import logger from '../config/logger.js'
 
 async function authenticate(ctx, next) {
   // 从请求头获取 Token
@@ -26,8 +27,7 @@ async function authenticate(ctx, next) {
   try {
     decoded = verifyToken(token)
   } catch (err) {
-    console.log('err11111111', err);
-
+    logger.warn({ err: { code: err.code, message: err.message } }, 'Token 验证失败')
     const code = err.code || businessCode.tokenExpired
     ctx.body = createFailResponse(code, err.message)
     return

@@ -22,7 +22,6 @@ export const useAuthStore = defineStore(SetupStoreId.Auth, () => {
   /** 是否为静态路由模式下的超级管理员角色 */
   const isStaticSuper = computed(() => {
     const { VITE_AUTH_ROUTE_MODE, VITE_STATIC_SUPER_ROLE } = import.meta.env
-    console.log(VITE_AUTH_ROUTE_MODE, VITE_STATIC_SUPER_ROLE, userInfo.roles)
     return VITE_AUTH_ROUTE_MODE === 'static' && userInfo.roles.includes(VITE_STATIC_SUPER_ROLE)
   })
 

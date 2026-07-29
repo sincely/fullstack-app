@@ -1,6 +1,7 @@
 import operationLogDao from '../modules/log/operationLogDao.js'
 import loginLogDao from '../modules/log/loginLogDao.js'
 import { randomUUID } from 'crypto'
+import logger from '../config/logger.js'
 
 /**
  * 解析 User-Agent 获取浏览器和操作系统信息
@@ -126,7 +127,7 @@ export const operationLogMiddleware = async (ctx, next) => {
     })
   } catch (error) {
     // 日志记录失败不影响主流程
-    console.error('记录操作日志失败:', error)
+    logger.error({ err: { message: error.message } }, '记录操作日志失败')
   }
 }
 
@@ -168,7 +169,7 @@ export const loginLogMiddleware = async (ctx, next) => {
       sessionId
     })
   } catch (error) {
-    console.error('记录登录日志失败:', error)
+    logger.error({ err: { message: error.message } }, '记录登录日志失败')
   }
 }
 
