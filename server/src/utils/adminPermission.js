@@ -4,23 +4,24 @@
  * @param {object} menu - 数据库菜单行
  * @returns {object} 前端路由树节点
  */
+// 注意：此函数接收的是 DAO 查询出的数据库原始行（snake_case 字段）
 const normalizeMenu = (menu) => {
   // 构建 meta 对象（前端路由仍需要 meta 格式）
   const meta = {
-    title: menu.menuName,
+    title: menu.menu_name,
     ...(menu.icon ? { icon: menu.icon } : {}),
-    ...(menu.orderNum ? { order: menu.orderNum } : {}),
-    ...(menu.hideInMenu ? { hideInMenu: Boolean(menu.hideInMenu) } : {}),
-    ...(menu.activeMenu ? { activeMenu: menu.activeMenu } : {}),
-    ...(menu.multiTab ? { multiTab: Boolean(menu.multiTab) } : {}),
-    ...(menu.keepAlive ? { keepAlive: Boolean(menu.keepAlive) } : {})
+    ...(menu.order_num ? { order: menu.order_num } : {}),
+    ...(menu.hide_in_menu ? { hideInMenu: Boolean(menu.hide_in_menu) } : {}),
+    ...(menu.active_menu ? { activeMenu: menu.active_menu } : {}),
+    ...(menu.multi_tab ? { multiTab: Boolean(menu.multi_tab) } : {}),
+    ...(menu.keep_alive ? { keepAlive: Boolean(menu.keep_alive) } : {})
   }
 
   return {
     id: menu.id,
-    parentId: menu.parentId,
-    path: menu.routePath,
-    name: menu.routeName,
+    parentId: menu.parent_id ?? 0,
+    path: menu.route_path,
+    name: menu.route_name,
     component: menu.component,
     redirect: menu.redirect,
     meta,
@@ -63,9 +64,9 @@ export const buildMenuTree = (menuList) => {
  */
 export const extractPermissionCodes = (menus, buttons) => {
   return {
-    routePaths: menus.map((menu) => menu.routePath),
-    routeNames: menus.map((menu) => menu.routeName),
-    buttons: buttons.map((button) => button.buttonName).filter(Boolean)
+    routePaths: menus.map((menu) => menu.route_path).filter(Boolean),
+    routeNames: menus.map((menu) => menu.route_name).filter(Boolean),
+    buttons: buttons.map((button) => button.button_name).filter(Boolean)
   }
 }
 

@@ -63,23 +63,32 @@ const formatMenuRow = (row, buttonMap = new Map()) => ({
   ...(row.keep_alive ? { keepAlive: Boolean(row.keep_alive) } : {})
 })
 
+// 注意：此函数接收的是 formatMenuRow 转换后的数据（camelCase 字段），
+// 因此使用 menuType / parentId 而非 menu_type / parent_id
 const buildMenuRecordTree = (rows) => {
-  const nodeMap = new Map(rows.map((row) => [row.id, row.menu_type === '1' ? { ...row, children: [] } : { ...row }]))
+  const nodeMap = new Map(rows.map((row) => [row.id, row.menuType === '1' ? { ...row, children: [] } : { ...row }]))
   const roots = []
 
   for (const row of rows) {
     const currentNode = nodeMap.get(row.id)
-    const parentId = Number(row.parent_id) || 0
+    const parentId = Number(row.parentId) || 0
 
     if (parentId !== 0 && nodeMap.has(parentId)) {
       const parentNode = nodeMap.get(parentId)
-      if (parentNode.menu_type === '1' && Array.isArray(parentNode.children)) {
+      if (parentNode.menuType === '1' && Array.isArray(parentNode.children)) {
         parentNode.children.push(currentNode)
         continue
       }
     }
 
     roots.push(currentNode)
+  }
+
+  // 清理空的 children 数组，避免表格显示多余的展开图标
+  for (const node of nodeMap.values()) {
+    if (Array.isArray(node.children) && node.children.length === 0) {
+      delete node.children
+    }
   }
 
   return roots
