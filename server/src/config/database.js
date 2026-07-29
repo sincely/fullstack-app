@@ -41,7 +41,9 @@ export const redisConfig = {
 
   // 自动重连策略：指数退避，上限 3s
   retryStrategy: (times) => {
-    if (times > 10) return null // 超过 10 次重连后放弃
+    if (times > 10) {
+      return null
+    } // 超过 10 次重连后放弃
     return Math.min(times * 200, 3000)
   },
 

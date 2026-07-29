@@ -35,19 +35,19 @@ export function verifyToken(token) {
     return jwt.verify(token, TokenSecret)
   } catch (error) {
     if (error.name === 'TokenExpiredError') {
-      let err = {
+      const err = {
         code: businessCode.tokenExpired,
         message: 'Token 已过期，请重新登录',
         status: 200
       }
       throw err
     } else {
-      let err = {
+      const err = {
         code: businessCode.unAuthorized,
         message: 'Token 无效',
         status: 200
       }
-        throw err
+      throw err
     }
   }
 }
@@ -63,14 +63,14 @@ export function verifyRefreshToken(token) {
     return jwt.verify(token, RefreshTokenSecret)
   } catch (error) {
     if (error.name === 'TokenExpiredError') {
-      let err = {
+      const err = {
         code: businessCode.tokenExpired,
         message: 'Refresh Token 已过期，请重新登录',
         status: 200
       }
       throw err
     }
-    let err = {
+    const err = {
       code: businessCode.tokenExpired,
       message: 'Refresh Token 无效'
     }

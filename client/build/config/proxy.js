@@ -35,6 +35,7 @@ function createProxyItem(item) {
   proxy[item.proxyPattern] = {
     target: item.baseURL,
     changeOrigin: true,
+    xfwd: true,
     rewrite: (path) => {
       // 默认后端本身就以 /api 为前缀，这里不做去前缀处理
       if (item.proxyPattern === '/api') {

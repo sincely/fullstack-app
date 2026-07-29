@@ -7,7 +7,7 @@ import { query } from '../../db/connection.js'
 /**
  * 分页查询登录日志列表
  */
-const listLoginLogs = async ({ page, pageSize, username, ipAddress, status, startTime, endTime }) => {
+const listLoginLogs = async ({ page, pageSize, username, ip_address, status, startTime, endTime }) => {
   const where = []
   const params = []
 
@@ -16,9 +16,9 @@ const listLoginLogs = async ({ page, pageSize, username, ipAddress, status, star
     params.push(`%${username}%`)
   }
 
-  if (ipAddress) {
-    where.push('ll.ipAddress = ?')
-    params.push(ipAddress)
+  if (ip_address) {
+    where.push('ll.ip_address = ?')
+    params.push(ip_address)
   }
 
   if (status !== undefined && status !== '') {
@@ -27,12 +27,12 @@ const listLoginLogs = async ({ page, pageSize, username, ipAddress, status, star
   }
 
   if (startTime) {
-    where.push('ll.createTime >= ?')
+    where.push('ll.create_time >= ?')
     params.push(startTime)
   }
 
   if (endTime) {
-    where.push('ll.createTime <= ?')
+    where.push('ll.create_time <= ?')
     params.push(endTime)
   }
 
@@ -44,21 +44,21 @@ const listLoginLogs = async ({ page, pageSize, username, ipAddress, status, star
   const sql = `
     SELECT
       ll.id,
-      ll.userId,
+      ll.user_id,
       ll.username,
-      ll.loginType,
-      ll.ipAddress,
+      ll.login_type,
+      ll.ip_address,
       ll.location,
       ll.browser,
       ll.os,
-      ll.userAgent,
+      ll.user_agent,
       ll.status,
       ll.message,
-      ll.sessionId,
-      ll.createTime
+      ll.session_id,
+      ll.create_time
     FROM LoginLog ll
     ${whereSql}
-    ORDER BY ll.createTime DESC
+    ORDER BY ll.create_time DESC
     LIMIT ?, ?
   `
 
@@ -68,7 +68,7 @@ const listLoginLogs = async ({ page, pageSize, username, ipAddress, status, star
 /**
  * 统计登录日志总数
  */
-const countLoginLogs = async ({ username, ipAddress, status, startTime, endTime }) => {
+const countLoginLogs = async ({ username, ip_address, status, startTime, endTime }) => {
   const where = []
   const params = []
 
@@ -77,9 +77,9 @@ const countLoginLogs = async ({ username, ipAddress, status, startTime, endTime 
     params.push(`%${username}%`)
   }
 
-  if (ipAddress) {
-    where.push('ll.ipAddress = ?')
-    params.push(ipAddress)
+  if (ip_address) {
+    where.push('ll.ip_address = ?')
+    params.push(ip_address)
   }
 
   if (status !== undefined && status !== '') {
@@ -88,12 +88,12 @@ const countLoginLogs = async ({ username, ipAddress, status, startTime, endTime 
   }
 
   if (startTime) {
-    where.push('ll.createTime >= ?')
+    where.push('ll.create_time >= ?')
     params.push(startTime)
   }
 
   if (endTime) {
-    where.push('ll.createTime <= ?')
+    where.push('ll.create_time <= ?')
     params.push(endTime)
   }
 
@@ -115,23 +115,23 @@ const countLoginLogs = async ({ username, ipAddress, status, startTime, endTime 
 const createLoginLog = async (data) => {
   const sql = `
     INSERT INTO LoginLog (
-      userId, username, loginType, ipAddress, location,
-      browser, os, userAgent, status, message, sessionId
+      user_id, username, login_type, ip_address, location,
+      browser, os, user_agent, status, message, session_id
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `
 
   return query(sql, [
-    data.userId || null,
+    data.user_id || null,
     data.username || '',
-    data.loginType || 'password',
-    data.ipAddress || '',
+    data.login_type || 'password',
+    data.ip_address || '',
     data.location || '',
     data.browser || '',
     data.os || '',
-    data.userAgent || '',
+    data.user_agent || '',
     data.status !== undefined ? data.status : 1,
     data.message || '',
-    data.sessionId || null
+    data.session_id || null
   ])
 }
 

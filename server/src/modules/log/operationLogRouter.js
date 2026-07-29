@@ -4,10 +4,7 @@ import authenticate from '../../middleware/authenticate.js'
 import authorizeRoute from '../../middleware/authorize.js'
 import { validateQuery, validateBody } from '../../middleware/validationMiddleware.js'
 import { errorControllerWrapper } from '../../utils/errorHandler.js'
-import {
-  OperationLogListQuerySchema,
-  LogBatchDeleteBodySchema
-} from '../../schemas/log/logSchema.js'
+import { OperationLogListQuerySchema, LogBatchDeleteBodySchema } from '../../schemas/log/logSchema.js'
 
 const operationLogRouter = new Router()
 

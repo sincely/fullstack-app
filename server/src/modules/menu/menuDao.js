@@ -4,10 +4,10 @@ import { getConnection, query } from '../../db/connection.js'
  * 菜单列表查询的公共字段（适配新表结构，不再依赖 meta JSON）。
  */
 const MENU_COLUMNS = `
-  id, parentId, menuType, menuName, routeName, routePath,
-  component, redirect, orderNum, icon, iconType,
-  hideInMenu, activeMenu, multiTab, keepAlive,
-  status, createBy, createTime, updateBy, updateTime
+  id, parent_id, menu_type, menu_name, route_name, route_path,
+  component, redirect, order_num, icon, icon_type,
+  hide_in_menu, active_menu, multi_tab, keep_alive,
+  status, create_by, create_time, update_by, update_time
 `
 
 /**
@@ -18,7 +18,7 @@ const listMenus = async () => {
   const sql = `
     select ${MENU_COLUMNS}
     from RouteAuth
-    order by coalesce(parentId, 0), orderNum asc, id asc
+    order by coalesce(parent_id, 0), order_num asc, id asc
   `
 
   return query(sql)
@@ -41,24 +41,24 @@ const findMenuById = async (id) => {
 }
 
 /**
- * 根据 routePath 查询菜单（唯一性校验使用）。
- * @param {string} routePath
+ * 根据 route_path 查询菜单（唯一性校验使用）。
+ * @param {string} route_path
  * @returns {Promise<any | null>}
  */
-const findMenuByPath = async (routePath) => {
-  const sql = 'select id, routePath from RouteAuth where routePath = ? limit 1'
-  const rows = await query(sql, [routePath])
+const findMenuByPath = async (route_path) => {
+  const sql = 'select id, route_path from RouteAuth where route_path = ? limit 1'
+  const rows = await query(sql, [route_path])
   return rows[0] || null
 }
 
 /**
- * 根据 routeName 查询菜单（唯一性校验使用）。
- * @param {string} routeName
+ * 根据 route_name 查询菜单（唯一性校验使用）。
+ * @param {string} route_name
  * @returns {Promise<any | null>}
  */
-const findMenuByName = async (routeName) => {
-  const sql = 'select id, routeName from RouteAuth where routeName = ? limit 1'
-  const rows = await query(sql, [routeName])
+const findMenuByName = async (route_name) => {
+  const sql = 'select id, route_name from RouteAuth where route_name = ? limit 1'
+  const rows = await query(sql, [route_name])
   return rows[0] || null
 }
 
@@ -70,27 +70,27 @@ const findMenuByName = async (routeName) => {
 const createMenu = async (payload) => {
   const sql = `
     insert into RouteAuth (
-      parentId, menuType, menuName, routeName, routePath,
-      component, redirect, orderNum, icon, iconType,
-      hideInMenu, activeMenu, multiTab, keepAlive, status
+      parent_id, menu_type, menu_name, route_name, route_path,
+      component, redirect, order_num, icon, icon_type,
+      hide_in_menu, active_menu, multi_tab, keep_alive, status
     ) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `
 
   const params = [
-    payload.parentId ?? null,
-    payload.menuType ?? 2,
-    payload.menuName,
-    payload.routeName,
-    payload.routePath,
+    payload.parent_id ?? null,
+    payload.menu_type ?? 2,
+    payload.menu_name,
+    payload.route_name,
+    payload.route_path,
     payload.component ?? null,
     payload.redirect ?? null,
-    payload.orderNum ?? 0,
+    payload.order_num ?? 0,
     payload.icon ?? null,
-    payload.iconType ?? 1,
-    payload.hideInMenu ? 1 : 0,
-    payload.activeMenu ?? null,
-    payload.multiTab ? 1 : 0,
-    payload.keepAlive ? 1 : 0,
+    payload.icon_type ?? 1,
+    payload.hide_in_menu ? 1 : 0,
+    payload.active_menu ?? null,
+    payload.multi_tab ? 1 : 0,
+    payload.keep_alive ? 1 : 0,
     payload.status ?? 1
   ]
 
@@ -126,7 +126,7 @@ const updateMenu = async (id, payload) => {
  * @returns {Promise<number>}
  */
 const countChildren = async (id) => {
-  const sql = 'select count(*) as total from RouteAuth where parentId = ?'
+  const sql = 'select count(*) as total from RouteAuth where parent_id = ?'
   const rows = await query(sql, [id])
   return rows[0]?.total || 0
 }
@@ -143,8 +143,8 @@ const deleteMenu = async (id) => {
   const connection = await getConnection()
   try {
     await connection.beginTransaction()
-    await connection.execute('delete from ButtonAuth where routeId = ?', [id])
-    await connection.execute('delete from RoleRoute where routeId = ?', [id])
+    await connection.execute('delete from ButtonAuth where route_id = ?', [id])
+    await connection.execute('delete from RoleRoute where route_id = ?', [id])
     const [result] = await connection.execute('delete from RouteAuth where id = ?', [id])
     await connection.commit()
     return result
@@ -167,7 +167,7 @@ const listMenusPaginated = async ({ page = 1, pageSize = 10, keyword = '' } = {}
   const params = []
 
   if (keyword) {
-    whereClause = ' where (menuName like ? or routePath like ? or routeName like ?)'
+    whereClause = ' where (menu_name like ? or route_path like ? or route_name like ?)'
     params.push(`%${keyword}%`, `%${keyword}%`, `%${keyword}%`)
   }
 
@@ -175,7 +175,7 @@ const listMenusPaginated = async ({ page = 1, pageSize = 10, keyword = '' } = {}
     select ${MENU_COLUMNS}
     from RouteAuth
     ${whereClause}
-    order by coalesce(parentId, 0), orderNum asc, id asc
+    order by coalesce(parent_id, 0), order_num asc, id asc
     limit ? offset ?
   `
 
@@ -192,7 +192,7 @@ const countMenus = async ({ keyword = '' } = {}) => {
   const params = []
 
   if (keyword) {
-    whereClause = ' where (menuName like ? or routePath like ? or routeName like ?)'
+    whereClause = ' where (menu_name like ? or route_path like ? or route_name like ?)'
     params.push(`%${keyword}%`, `%${keyword}%`, `%${keyword}%`)
   }
 
@@ -208,15 +208,15 @@ const countMenus = async ({ keyword = '' } = {}) => {
 const listMenuButtons = async () => {
   const sql = `
     select
-      buttonId,
-      routeId,
-      routeName,
-      buttonName,
-      buttonLabel,
-      orderNum,
+      button_id,
+      route_id,
+      route_name,
+      button_name,
+      button_label,
+      order_num,
       status
     from ButtonAuth
-    order by routeId asc, orderNum asc, buttonId asc
+    order by route_id asc, order_num asc, button_id asc
   `
 
   return query(sql)
@@ -224,37 +224,37 @@ const listMenuButtons = async () => {
 
 /**
  * 重置单个菜单的按钮配置。
- * @param {number} routeId
- * @param {string} routeName
+ * @param {number} route_id
+ * @param {string} route_name
  * @param {Array<{code:string,desc?:string}>} buttons
  * @param {import('mysql2/promise').PoolConnection} [connection]
  * @returns {Promise<void>}
  */
-const replaceMenuButtons = async (routeId, routeName, buttons = [], connection) => {
+const replaceMenuButtons = async (route_id, route_name, buttons = [], connection) => {
   const executor = connection || (await getConnection())
   const safeButtons = buttons
     .map((item, index) => ({
-      buttonName: String(item.code || '').trim(),
-      buttonLabel: String(item.desc || '').trim() || null,
-      orderNum: index + 1
+      button_name: String(item.code || '').trim(),
+      button_label: String(item.desc || '').trim() || null,
+      order_num: index + 1
     }))
-    .filter((item) => item.buttonName)
+    .filter((item) => item.button_name)
 
   try {
-    await executor.execute('delete from ButtonAuth where routeId = ?', [routeId])
+    await executor.execute('delete from ButtonAuth where route_id = ?', [route_id])
 
     if (safeButtons.length > 0) {
       const valuesSql = safeButtons.map(() => '(?, ?, ?, ?, ?, 1)').join(', ')
       const values = safeButtons.flatMap((item) => [
-        routeId,
-        routeName,
-        item.buttonName,
-        item.buttonLabel,
-        item.orderNum
+        route_id,
+        route_name,
+        item.button_name,
+        item.button_label,
+        item.order_num
       ])
       await executor.execute(
         `
-          insert into ButtonAuth (routeId, routeName, buttonName, buttonLabel, orderNum, status)
+          insert into ButtonAuth (route_id, route_name, button_name, button_label, order_num, status)
           values ${valuesSql}
         `,
         values
@@ -268,13 +268,13 @@ const replaceMenuButtons = async (routeId, routeName, buttons = [], connection) 
 }
 
 /**
- * 同步按钮记录中的 routeName。
- * @param {number} routeId
- * @param {string} routeName
+ * 同步按钮记录中的 route_name。
+ * @param {number} route_id
+ * @param {string} route_name
  * @returns {Promise<any>}
  */
-const updateMenuButtonRouteName = async (routeId, routeName) => {
-  return query('update ButtonAuth set routeName = ? where routeId = ?', [routeName, routeId])
+const updateMenuButtonRouteName = async (route_id, route_name) => {
+  return query('update ButtonAuth set route_name = ? where route_id = ?', [route_name, route_id])
 }
 
 /**
@@ -289,8 +289,8 @@ const deleteMenus = async (ids) => {
   try {
     await connection.beginTransaction()
     for (const id of safeIds) {
-      await connection.execute('delete from ButtonAuth where routeId = ?', [id])
-      await connection.execute('delete from RoleRoute where routeId = ?', [id])
+      await connection.execute('delete from ButtonAuth where route_id = ?', [id])
+      await connection.execute('delete from RoleRoute where route_id = ?', [id])
       await connection.execute('delete from RouteAuth where id = ?', [id])
     }
     await connection.commit()

@@ -1,10 +1,10 @@
 /**
  * Redis 缓存工具模块
- * 
+ *
  * 提供两类缓存：
  *  1. 认证缓存（auth cache）  — 缓存 sessionId/sessionExpire，减少 MySQL 查询
  *  2. 权限缓存（perm cache）  — 缓存角色关联的菜单路径，减少 authorize 中间件查库
- * 
+ *
  * 所有方法在 Redis 不可用时优雅降级（返回 null / 不抛异常）
  */
 
@@ -16,8 +16,8 @@ import logger from '../config/logger.js'
 const AUTH_KEY_PREFIX = 'auth:user:'
 const PERM_KEY_PREFIX = 'perm:role:'
 
-const AUTH_TTL = 3600        // 认证缓存 1 小时
-const PERM_TTL = 300         // 权限缓存 5 分钟
+const AUTH_TTL = 3600 // 认证缓存 1 小时
+const PERM_TTL = 300 // 权限缓存 5 分钟
 
 // ─── 内部工具 ────────────────────────────────────────────
 
@@ -58,7 +58,9 @@ function normalizeRoleKey(roleIds) {
  */
 export async function getAuthCache(userId) {
   const redis = safeGetRedis()
-  if (!redis) return null
+  if (!redis) {
+    return null
+  }
 
   try {
     const data = await redis.get(`${AUTH_KEY_PREFIX}${userId}`)
@@ -76,14 +78,12 @@ export async function getAuthCache(userId) {
  */
 export async function setAuthCache(userId, data) {
   const redis = safeGetRedis()
-  if (!redis) return
+  if (!redis) {
+    return
+  }
 
   try {
-    await redis.setex(
-      `${AUTH_KEY_PREFIX}${userId}`,
-      AUTH_TTL,
-      JSON.stringify(data)
-    )
+    await redis.setex(`${AUTH_KEY_PREFIX}${userId}`, AUTH_TTL, JSON.stringify(data))
   } catch (err) {
     logger.warn({ err: { message: err.message } }, 'Auth cache write failed')
   }
@@ -95,7 +95,9 @@ export async function setAuthCache(userId, data) {
  */
 export async function delAuthCache(userId) {
   const redis = safeGetRedis()
-  if (!redis) return
+  if (!redis) {
+    return
+  }
 
   try {
     await redis.del(`${AUTH_KEY_PREFIX}${userId}`)
@@ -118,7 +120,9 @@ export async function delAuthCache(userId) {
  */
 export async function getPermCache(roleIds) {
   const redis = safeGetRedis()
-  if (!redis) return null
+  if (!redis) {
+    return null
+  }
 
   try {
     const key = `${PERM_KEY_PREFIX}${normalizeRoleKey(roleIds)}`
@@ -137,7 +141,9 @@ export async function getPermCache(roleIds) {
  */
 export async function setPermCache(roleIds, routePaths) {
   const redis = safeGetRedis()
-  if (!redis) return
+  if (!redis) {
+    return
+  }
 
   try {
     const key = `${PERM_KEY_PREFIX}${normalizeRoleKey(roleIds)}`
@@ -153,7 +159,9 @@ export async function setPermCache(roleIds, routePaths) {
  */
 export async function delPermCacheByRole(roleId) {
   const redis = safeGetRedis()
-  if (!redis) return
+  if (!redis) {
+    return
+  }
 
   try {
     await redis.del(`${PERM_KEY_PREFIX}${roleId}`)
@@ -168,7 +176,9 @@ export async function delPermCacheByRole(roleId) {
  */
 export async function delAllPermCache() {
   const redis = safeGetRedis()
-  if (!redis) return
+  if (!redis) {
+    return
+  }
 
   try {
     let cursor = '0'
@@ -194,7 +204,9 @@ export async function delAllPermCache() {
  */
 export async function getCacheStats() {
   const redis = safeGetRedis()
-  if (!redis) return { authKeys: 0, permKeys: 0 }
+  if (!redis) {
+    return { authKeys: 0, permKeys: 0 }
+  }
 
   try {
     const [authKeys, permKeys] = await Promise.all([

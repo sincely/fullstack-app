@@ -97,7 +97,9 @@ export const recordLoginFailure = async (username) => {
  */
 export const clearLoginLock = async (username) => {
   const redis = getRedisClient()
-  if (!redis) return
+  if (!redis) {
+    return
+  }
 
   try {
     await redis.del(`${KEY_PREFIX}${username}`)

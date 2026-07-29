@@ -11,12 +11,7 @@ const authRouter = new Router()
 
 // 前端兼容接口 - 登录
 const frontendLogin = async (ctx) => {
-  const loginIp =
-    ctx.headers['x-forwarded-for'] ||
-    ctx.headers['x-real-ip'] ||
-    ctx.ip ||
-    ctx.request.ip ||
-    'unknown'
+  const loginIp = ctx.headers['x-forwarded-for'] || ctx.headers['x-real-ip'] || ctx.ip || ctx.request.ip || 'unknown'
   const userAgent = ctx.headers['user-agent'] || ''
 
   const result = await authService.frontendLogin({
@@ -25,7 +20,9 @@ const frontendLogin = async (ctx) => {
     userAgent
   })
 
-  if (!result.success) return (ctx.body = createFailResponse(result.code, businessMsg[result.code], result.data))
+  if (!result.success) {
+    return (ctx.body = createFailResponse(ctx, result.code, businessMsg[result.code], result.data))
+  }
 
   // 写入 Session（Redis Store 会在响应结束时自动持久化）
   ctx.session.user = {
@@ -43,7 +40,9 @@ authRouter.post('/user/auth/login', validateBody(loginBodySchema), errorControll
 // 前端兼容接口 - 获取用户信息
 const frontendGetUserInfo = async (ctx) => {
   const result = await authService.frontendGetUserInfo(ctx.state.user.userId)
-  if (!result.success) return (ctx.body = createFailResponse(result.code, businessMsg[result.code]))
+  if (!result.success) {
+    return (ctx.body = createFailResponse(ctx, result.code, businessMsg[result.code]))
+  }
   ctx.body = createSuccessResponse(businessCode.success, '获取用户信息成功', result.data)
 }
 
@@ -56,7 +55,7 @@ authRouter.post(
     const { refreshToken } = ctx.request.body
     const result = await authService.frontendRefreshToken(refreshToken)
     if (!result.success) {
-      return (ctx.body = createFailResponse(result.code, result.msg || businessMsg[result.code]))
+      return (ctx.body = createFailResponse(ctx, result.code, result.msg || businessMsg[result.code]))
     }
     ctx.body = createSuccessResponse(businessCode.success, '刷新成功', result.data)
   })
@@ -83,7 +82,7 @@ authRouter.get(
   errorControllerWrapper((ctx) => {
     const code = Number(ctx.query.code) || businessCode.error
     const msg = ctx.query.msg || '自定义后端错误'
-    ctx.body = createFailResponse(code, msg)
+    ctx.body = createFailResponse(ctx, code, msg)
   })
 )
 

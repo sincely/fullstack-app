@@ -36,7 +36,7 @@ async function ensureMigrationsTable() {
  */
 async function getExecutedMigrations() {
   const rows = await query(`SELECT name FROM \`${MIGRATIONS_TABLE}\` ORDER BY id`)
-  return new Set(rows.map(r => r.name))
+  return new Set(rows.map((r) => r.name))
 }
 
 /**
@@ -47,9 +47,9 @@ async function getExecutedMigrations() {
 function getMigrationFiles(dir) {
   try {
     const files = readdirSync(dir)
-      .filter(f => f.endsWith('.js') || f.endsWith('.sql'))
+      .filter((f) => f.endsWith('.js') || f.endsWith('.sql'))
       .sort()
-    return files.map(f => ({ name: f, path: join(dir, f) }))
+    return files.map((f) => ({ name: f, path: join(dir, f) }))
   } catch {
     return []
   }
@@ -72,8 +72,8 @@ async function runMigration(migration, batch) {
     // 分割多条语句（以 ; 结尾）
     const statements = sql
       .split(';')
-      .map(s => s.trim())
-      .filter(s => s.length > 0)
+      .map((s) => s.trim())
+      .filter((s) => s.length > 0)
 
     for (const statement of statements) {
       await query(statement)
@@ -106,7 +106,7 @@ export async function migrate(migrationsDir) {
   const files = getMigrationFiles(migrationsDir)
 
   // 过滤出未执行的迁移
-  const pending = files.filter(f => !executed.has(f.name))
+  const pending = files.filter((f) => !executed.has(f.name))
 
   if (pending.length === 0) {
     logger.info('没有待执行的迁移')
@@ -137,9 +137,7 @@ export async function rollback(migrationsDir) {
   await ensureMigrationsTable()
 
   // 获取最近批次
-  const batchResult = await query(
-    `SELECT batch FROM \`${MIGRATIONS_TABLE}\` ORDER BY batch DESC LIMIT 1`
-  )
+  const batchResult = await query(`SELECT batch FROM \`${MIGRATIONS_TABLE}\` ORDER BY batch DESC LIMIT 1`)
 
   if (batchResult.length === 0) {
     logger.info('没有可回滚的迁移')
@@ -149,10 +147,7 @@ export async function rollback(migrationsDir) {
   const batch = batchResult[0].batch
 
   // 获取该批次的所有迁移
-  const migrations = await query(
-    `SELECT name FROM \`${MIGRATIONS_TABLE}\` WHERE batch = ? ORDER BY id DESC`,
-    [batch]
-  )
+  const migrations = await query(`SELECT name FROM \`${MIGRATIONS_TABLE}\` WHERE batch = ? ORDER BY id DESC`, [batch])
 
   const rolledBackList = []
 
@@ -196,8 +191,8 @@ export async function status(migrationsDir) {
   const files = getMigrationFiles(migrationsDir)
 
   return {
-    executed: files.filter(f => executed.has(f.name)).map(f => f.name),
-    pending: files.filter(f => !executed.has(f.name)).map(f => f.name)
+    executed: files.filter((f) => executed.has(f.name)).map((f) => f.name),
+    pending: files.filter((f) => !executed.has(f.name)).map((f) => f.name)
   }
 }
 

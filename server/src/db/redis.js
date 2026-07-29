@@ -119,7 +119,9 @@ export async function connectRedis() {
  * @returns {Redis | null}
  */
 export function getRedisClient() {
-  if (!redisEnabled) return null
+  if (!redisEnabled) {
+    return null
+  }
   if (!client) {
     logger.warn('Redis 客户端未初始化，自动创建（建议启动时显式调用 connectRedis）')
     client = createClient()

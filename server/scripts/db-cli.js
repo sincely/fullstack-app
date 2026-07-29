@@ -79,7 +79,7 @@ async function runMigrate() {
   const result = await migrate(MIGRATIONS_DIR)
   console.log(`\n✅ 迁移完成: ${result.executed} 个文件`)
   if (result.migrations.length > 0) {
-    result.migrations.forEach(m => console.log(`  - ${m}`))
+    result.migrations.forEach((m) => console.log(`  - ${m}`))
   }
 }
 
@@ -88,7 +88,7 @@ async function runRollback() {
   const result = await rollback(MIGRATIONS_DIR)
   console.log(`\n✅ 回滚完成: ${result.rolledBack} 个文件`)
   if (result.migrations.length > 0) {
-    result.migrations.forEach(m => console.log(`  - ${m}`))
+    result.migrations.forEach((m) => console.log(`  - ${m}`))
   }
 }
 
@@ -97,12 +97,12 @@ async function runStatus() {
   const result = await status(MIGRATIONS_DIR)
   console.log('\n📋 迁移状态:')
   console.log('\n已执行:')
-  result.executed.forEach(m => console.log(`  ✓ ${m}`))
+  result.executed.forEach((m) => console.log(`  ✓ ${m}`))
   console.log('\n待执行:')
   if (result.pending.length === 0) {
     console.log('  (无)')
   } else {
-    result.pending.forEach(m => console.log(`  ○ ${m}`))
+    result.pending.forEach((m) => console.log(`  ○ ${m}`))
   }
 }
 
@@ -132,7 +132,7 @@ async function runRestore(filename) {
 
   const { createInterface } = await import('readline')
   const rl = createInterface({ input: process.stdin, output: process.stdout })
-  const answer = await new Promise(resolve => rl.question('', resolve))
+  const answer = await new Promise((resolve) => rl.question('', resolve))
   rl.close()
 
   if (answer !== 'yes') {
@@ -157,7 +157,7 @@ async function runList() {
     return
   }
 
-  backups.forEach(b => {
+  backups.forEach((b) => {
     const size = (b.size / 1024 / 1024).toFixed(2)
     const date = b.created.toISOString().slice(0, 19).replace('T', ' ')
     console.log(`  ${b.name}`)
@@ -187,7 +187,7 @@ async function runVerify(filename) {
   }
 }
 
-main().catch(err => {
+main().catch((err) => {
   console.error('\n❌ 执行失败:', err.message)
   process.exit(1)
 })

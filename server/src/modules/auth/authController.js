@@ -12,7 +12,9 @@ import { createSuccessResponse, createFailResponse } from '../../utils/createRes
  */
 const register = async (ctx) => {
   const result = await authService.register(ctx.request.body)
-  if (!result.success) return (ctx.body = createFailResponse(result.code, result.msg))
+  if (!result.success) {
+    return (ctx.body = createFailResponse(result.code, result.msg))
+  }
   ctx.body = createSuccessResponse(businessCode.success, '注册成功', result.data)
 }
 
@@ -21,7 +23,9 @@ const register = async (ctx) => {
  */
 const login = async (ctx) => {
   const result = await authService.login(ctx.request.body)
-  if (!result.success) return (ctx.body = createFailResponse(result.code, businessMsg[result.code]))
+  if (!result.success) {
+    return (ctx.body = createFailResponse(result.code, businessMsg[result.code]))
+  }
   ctx.body = createSuccessResponse(businessCode.success, '登录成功', result.data)
 }
 
@@ -30,7 +34,9 @@ const login = async (ctx) => {
  */
 const getProfile = async (ctx) => {
   const result = await authService.getProfile(ctx.state.user.userId)
-  if (!result.success) return (ctx.body = createFailResponse(result.code, businessMsg[result.code]))
+  if (!result.success) {
+    return (ctx.body = createFailResponse(ctx, result.code, businessMsg[result.code]))
+  }
   ctx.body = createSuccessResponse(businessCode.success, '获取用户信息成功', result.data)
 }
 
@@ -39,7 +45,9 @@ const getProfile = async (ctx) => {
  */
 const getMenus = async (ctx) => {
   const result = await authService.getMenus(ctx.state.user.roleIds, ctx.state.user.roleId)
-  if (!result.success) return (ctx.body = createFailResponse(result.code, businessMsg[result.code]))
+  if (!result.success) {
+    return (ctx.body = createFailResponse(ctx, result.code, businessMsg[result.code]))
+  }
   ctx.body = createSuccessResponse(businessCode.success, '获取菜单成功', result.data)
 }
 
@@ -48,7 +56,9 @@ const getMenus = async (ctx) => {
  */
 const getPermissions = async (ctx) => {
   const result = await authService.getPermissions(ctx.state.user.roleIds, ctx.state.user.roleId)
-  if (!result.success) return (ctx.body = createFailResponse(result.code, businessMsg[result.code]))
+  if (!result.success) {
+    return (ctx.body = createFailResponse(ctx, result.code, businessMsg[result.code]))
+  }
   ctx.body = createSuccessResponse(businessCode.success, '获取权限成功', result.data)
 }
 

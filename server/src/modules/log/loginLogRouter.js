@@ -4,10 +4,7 @@ import authenticate from '../../middleware/authenticate.js'
 import authorizeRoute from '../../middleware/authorize.js'
 import { validateQuery, validateBody } from '../../middleware/validationMiddleware.js'
 import { errorControllerWrapper } from '../../utils/errorHandler.js'
-import {
-  LoginLogListQuerySchema,
-  LogBatchDeleteBodySchema
-} from '../../schemas/log/logSchema.js'
+import { LoginLogListQuerySchema, LogBatchDeleteBodySchema } from '../../schemas/log/logSchema.js'
 
 const loginLogRouter = new Router()
 
@@ -37,10 +34,6 @@ loginLogRouter.post(
 )
 
 // 清空登录日志
-loginLogRouter.post(
-  '/log/clearLoginLogs',
-  ...usePermission,
-  errorControllerWrapper(LoginLogController.clearLoginLogs)
-)
+loginLogRouter.post('/log/clearLoginLogs', ...usePermission, errorControllerWrapper(LoginLogController.clearLoginLogs))
 
 export default loginLogRouter

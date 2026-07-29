@@ -10,7 +10,9 @@ import { businessCode } from '../../config/businessCode.js'
 import { normalizePagination } from '../../schemas/common/paginationSchema.js'
 
 const toDbStatus = (status) => {
-  if (status === '2' || Number(status) === 0) return 0
+  if (status === '2' || Number(status) === 0) {
+    return 0
+  }
   return 1
 }
 
@@ -19,14 +21,14 @@ const toFrontendStatus = (status) => {
 }
 
 const formatRoleRow = (role) => ({
-  id: role.roleId,
-  roleId: role.roleId,
-  roleCode: role.roleCode,
-  roleName: role.roleName,
+  id: role.role_id,
+  roleId: role.role_id,
+  roleCode: role.role_code,
+  roleName: role.role_name,
   roleDesc: role.description ?? '',
   description: role.description ?? '',
   status: toFrontendStatus(role.status),
-  isSystem: Boolean(role.isSystem),
+  isSystem: Boolean(role.is_system),
   userCount: Number(role.userCount || 0),
   routeIds: role.routeIds || []
 })
@@ -40,8 +42,8 @@ export const listRoles = async (query) => {
   const normalizedStatus = status === '2' ? '0' : status
 
   const filterParams = {
-    roleName: roleName || '',
-    roleCode: roleCode || '',
+    role_name: roleName || '',
+    role_code: roleCode || '',
     status: normalizedStatus
   }
 
@@ -52,7 +54,7 @@ export const listRoles = async (query) => {
 
   const roleList = await Promise.all(
     roles.map(async (role) => {
-      const routeIds = await adminRoleDao.getRouteIdsByRoleId(role.roleId)
+      const routeIds = await adminRoleDao.getRouteIdsByRoleId(role.role_id)
       return {
         ...formatRoleRow(role),
         routeIds
@@ -76,17 +78,19 @@ export const createRole = async (body) => {
   const normalizedDescription = roleDesc ?? description ?? ''
   const existedRole = await adminRoleDao.findRoleByName(roleName, roleCode)
 
-  if (existedRole) return { success: false, code: businessCode.roleExist }
+  if (existedRole) {
+    return { success: false, code: businessCode.roleExist }
+  }
 
   const result = await adminRoleDao.createRoleWithRoutes({
-    roleName,
-    roleCode,
+    role_name: roleName,
+    role_code: roleCode,
     description: normalizedDescription,
     status: toDbStatus(status),
     routeIds: [...new Set(routeIds)]
   })
 
-  return { success: true, data: { roleId: result.roleId } }
+  return { success: true, data: { roleId: result.role_id } }
 }
 
 /**
@@ -98,17 +102,19 @@ export const updateRole = async (body) => {
   const normalizedDescription = roleDesc ?? description ?? ''
   const currentRole = await adminRoleDao.findRoleById(roleId)
 
-  if (!currentRole) return { success: false, code: businessCode.roleNotFound }
+  if (!currentRole) {
+    return { success: false, code: businessCode.roleNotFound }
+  }
 
   const existedRole = await adminRoleDao.findRoleByName(roleName, roleCode)
-  if (existedRole && Number(existedRole.roleId) !== roleId) {
+  if (existedRole && Number(existedRole.role_id) !== roleId) {
     return { success: false, code: businessCode.roleExist }
   }
 
   await adminRoleDao.updateRoleWithRoutes({
-    roleId,
-    roleName,
-    roleCode,
+    role_id: roleId,
+    role_name: roleName,
+    role_code: roleCode,
     description: normalizedDescription,
     status: toDbStatus(status),
     routeIds: [...new Set(routeIds)]
@@ -124,10 +130,14 @@ export const deleteRole = async (roleIdOrId) => {
   const roleId = Number(roleIdOrId)
   const currentRole = await adminRoleDao.findRoleById(roleId)
 
-  if (!currentRole) return { success: false, code: businessCode.roleNotFound }
+  if (!currentRole) {
+    return { success: false, code: businessCode.roleNotFound }
+  }
 
   const userCount = await adminRoleDao.countUsersByRoleId(roleId)
-  if (userCount > 0) return { success: false, code: businessCode.roleInUse }
+  if (userCount > 0) {
+    return { success: false, code: businessCode.roleInUse }
+  }
 
   await adminRoleDao.deleteRole(roleId)
   return { success: true }
@@ -141,9 +151,9 @@ export const getAllRoles = async () => {
   return {
     success: true,
     data: roles.map((role) => ({
-      roleId: role.roleId,
-      roleCode: role.roleCode,
-      roleName: role.roleName,
+      roleId: role.role_id,
+      roleCode: role.role_code,
+      roleName: role.role_name,
       status: toFrontendStatus(role.status)
     }))
   }
@@ -162,19 +172,21 @@ export const getRoleRouteIds = async (roleId) => {
  */
 export const updateRoleRouteIds = async ({ roleId, routeIds }) => {
   const currentRole = await adminRoleDao.findRoleById(roleId)
-  if (!currentRole) return { success: false, code: businessCode.roleNotFound }
+  if (!currentRole) {
+    return { success: false, code: businessCode.roleNotFound }
+  }
 
   const connection = await getConnection()
   try {
     await connection.beginTransaction()
-    await connection.execute('delete from RoleRoute where roleId = ?', [roleId])
+    await connection.execute('delete from RoleRoute where role_id = ?', [roleId])
     if (routeIds && routeIds.length > 0) {
       const valuesSql = routeIds.map(() => '(?, ?)').join(', ')
       const values = routeIds.flatMap((id) => [roleId, id])
-      await connection.execute(`insert into RoleRoute (roleId, routeId) values ${valuesSql}`, values)
+      await connection.execute(`insert into RoleRoute (role_id, route_id) values ${valuesSql}`, values)
     }
     await connection.commit()
-    
+
     return { success: true }
   } catch (error) {
     await connection.rollback()
@@ -189,7 +201,7 @@ export const updateRoleRouteIds = async ({ roleId, routeIds }) => {
  */
 export const getRoleButtonIds = async (roleId) => {
   const buttons = await adminPermissionDao.findButtonsByRoleId(Number(roleId))
-  const buttonIds = buttons.map((b) => b.buttonId)
+  const buttonIds = buttons.map((b) => b.button_id)
   return { success: true, data: buttonIds }
 }
 
@@ -198,10 +210,12 @@ export const getRoleButtonIds = async (roleId) => {
  */
 export const updateRoleButtonIds = async ({ roleId, buttonIds }) => {
   const currentRole = await adminRoleDao.findRoleById(roleId)
-  if (!currentRole) return { success: false, code: businessCode.roleNotFound }
+  if (!currentRole) {
+    return { success: false, code: businessCode.roleNotFound }
+  }
 
   await adminPermissionDao.replaceRoleButtons(roleId, buttonIds)
-  
+
   return { success: true }
 }
 

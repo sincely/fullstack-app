@@ -7,6 +7,27 @@ import operationLogDao from './operationLogDao.js'
 import { normalizePagination } from '../../schemas/common/paginationSchema.js'
 
 /**
+ * 将数据库 snake_case 字段映射为前端 camelCase 字段
+ */
+const formatOperationLogRow = (row) => ({
+  id: row.id,
+  userId: row.user_id,
+  username: row.username,
+  action: row.action,
+  module: row.module,
+  method: row.method,
+  requestUrl: row.request_url,
+  requestParams: row.request_params,
+  responseStatus: row.response_status,
+  responseMsg: row.response_msg,
+  ipAddress: row.ip_address,
+  userAgent: row.user_agent,
+  executeTime: row.execute_time,
+  status: row.status,
+  createTime: row.create_time
+})
+
+/**
  * 获取操作日志列表
  * @param {object} query - 查询参数
  * @returns {Promise<{ records: Array, current: number, size: number, total: number }>}
@@ -23,7 +44,7 @@ export const listOperationLogs = async (query) => {
   ])
 
   return {
-    records: list,
+    records: list.map(formatOperationLogRow),
     current: actualPage,
     size: actualPageSize,
     total: Number(total)
@@ -31,22 +52,28 @@ export const listOperationLogs = async (query) => {
 }
 
 /**
- * 获取操作日志详情（含 requestParams JSON 解析）
+ * 获取操作日志详情（含 request_params JSON 解析）
  * @param {number} id
  * @returns {Promise<object|null>}
  */
 export const getOperationLogDetail = async (id) => {
   const log = await operationLogDao.getOperationLogById(id)
 
-  if (log?.requestParams) {
+  if (!log) {
+    return null
+  }
+
+  const formatted = formatOperationLogRow(log)
+
+  if (formatted.requestParams) {
     try {
-      log.requestParams = JSON.parse(log.requestParams)
+      formatted.requestParams = JSON.parse(formatted.requestParams)
     } catch {
       // 保持原样
     }
   }
 
-  return log
+  return formatted
 }
 
 /**

@@ -2,60 +2,92 @@ import operationLogDao from '../modules/log/operationLogDao.js'
 import loginLogDao from '../modules/log/loginLogDao.js'
 import { randomUUID } from 'crypto'
 import logger from '../config/logger.js'
+import { getIpLocation } from '../utils/ipLocation.js'
 
 /**
  * 解析 User-Agent 获取浏览器和操作系统信息
  */
-const parseUserAgent = (userAgent) => {
-  const browser = detectBrowser(userAgent)
-  const os = detectOS(userAgent)
+const parseUserAgent = (user_agent) => {
+  const browser = detectBrowser(user_agent)
+  const os = detectOS(user_agent)
   return { browser, os }
 }
 
 const detectBrowser = (ua) => {
-  if (!ua) return 'Unknown'
+  if (!ua) {
+    return 'Unknown'
+  }
 
-  if (ua.includes('Edg/')) return 'Microsoft Edge'
-  if (ua.includes('Chrome/')) return 'Google Chrome'
-  if (ua.includes('Firefox/')) return 'Mozilla Firefox'
-  if (ua.includes('Safari/') && !ua.includes('Chrome/')) return 'Safari'
-  if (ua.includes('MSIE') || ua.includes('Trident/')) return 'Internet Explorer'
+  if (ua.includes('Edg/')) {
+    return 'Microsoft Edge'
+  }
+  if (ua.includes('Chrome/')) {
+    return 'Google Chrome'
+  }
+  if (ua.includes('Firefox/')) {
+    return 'Mozilla Firefox'
+  }
+  if (ua.includes('Safari/') && !ua.includes('Chrome/')) {
+    return 'Safari'
+  }
+  if (ua.includes('MSIE') || ua.includes('Trident/')) {
+    return 'Internet Explorer'
+  }
 
   return 'Unknown'
 }
 
 const detectOS = (ua) => {
-  if (!ua) return 'Unknown'
+  if (!ua) {
+    return 'Unknown'
+  }
 
   if (ua.includes('Windows NT')) {
     const version = ua.match(/Windows NT (\d+\.\d+)/)?.[1]
     const versionMap = {
       '10.0': 'Windows 10/11',
-      '6.3': 'Windows 8.1',
-      '6.2': 'Windows 8',
-      '6.1': 'Windows 7'
+      6.3: 'Windows 8.1',
+      6.2: 'Windows 8',
+      6.1: 'Windows 7'
     }
     return versionMap[version] || 'Windows'
   }
-  if (ua.includes('Macintosh') || ua.includes('Mac OS X')) return 'macOS'
-  if (ua.includes('Linux')) return 'Linux'
-  if (ua.includes('Android')) return 'Android'
-  if (ua.includes('iPhone') || ua.includes('iPad')) return 'iOS'
+  if (ua.includes('Macintosh') || ua.includes('Mac OS X')) {
+    return 'macOS'
+  }
+  if (ua.includes('Linux')) {
+    return 'Linux'
+  }
+  if (ua.includes('Android')) {
+    return 'Android'
+  }
+  if (ua.includes('iPhone') || ua.includes('iPad')) {
+    return 'iOS'
+  }
 
   return 'Unknown'
 }
 
 /**
  * 获取客户端 IP 地址
+ * 优先读取代理头（X-Forwarded-For / X-Real-IP），取第一个非内网 IP
  */
 const getClientIp = (ctx) => {
-  return (
-    ctx.headers['x-forwarded-for'] ||
-    ctx.headers['x-real-ip'] ||
-    ctx.ip ||
-    ctx.request.ip ||
-    'Unknown'
-  )
+  const forwardedFor = ctx.headers['x-forwarded-for']
+  if (forwardedFor) {
+    // X-Forwarded-For 可能是 "client, proxy1, proxy2"，取第一个
+    const firstIp = forwardedFor.split(',')[0].trim()
+    if (firstIp) {
+      return firstIp
+    }
+  }
+
+  const realIp = ctx.headers['x-real-ip']
+  if (realIp) {
+    return realIp.trim()
+  }
+
+  return ctx.ip || ctx.request.ip || 'Unknown'
 }
 
 /**
@@ -69,7 +101,7 @@ export const operationLogMiddleware = async (ctx, next) => {
   await next()
 
   // 异步记录日志，不阻塞响应
-  const executeTime = Date.now() - startTime
+  const execute_time = Date.now() - startTime
 
   // 只记录 POST/PUT/DELETE 等写操作
   const method = ctx.method.toUpperCase()
@@ -112,17 +144,17 @@ export const operationLogMiddleware = async (ctx, next) => {
     const status = responseBody?.code === 200 ? 1 : 0
 
     await operationLogDao.createOperationLog({
-      userId,
+      user_id: userId,
       username,
       action,
       module,
       method,
-      requestParams,
+      request_params: requestParams,
       responseStatus: String(responseBody?.code || ctx.status),
-      responseMsg: responseBody?.msg || '',
+      response_msg: responseBody?.msg || '',
       ipAddress: getClientIp(ctx),
-      userAgent: ctx.headers['user-agent'] || '',
-      executeTime,
+      user_agent: ctx.headers['user-agent'] || '',
+      executeTime: execute_time,
       status
     })
   } catch (error) {
@@ -154,19 +186,21 @@ export const loginLogMiddleware = async (ctx, next) => {
 
     const userAgent = ctx.headers['user-agent'] || ''
     const { browser, os } = parseUserAgent(userAgent)
+    const loginIp = getClientIp(ctx)
+    const location = await getIpLocation(loginIp)
 
     await loginLogDao.createLoginLog({
-      userId,
+      user_id: userId,
       username: username || '',
-      loginType,
-      ipAddress: getClientIp(ctx),
-      location: '', // 可以后续接入 IP 地理位置服务
+      login_type: loginType,
+      ip_address: loginIp,
+      location,
       browser,
       os,
-      userAgent,
+      user_agent: userAgent,
       status: isSuccess ? 1 : 0,
       message: responseBody?.msg || '',
-      sessionId
+      session_id: sessionId
     })
   } catch (error) {
     logger.error({ err: { message: error.message } }, '记录登录日志失败')
@@ -181,9 +215,15 @@ const extractModule = (path) => {
   // /api/systemManage/xxx 根据子路径关键词区分
   if (parts[1] === 'systemManage') {
     const last = parts[parts.length - 1] || ''
-    if (last.toLowerCase().includes('user')) return '用户管理'
-    if (last.toLowerCase().includes('role')) return '角色管理'
-    if (last.toLowerCase().includes('menu')) return '菜单管理'
+    if (last.toLowerCase().includes('user')) {
+      return '用户管理'
+    }
+    if (last.toLowerCase().includes('role')) {
+      return '角色管理'
+    }
+    if (last.toLowerCase().includes('menu')) {
+      return '菜单管理'
+    }
     return '系统管理'
   }
   const moduleMap = {
@@ -202,15 +242,33 @@ const extractAction = (path, method) => {
   const lastPart = pathParts[pathParts.length - 1] || ''
 
   // 根据路径关键词判断
-  if (lastPart.includes('save') || lastPart.includes('create')) return '新增'
-  if (lastPart.includes('update') || lastPart.includes('edit')) return '编辑'
-  if (lastPart.includes('delete') || lastPart.includes('remove')) return '删除'
-  if (lastPart.includes('reset') || lastPart.includes('refresh')) return '重置'
-  if (lastPart.includes('login')) return '登录'
-  if (lastPart.includes('logout')) return '登出'
-  if (lastPart.includes('status')) return '状态变更'
-  if (lastPart.includes('batch')) return '批量操作'
-  if (lastPart.includes('clear')) return '清空'
+  if (lastPart.includes('save') || lastPart.includes('create')) {
+    return '新增'
+  }
+  if (lastPart.includes('update') || lastPart.includes('edit')) {
+    return '编辑'
+  }
+  if (lastPart.includes('delete') || lastPart.includes('remove')) {
+    return '删除'
+  }
+  if (lastPart.includes('reset') || lastPart.includes('refresh')) {
+    return '重置'
+  }
+  if (lastPart.includes('login')) {
+    return '登录'
+  }
+  if (lastPart.includes('logout')) {
+    return '登出'
+  }
+  if (lastPart.includes('status')) {
+    return '状态变更'
+  }
+  if (lastPart.includes('batch')) {
+    return '批量操作'
+  }
+  if (lastPart.includes('clear')) {
+    return '清空'
+  }
 
   // 根据请求方法判断
   const methodMap = {

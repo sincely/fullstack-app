@@ -28,7 +28,7 @@ const getConstantRoutes = (ctx) => {
       meta: {
         title: 'login',
         constant: true,
-        hideInMenu: true
+        hide_in_menu: true
       }
     },
     {
@@ -38,7 +38,7 @@ const getConstantRoutes = (ctx) => {
       meta: {
         title: '403',
         constant: true,
-        hideInMenu: true
+        hide_in_menu: true
       }
     },
     {
@@ -48,7 +48,7 @@ const getConstantRoutes = (ctx) => {
       meta: {
         title: '404',
         constant: true,
-        hideInMenu: true
+        hide_in_menu: true
       }
     },
     {
@@ -58,7 +58,7 @@ const getConstantRoutes = (ctx) => {
       meta: {
         title: '500',
         constant: true,
-        hideInMenu: true
+        hide_in_menu: true
       }
     }
   ])

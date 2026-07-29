@@ -46,28 +46,28 @@ async function authenticate(ctx, next) {
 
   if (userId && jwtSessionId) {
     const sql = `
-      SELECT sessionId, sessionExpire
+      SELECT session_id, session_expire
       FROM Users
       WHERE id = ?
       LIMIT 1
     `
     const rows = await query(sql, [userId])
-    const dbSessionId = rows[0]?.sessionId
-    const sessionExpire = rows[0]?.sessionExpire
+    const dbSessionId = rows[0]?.session_id
+    const sessionExpire = rows[0]?.session_expire
 
     // 1. 检查会话是否过期
     if (sessionExpire) {
       const expireTime = new Date(sessionExpire).getTime()
       const now = Date.now()
       if (now > expireTime) {
-        ctx.body = createFailResponse(businessCode.accountKicked, '会话已过期，请重新登录')
+        ctx.body = createFailResponse(ctx, businessCode.accountKicked, '会话已过期，请重新登录')
         return
       }
     }
 
-    // 2. 检查 sessionId 是否匹配
+    // 2. 检查 session_id 是否匹配
     if (!dbSessionId || dbSessionId !== jwtSessionId) {
-      ctx.body = createFailResponse(businessCode.accountKicked, '账号在其他设备登录，请重新登录')
+      ctx.body = createFailResponse(ctx, businessCode.accountKicked, '账号在其他设备登录，请重新登录')
       return
     }
   }

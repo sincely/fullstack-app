@@ -10,19 +10,29 @@ import { hashPassword } from '../../utils/password.js'
 import { normalizePagination } from '../../schemas/common/paginationSchema.js'
 
 const toFrontendGender = (gender) => {
-  if (gender === 'male') return '1'
-  if (gender === 'female') return '2'
+  if (gender === 'male') {
+    return '1'
+  }
+  if (gender === 'female') {
+    return '2'
+  }
   return null
 }
 
 const toDbGender = (gender) => {
-  if (gender === '1') return 'male'
-  if (gender === '2') return 'female'
+  if (gender === '1') {
+    return 'male'
+  }
+  if (gender === '2') {
+    return 'female'
+  }
   return undefined
 }
 
 const toDbStatus = (status) => {
-  if (status === '2' || Number(status) === 0) return 0
+  if (status === '2' || Number(status) === 0) {
+    return 0
+  }
   return 1
 }
 
@@ -31,7 +41,9 @@ const toFrontendStatus = (status) => {
 }
 
 const parseRoleIds = (value) => {
-  if (typeof value !== 'string' || !value.trim()) return []
+  if (typeof value !== 'string' || !value.trim()) {
+    return []
+  }
   return value
     .split(',')
     .map((item) => Number(item))
@@ -44,19 +56,19 @@ const formatUserRow = (row) => {
     id: row.id,
     userName: row.username,
     userGender: toFrontendGender(row.gender),
-    nickName: row.nickName ?? '',
+    nickName: row.nick_name ?? '',
     userPhone: row.phone ?? '',
     userEmail: row.email ?? '',
     status: toFrontendStatus(row.status),
     age: row.age,
-    idCard: row.idCard ?? '',
+    idCard: row.id_card ?? '',
     address: row.address ?? '',
     avatar: row.avatar ?? '',
-    createBy: row.createBy ?? '',
-    createTime: row.createTime ?? '',
-    updateBy: row.updateBy ?? '',
-    updateTime: row.updateTime ?? '',
-    roleId: roleIds[0] ?? (row.roleId ? Number(row.roleId) : undefined),
+    createBy: row.create_by ?? '',
+    createTime: row.create_time ?? '',
+    updateBy: row.update_by ?? '',
+    updateTime: row.update_time ?? '',
+    roleId: roleIds[0] ?? (row.role_id ? Number(row.role_id) : undefined),
     roleIds,
     roleNames: typeof row.roleNames === 'string' && row.roleNames ? row.roleNames.split(',') : []
   }
@@ -66,8 +78,20 @@ const formatUserRow = (row) => {
  * 获取用户列表
  */
 export const listUsers = async (query) => {
-  const { current, size, page, pageSize, keyword, status, roleId, userName, nickName, userEmail, userPhone, userGender } =
-    query
+  const {
+    current,
+    size,
+    page,
+    pageSize,
+    keyword,
+    status,
+    roleId,
+    userName,
+    nickName,
+    userEmail,
+    userPhone,
+    userGender
+  } = query
   const { actualPage, actualPageSize } = normalizePagination({ current, size, page, pageSize })
   const normalizedKeyword = keyword || userName || nickName || userEmail || userPhone || ''
   const normalizedStatus = status === '2' ? '0' : status
@@ -106,10 +130,18 @@ export const createUser = async (body) => {
     adminRoleDao.findRoleById(roleId)
   ])
 
-  if (existedUser) return { success: false, code: businessCode.userExist }
-  if (existedEmail) return { success: false, code: businessCode.emailExist }
-  if (existedIdCard) return { success: false, code: businessCode.idCardExist }
-  if (!role) return { success: false, code: businessCode.roleNotFound }
+  if (existedUser) {
+    return { success: false, code: businessCode.userExist }
+  }
+  if (existedEmail) {
+    return { success: false, code: businessCode.emailExist }
+  }
+  if (existedIdCard) {
+    return { success: false, code: businessCode.idCardExist }
+  }
+  if (!role) {
+    return { success: false, code: businessCode.roleNotFound }
+  }
 
   const passwordHash = await hashPassword(password || '123456')
   const result = await adminUserDao.createUser({
@@ -137,7 +169,9 @@ export const updateUser = async (body) => {
   const { id, password, email, idCard, roleId, ...rest } = body
   const currentUser = await adminUserDao.findUserById(id)
 
-  if (!currentUser) return { success: false, code: businessCode.userNotFound }
+  if (!currentUser) {
+    return { success: false, code: businessCode.userNotFound }
+  }
 
   if (email) {
     const existedEmail = await adminUserDao.findUserByEmail(email)
@@ -155,15 +189,27 @@ export const updateUser = async (body) => {
 
   if (roleId) {
     const role = await adminRoleDao.findRoleById(roleId)
-    if (!role) return { success: false, code: businessCode.roleNotFound }
+    if (!role) {
+      return { success: false, code: businessCode.roleNotFound }
+    }
   }
 
   const payload = { ...rest }
-  if (payload.gender !== undefined) payload.gender = toDbGender(payload.gender) || 'other'
-  if (payload.status !== undefined) payload.status = toDbStatus(payload.status)
-  if (email !== undefined) payload.email = email
-  if (idCard !== undefined) payload.idCard = idCard
-  if (password) payload.password = await hashPassword(password)
+  if (payload.gender !== undefined) {
+    payload.gender = toDbGender(payload.gender) || 'other'
+  }
+  if (payload.status !== undefined) {
+    payload.status = toDbStatus(payload.status)
+  }
+  if (email !== undefined) {
+    payload.email = email
+  }
+  if (idCard !== undefined) {
+    payload.idCard = idCard
+  }
+  if (password) {
+    payload.password = await hashPassword(password)
+  }
 
   await adminUserDao.updateUser(id, payload)
   if (roleId !== undefined) {
@@ -182,7 +228,9 @@ export const deleteUser = async (id, currentUserId) => {
   }
 
   const currentUser = await adminUserDao.findUserById(id)
-  if (!currentUser) return { success: false, code: businessCode.userNotFound }
+  if (!currentUser) {
+    return { success: false, code: businessCode.userNotFound }
+  }
 
   await adminUserDao.deleteUser(id)
   return { success: true }
@@ -222,7 +270,9 @@ export const updateUserStatus = async (id, status, currentUserId) => {
   }
 
   const currentUser = await adminUserDao.findUserById(id)
-  if (!currentUser) return { success: false, code: businessCode.userNotFound }
+  if (!currentUser) {
+    return { success: false, code: businessCode.userNotFound }
+  }
 
   await adminUserDao.updateUser(id, { status: toDbStatus(status) })
   return { success: true }
@@ -233,7 +283,9 @@ export const updateUserStatus = async (id, status, currentUserId) => {
  */
 export const resetUserPassword = async (id) => {
   const currentUser = await adminUserDao.findUserById(id)
-  if (!currentUser) return { success: false, code: businessCode.userNotFound }
+  if (!currentUser) {
+    return { success: false, code: businessCode.userNotFound }
+  }
 
   const passwordHash = await hashPassword('123456')
   await adminUserDao.updateUser(id, { password: passwordHash })

@@ -4,10 +4,10 @@ import { getConnection, query } from '../../db/connection.js'
  * 菜单查询的公共字段（适配新表结构）。
  */
 const MENU_COLUMNS = `
-  ra.id, ra.parentId, ra.menuType, ra.menuName, ra.routeName, ra.routePath,
-  ra.component, ra.redirect, ra.orderNum, ra.icon, ra.iconType,
-  ra.hideInMenu, ra.activeMenu, ra.multiTab, ra.keepAlive,
-  ra.status, ra.createBy, ra.createTime, ra.updateBy, ra.updateTime
+  ra.id, ra.parent_id, ra.menu_type, ra.menu_name, ra.route_name, ra.route_path,
+  ra.component, ra.redirect, ra.order_num, ra.icon, ra.icon_type,
+  ra.hide_in_menu, ra.active_menu, ra.multi_tab, ra.keep_alive,
+  ra.status, ra.create_by, ra.create_time, ra.update_by, ra.update_time
 `
 
 const normalizeRoleIds = (roleIds) => {
@@ -19,11 +19,11 @@ const buildInClause = (values) => values.map(() => '?').join(', ')
 
 /**
  * 根据角色 ID 查询可访问菜单列表。
- * @param {number} roleId
+ * @param {number} role_id
  * @returns {Promise<Array<any>>}
  */
-const findMenusByRoleId = async (roleId) => {
-  const roleIds = normalizeRoleIds(roleId)
+const findMenusByRoleId = async (role_id) => {
+  const roleIds = normalizeRoleIds(role_id)
   if (roleIds.length === 0) {
     return []
   }
@@ -32,9 +32,9 @@ const findMenusByRoleId = async (roleId) => {
     select distinct
       ${MENU_COLUMNS}
     from RoleRoute rr
-    inner join RouteAuth ra on ra.id = rr.routeId
-    where rr.roleId in (${buildInClause(roleIds)})
-    order by coalesce(ra.parentId, 0), ra.orderNum asc, ra.id asc
+    inner join RouteAuth ra on ra.id = rr.route_id
+    where rr.role_id in (${buildInClause(roleIds)})
+    order by coalesce(ra.parent_id, 0), ra.order_num asc, ra.id asc
   `
 
   return query(sql, roleIds)
@@ -42,26 +42,26 @@ const findMenusByRoleId = async (roleId) => {
 
 /**
  * 根据角色 ID 查询可用按钮权限列表。
- * @param {number} roleId
+ * @param {number} role_id
  * @returns {Promise<Array<any>>}
  */
-const findButtonsByRoleId = async (roleId) => {
-  const roleIds = normalizeRoleIds(roleId)
+const findButtonsByRoleId = async (role_id) => {
+  const roleIds = normalizeRoleIds(role_id)
   if (roleIds.length === 0) {
     return []
   }
 
   const sql = `
     select distinct
-      ba.buttonId,
-      ba.routeId,
-      ba.routeName,
-      ba.buttonName,
-      ba.buttonLabel
+      ba.button_id,
+      ba.route_id,
+      ba.route_name,
+      ba.button_name,
+      ba.button_label
     from RoleButton rb
-    inner join ButtonAuth ba on ba.buttonId = rb.buttonId
-    where rb.roleId in (${buildInClause(roleIds)})
-    order by ba.routeId asc, ba.buttonId asc
+    inner join ButtonAuth ba on ba.button_id = rb.button_id
+    where rb.role_id in (${buildInClause(roleIds)})
+    order by ba.route_id asc, ba.button_id asc
   `
 
   return query(sql, roleIds)
@@ -74,28 +74,28 @@ const findButtonsByRoleId = async (roleId) => {
 const findAllButtons = async () => {
   const sql = `
     select
-      buttonId,
-      routeId,
-      routeName,
-      buttonName
+      button_id,
+      route_id,
+      route_name,
+      button_name
     from ButtonAuth
-    order by routeId asc, buttonId asc
+    order by route_id asc, button_id asc
   `
   return query(sql)
 }
 
-const replaceRoleButtons = async (roleId, buttonIds) => {
+const replaceRoleButtons = async (role_id, buttonIds) => {
   const safeButtonIds = [...new Set((buttonIds || []).map((id) => Number(id)).filter(Boolean))]
   const connection = await getConnection()
 
   try {
     await connection.beginTransaction()
-    await connection.execute('delete from RoleButton where roleId = ?', [roleId])
+    await connection.execute('delete from RoleButton where role_id = ?', [role_id])
 
     if (safeButtonIds.length > 0) {
       const valuesSql = safeButtonIds.map(() => '(?, ?)').join(', ')
-      const values = safeButtonIds.flatMap((buttonId) => [roleId, buttonId])
-      await connection.execute(`insert into RoleButton (roleId, buttonId) values ${valuesSql}`, values)
+      const values = safeButtonIds.flatMap((button_id) => [role_id, button_id])
+      await connection.execute(`insert into RoleButton (role_id, button_id) values ${valuesSql}`, values)
     }
 
     await connection.commit()

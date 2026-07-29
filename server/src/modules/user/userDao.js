@@ -4,20 +4,20 @@ import { getConnection, query } from '../../db/connection.js'
  * 用户查询公共字段（适配新表结构，多角色通过 UserRole 关联）。
  */
 const USER_COLUMNS = `
-  u.id, u.username, u.nickName, u.gender, u.age, u.phone,
-  u.idCard, u.email, u.address, u.status, u.avatar,
-  u.createBy, u.createTime, u.updateBy, u.updateTime
+  u.id, u.username, u.nick_name, u.gender, u.age, u.phone,
+  u.id_card, u.email, u.address, u.status, u.avatar,
+  u.create_by, u.create_time, u.update_by, u.update_time
 `
 
 const USER_ROLE_AGGREGATE_SQL = `
   select
-    ur.userId,
-    min(ur.roleId) as roleId,
-    group_concat(distinct ur.roleId order by ur.roleId asc) as roleIds,
-    group_concat(distinct r.roleName order by r.roleName asc) as roleNames
+    ur.user_id,
+    min(ur.role_id) as role_id,
+    group_concat(distinct ur.role_id order by ur.role_id asc) as roleIds,
+    group_concat(distinct r.role_name order by r.role_name asc) as roleNames
   from UserRole ur
-  left join Roles r on r.roleId = ur.roleId
-  group by ur.userId
+  left join Roles r on r.role_id = ur.role_id
+  group by ur.user_id
 `
 
 const buildUserFilters = ({ keyword, status, gender }) => {
@@ -25,7 +25,7 @@ const buildUserFilters = ({ keyword, status, gender }) => {
   const params = []
 
   if (keyword) {
-    where.push('(u.username like ? or u.email like ? or u.nickName like ? or u.phone like ?)')
+    where.push('(u.username like ? or u.email like ? or u.nick_name like ? or u.phone like ?)')
     params.push(`%${keyword}%`, `%${keyword}%`, `%${keyword}%`, `%${keyword}%`)
   }
 
@@ -49,7 +49,7 @@ const buildUserFilters = ({ keyword, status, gender }) => {
  * 查询用户列表（含角色信息）。
  * 多角色场景：通过 UserRole 关联获取 roleIds 数组。
  */
-const listUsers = async ({ keyword, status, gender, roleId, page, pageSize }) => {
+const listUsers = async ({ keyword, status, gender, role_id, page, pageSize }) => {
   const { whereSql, params } = buildUserFilters({ keyword, status, gender })
   const safePage = Number.parseInt(page, 10) || 1
   const safePageSize = Number.parseInt(pageSize, 10) || 10
@@ -57,9 +57,9 @@ const listUsers = async ({ keyword, status, gender, roleId, page, pageSize }) =>
   const extraWhere = []
   const queryParams = [...params]
 
-  if (roleId) {
-    extraWhere.push('exists (select 1 from UserRole urf where urf.userId = u.id and urf.roleId = ?)')
-    queryParams.push(Number(roleId))
+  if (role_id) {
+    extraWhere.push('exists (select 1 from UserRole urf where urf.user_id = u.id and urf.role_id = ?)')
+    queryParams.push(Number(role_id))
   }
 
   const finalWhereSql = [whereSql.replace(/^where\s+/i, ''), ...extraWhere].filter(Boolean).join(' and ')
@@ -67,11 +67,11 @@ const listUsers = async ({ keyword, status, gender, roleId, page, pageSize }) =>
   const sql = `
     select
       ${USER_COLUMNS},
-      roleAgg.roleId,
+      roleAgg.role_id,
       roleAgg.roleIds,
       roleAgg.roleNames
     from Users u
-    left join (${USER_ROLE_AGGREGATE_SQL}) roleAgg on roleAgg.userId = u.id
+    left join (${USER_ROLE_AGGREGATE_SQL}) roleAgg on roleAgg.user_id = u.id
     ${finalWhereSql ? `where ${finalWhereSql}` : ''}
     order by u.id desc
     limit ?, ?
@@ -81,16 +81,16 @@ const listUsers = async ({ keyword, status, gender, roleId, page, pageSize }) =>
 }
 
 /**
- * 统计用户总数（支持按 roleId 过滤）。
+ * 统计用户总数（支持按 role_id 过滤）。
  */
-const countUsers = async ({ keyword, status, gender, roleId }) => {
+const countUsers = async ({ keyword, status, gender, role_id }) => {
   const { whereSql, params } = buildUserFilters({ keyword, status, gender })
   const extraWhere = []
   const queryParams = [...params]
 
-  if (roleId) {
-    extraWhere.push('exists (select 1 from UserRole ur where ur.userId = u.id and ur.roleId = ?)')
-    queryParams.push(Number(roleId))
+  if (role_id) {
+    extraWhere.push('exists (select 1 from UserRole ur where ur.user_id = u.id and ur.role_id = ?)')
+    queryParams.push(Number(role_id))
   }
 
   const finalWhereSql = [whereSql.replace(/^where\s+/i, ''), ...extraWhere].filter(Boolean).join(' and ')
@@ -112,11 +112,11 @@ const findUserById = async (id) => {
     select
       ${USER_COLUMNS},
       u.password,
-      roleAgg.roleId,
+      roleAgg.role_id,
       roleAgg.roleIds,
       roleAgg.roleNames
     from Users u
-    left join (${USER_ROLE_AGGREGATE_SQL}) roleAgg on roleAgg.userId = u.id
+    left join (${USER_ROLE_AGGREGATE_SQL}) roleAgg on roleAgg.user_id = u.id
     where u.id = ?
     limit 1
   `
@@ -136,9 +136,9 @@ const findUserByEmail = async (email) => {
   return rows[0] || null
 }
 
-const findUserByIdCard = async (idCard) => {
-  const sql = 'select id, idCard from Users where idCard = ? limit 1'
-  const rows = await query(sql, [idCard])
+const findUserByIdCard = async (id_card) => {
+  const sql = 'select id, id_card from Users where id_card = ? limit 1'
+  const rows = await query(sql, [id_card])
   return rows[0] || null
 }
 
@@ -166,7 +166,7 @@ const createUser = async ({
     await connection.beginTransaction()
 
     const [userResult] = await connection.execute(
-      `insert into Users (username, nickName, gender, age, phone, idCard, email, address, status, avatar, password)
+      `insert into Users (username, nick_name, gender, age, phone, id_card, email, address, status, avatar, password)
        values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         username,
@@ -174,7 +174,7 @@ const createUser = async ({
         gender ?? 'other',
         age ?? null,
         phone ?? null,
-        idCard,
+        idCard ?? null,
         email,
         address ?? null,
         status ?? 1,
@@ -183,16 +183,16 @@ const createUser = async ({
       ]
     )
 
-    const userId = userResult.insertId
+    const user_id = userResult.insertId
 
     if (roleIds && roleIds.length > 0) {
       const valuesSql = roleIds.map(() => '(?, ?)').join(', ')
-      const values = roleIds.flatMap((roleId) => [userId, roleId])
-      await connection.execute(`insert into UserRole (userId, roleId) values ${valuesSql}`, values)
+      const values = roleIds.flatMap((role_id) => [user_id, role_id])
+      await connection.execute(`insert into UserRole (user_id, role_id) values ${valuesSql}`, values)
     }
 
     await connection.commit()
-    return { insertId: userId, affectedRows: userResult.affectedRows }
+    return { insertId: user_id, affectedRows: userResult.affectedRows }
   } catch (error) {
     await connection.rollback()
     throw error
@@ -223,19 +223,19 @@ const updateUser = async (id, payload) => {
 
 /**
  * 更新用户角色关系（事务：先删后插）。
- * @param {number} userId
+ * @param {number} user_id
  * @param {number[]} roleIds
  */
-const updateUserRoles = async (userId, roleIds) => {
+const updateUserRoles = async (user_id, roleIds) => {
   const connection = await getConnection()
   try {
     await connection.beginTransaction()
-    await connection.execute('delete from UserRole where userId = ?', [userId])
+    await connection.execute('delete from UserRole where user_id = ?', [user_id])
 
     if (roleIds.length > 0) {
       const valuesSql = roleIds.map(() => '(?, ?)').join(', ')
-      const values = roleIds.flatMap((roleId) => [userId, roleId])
-      await connection.execute(`insert into UserRole (userId, roleId) values ${valuesSql}`, values)
+      const values = roleIds.flatMap((role_id) => [user_id, role_id])
+      await connection.execute(`insert into UserRole (user_id, role_id) values ${valuesSql}`, values)
     }
 
     await connection.commit()
@@ -255,7 +255,7 @@ const deleteUser = async (id) => {
   const connection = await getConnection()
   try {
     await connection.beginTransaction()
-    await connection.execute('delete from UserRole where userId = ?', [id])
+    await connection.execute('delete from UserRole where user_id = ?', [id])
     const [result] = await connection.execute('delete from Users where id = ?', [id])
     await connection.commit()
     return result
@@ -269,17 +269,17 @@ const deleteUser = async (id) => {
 
 /**
  * 获取用户的角色 ID 列表。
- * @param {number} userId
+ * @param {number} user_id
  * @returns {Promise<number[]>}
  */
-const getRoleIdsByUserId = async (userId) => {
-  const sql = 'select roleId from UserRole where userId = ? order by roleId asc'
-  const rows = await query(sql, [userId])
-  return rows.map((item) => item.roleId)
+const getRoleIdsByUserId = async (user_id) => {
+  const sql = 'select role_id from UserRole where user_id = ? order by role_id asc'
+  const rows = await query(sql, [user_id])
+  return rows.map((item) => item.role_id)
 }
 
 const listRoleOptions = async () => {
-  const sql = 'select roleId, roleName from Roles order by roleId asc'
+  const sql = 'select role_id, role_name from Roles order by role_id asc'
   return query(sql)
 }
 

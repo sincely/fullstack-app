@@ -32,6 +32,8 @@ import { connectRedis, getRedisClient } from './db/redis.js'
 import { createRedisSessionStore } from './session/redisStore.js'
 
 const app = new Koa()
+// 信任反向代理（Vite dev proxy / Nginx），使 ctx.ip 读取 X-Forwarded-For
+app.proxy = true
 app.keys = [process.env.SESSION_SECRET || process.env.JWT_SECRET || 'koa-app-template-session-secret']
 
 // ========== 阶段 A：基础设施层 ==========
@@ -55,7 +57,7 @@ app.use(securityHeaders)
 app.use(cors(corsConfig))
 
 // 7. 限流（在请求体解析前执行，快速拒绝超限请求）
-  app.use(redisEnabled ? redisRateLimiter : rateLimiter)
+app.use(redisEnabled ? redisRateLimiter : rateLimiter)
 
 // ========== 阶段 C：请求处理层 ==========
 // 8. 请求体解析（JSON、表单、文本、XML）
@@ -128,10 +130,7 @@ if (!process.env.VERCEL) {
       try {
         await connectRedis()
       } catch (err) {
-        logger.warn(
-          { err: { message: err.message } },
-          'Redis 连接失败，服务将降级运行（任务队列/缓存不可用）'
-        )
+        logger.warn({ err: { message: err.message } }, 'Redis 连接失败，服务将降级运行（任务队列/缓存不可用）')
       }
     } else {
       logger.info('Redis 未启用（REDIS_ENABLED !== true）')

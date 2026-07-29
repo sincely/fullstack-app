@@ -45,9 +45,7 @@ export async function verifyMySQLConnection() {
       connection.release()
     }
     const latency = Date.now() - start
-    logger.info(
-      `MySQL 连接验证通过 ✓ → ${dbConfig.host}:${dbConfig.port}/${dbConfig.database}（${latency}ms）`
-    )
+    logger.info(`MySQL 连接验证通过 ✓ → ${dbConfig.host}:${dbConfig.port}/${dbConfig.database}（${latency}ms）`)
   } catch (err) {
     const latency = Date.now() - start
     logger.error(

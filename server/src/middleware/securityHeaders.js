@@ -25,12 +25,22 @@ export const securityHeaders = async (ctx, next) => {
   ctx.set(
     'Content-Security-Policy',
     "default-src 'self'; " +
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval'" + (isDocsPage ? " https://cdnjs.cloudflare.com" : "") + "; " +
-      "script-src-elem 'self' 'unsafe-inline'" + (isDocsPage ? " https://cdnjs.cloudflare.com" : "") + "; " +
-      "style-src 'self' 'unsafe-inline'" + (isDocsPage ? " https://fonts.googleapis.com https://cdnjs.cloudflare.com" : "") + "; " +
-      "style-src-elem 'self' 'unsafe-inline'" + (isDocsPage ? " https://fonts.googleapis.com https://cdnjs.cloudflare.com" : "") + "; " +
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval'" +
+      (isDocsPage ? ' https://cdnjs.cloudflare.com' : '') +
+      '; ' +
+      "script-src-elem 'self' 'unsafe-inline'" +
+      (isDocsPage ? ' https://cdnjs.cloudflare.com' : '') +
+      '; ' +
+      "style-src 'self' 'unsafe-inline'" +
+      (isDocsPage ? ' https://fonts.googleapis.com https://cdnjs.cloudflare.com' : '') +
+      '; ' +
+      "style-src-elem 'self' 'unsafe-inline'" +
+      (isDocsPage ? ' https://fonts.googleapis.com https://cdnjs.cloudflare.com' : '') +
+      '; ' +
       "img-src 'self' data: https:; " +
-      "font-src 'self' data:" + (isDocsPage ? " https://fonts.gstatic.com" : "") + "; " +
+      "font-src 'self' data:" +
+      (isDocsPage ? ' https://fonts.gstatic.com' : '') +
+      '; ' +
       "connect-src 'self' https:; " +
       "frame-ancestors 'none'; " +
       "base-uri 'self'; " +
@@ -38,10 +48,7 @@ export const securityHeaders = async (ctx, next) => {
   )
 
   // 7. Permissions-Policy - 控制浏览器功能权限
-  ctx.set(
-    'Permissions-Policy',
-    'camera=(), microphone=(), geolocation=(), payment=()'
-  )
+  ctx.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=()')
 
   // 8. Cache-Control - 控制缓存策略（敏感数据不缓存）
   if (ctx.path.startsWith('/api/')) {

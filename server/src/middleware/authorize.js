@@ -17,17 +17,17 @@ const parseRoleIds = (value, fallbackRoleId) => {
  * 获取角色的菜单路径列表（直接查询 MySQL）
  *
  * @param {number|string|number[]} roleIds
- * @returns {Promise<string[]>} routePath 数组
+ * @returns {Promise<string[]>} route_path 数组
  */
 async function getMenuPathsByRoleId(roleIds) {
   const menus = await adminPermissionDao.findMenusByRoleId(roleIds)
-  return menus.map((menu) => menu.routePath)
+  return menus.map((menu) => menu.route_path)
 }
 
-export const authorizeRoute = (routePath) => {
+export const authorizeRoute = (route_path) => {
   return async (ctx, next) => {
     const currentUser = ctx.state.user
-    const allowedRoutePaths = Array.isArray(routePath) ? routePath : [routePath]
+    const allowedRoutePaths = Array.isArray(route_path) ? route_path : [route_path]
 
     const roleIds = parseRoleIds(currentUser?.roleIds, currentUser?.roleId)
 

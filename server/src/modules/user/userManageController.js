@@ -20,7 +20,9 @@ const listUsers = async (ctx) => {
  */
 const createUser = async (ctx) => {
   const result = await userService.createUser(ctx.request.body)
-  if (!result.success) return (ctx.body = createFailResponse(result.code, businessMsg[result.code]))
+  if (!result.success) {
+    return (ctx.body = createFailResponse(result.code, businessMsg[result.code]))
+  }
   ctx.body = createSuccessResponse(businessCode.success, '创建用户成功', result.data)
 }
 
@@ -29,7 +31,9 @@ const createUser = async (ctx) => {
  */
 const updateUser = async (ctx) => {
   const result = await userService.updateUser(ctx.request.body)
-  if (!result.success) return (ctx.body = createFailResponse(result.code, businessMsg[result.code]))
+  if (!result.success) {
+    return (ctx.body = createFailResponse(result.code, businessMsg[result.code]))
+  }
   ctx.body = createSuccessResponse(businessCode.success, '更新用户成功')
 }
 
@@ -39,7 +43,9 @@ const updateUser = async (ctx) => {
 const deleteUser = async (ctx) => {
   const { id } = ctx.request.body
   const result = await userService.deleteUser(id, ctx.state.user.userId)
-  if (!result.success) return (ctx.body = createFailResponse(result.code, businessMsg[result.code]))
+  if (!result.success) {
+    return (ctx.body = createFailResponse(result.code, businessMsg[result.code]))
+  }
   ctx.body = createSuccessResponse(businessCode.success, '删除用户成功')
 }
 
@@ -49,7 +55,9 @@ const deleteUser = async (ctx) => {
 const batchDeleteUsers = async (ctx) => {
   const { ids } = ctx.request.body
   const result = await userService.batchDeleteUsers(ids, ctx.state.user.userId)
-  if (!result.success) return (ctx.body = createFailResponse(result.code, result.msg))
+  if (!result.success) {
+    return (ctx.body = createFailResponse(result.code, result.msg))
+  }
   ctx.body = createSuccessResponse(businessCode.success, `成功删除 ${result.data.count} 个用户`)
 }
 
@@ -59,7 +67,9 @@ const batchDeleteUsers = async (ctx) => {
 const updateUserStatus = async (ctx) => {
   const { id, status } = ctx.request.body
   const result = await userService.updateUserStatus(id, status, ctx.state.user.userId)
-  if (!result.success) return (ctx.body = createFailResponse(result.code, businessMsg[result.code]))
+  if (!result.success) {
+    return (ctx.body = createFailResponse(result.code, businessMsg[result.code]))
+  }
   ctx.body = createSuccessResponse(businessCode.success, '更新用户状态成功')
 }
 
@@ -69,7 +79,9 @@ const updateUserStatus = async (ctx) => {
 const resetUserPassword = async (ctx) => {
   const { id } = ctx.request.body
   const result = await userService.resetUserPassword(id)
-  if (!result.success) return (ctx.body = createFailResponse(result.code, businessMsg[result.code]))
+  if (!result.success) {
+    return (ctx.body = createFailResponse(result.code, businessMsg[result.code]))
+  }
   ctx.body = createSuccessResponse(businessCode.success, '密码重置成功，默认密码: 123456')
 }
 

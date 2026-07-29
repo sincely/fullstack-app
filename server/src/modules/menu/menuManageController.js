@@ -29,7 +29,9 @@ const getMenuTree = async (ctx) => {
  */
 const createMenu = async (ctx) => {
   const result = await menuService.createMenu(ctx.request.body)
-  if (!result.success) return (ctx.body = createFailResponse(result.code, result.msg))
+  if (!result.success) {
+    return (ctx.body = createFailResponse(result.code, result.msg))
+  }
   ctx.body = createSuccessResponse(businessCode.success, '创建菜单成功', result.data)
 }
 
@@ -38,7 +40,9 @@ const createMenu = async (ctx) => {
  */
 const updateMenu = async (ctx) => {
   const result = await menuService.updateMenu(ctx.request.body)
-  if (!result.success) return (ctx.body = createFailResponse(result.code, result.msg))
+  if (!result.success) {
+    return (ctx.body = createFailResponse(result.code, result.msg))
+  }
   ctx.body = createSuccessResponse(businessCode.success, '更新菜单成功')
 }
 
@@ -47,7 +51,9 @@ const updateMenu = async (ctx) => {
  */
 const deleteMenu = async (ctx) => {
   const result = await menuService.deleteMenu(ctx.request.body)
-  if (!result.success) return (ctx.body = createFailResponse(result.code, result.msg))
+  if (!result.success) {
+    return (ctx.body = createFailResponse(result.code, result.msg))
+  }
   ctx.body = createSuccessResponse(businessCode.success, '删除菜单成功')
 }
 

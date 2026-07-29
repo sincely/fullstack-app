@@ -20,7 +20,9 @@ const listRoles = async (ctx) => {
  */
 const createRole = async (ctx) => {
   const result = await roleService.createRole(ctx.request.body)
-  if (!result.success) return (ctx.body = createFailResponse(result.code, businessMsg[result.code]))
+  if (!result.success) {
+    return (ctx.body = createFailResponse(result.code, businessMsg[result.code]))
+  }
   ctx.body = createSuccessResponse(businessCode.success, '创建角色成功', result.data)
 }
 
@@ -29,7 +31,9 @@ const createRole = async (ctx) => {
  */
 const updateRole = async (ctx) => {
   const result = await roleService.updateRole(ctx.request.body)
-  if (!result.success) return (ctx.body = createFailResponse(result.code, businessMsg[result.code]))
+  if (!result.success) {
+    return (ctx.body = createFailResponse(result.code, businessMsg[result.code]))
+  }
   ctx.body = createSuccessResponse(businessCode.success, '更新角色成功')
 }
 
@@ -39,7 +43,9 @@ const updateRole = async (ctx) => {
 const deleteRole = async (ctx) => {
   const roleId = ctx.request.body.roleId || ctx.request.body.id
   const result = await roleService.deleteRole(roleId)
-  if (!result.success) return (ctx.body = createFailResponse(result.code, businessMsg[result.code]))
+  if (!result.success) {
+    return (ctx.body = createFailResponse(ctx, result.code, businessMsg[result.code]))
+  }
   ctx.body = createSuccessResponse(businessCode.success, '删除角色成功')
 }
 
@@ -65,7 +71,9 @@ const getRoleRouteIds = async (ctx) => {
  */
 const updateRoleRouteIds = async (ctx) => {
   const result = await roleService.updateRoleRouteIds(ctx.request.body)
-  if (!result.success) return (ctx.body = createFailResponse(result.code, businessMsg[result.code]))
+  if (!result.success) {
+    return (ctx.body = createFailResponse(ctx, result.code, businessMsg[result.code]))
+  }
   ctx.body = createSuccessResponse(businessCode.success, '更新角色菜单成功')
 }
 
@@ -83,7 +91,9 @@ const getRoleButtonIds = async (ctx) => {
  */
 const updateRoleButtonIds = async (ctx) => {
   const result = await roleService.updateRoleButtonIds(ctx.request.body)
-  if (!result.success) return (ctx.body = createFailResponse(result.code, businessMsg[result.code]))
+  if (!result.success) {
+    return (ctx.body = createFailResponse(ctx, result.code, businessMsg[result.code]))
+  }
   ctx.body = createSuccessResponse(businessCode.success, '更新角色按钮成功')
 }
 

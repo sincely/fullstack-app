@@ -32,12 +32,12 @@ const listOperationLogs = async ({ page, pageSize, username, module, action, sta
   }
 
   if (startTime) {
-    where.push('ol.createTime >= ?')
+    where.push('ol.create_time >= ?')
     params.push(startTime)
   }
 
   if (endTime) {
-    where.push('ol.createTime <= ?')
+    where.push('ol.create_time <= ?')
     params.push(endTime)
   }
 
@@ -49,21 +49,21 @@ const listOperationLogs = async ({ page, pageSize, username, module, action, sta
   const sql = `
     SELECT
       ol.id,
-      ol.userId,
+      ol.user_id,
       ol.username,
       ol.action,
       ol.module,
-      ol.requestParams,
-      ol.responseStatus,
-      ol.responseMsg,
-      ol.ipAddress,
-      ol.userAgent,
-      ol.executeTime,
+      ol.request_params,
+      ol.response_status,
+      ol.response_msg,
+      ol.ip_address,
+      ol.user_agent,
+      ol.execute_time,
       ol.status,
-      ol.createTime
+      ol.create_time
     FROM OperationLog ol
     ${whereSql}
-    ORDER BY ol.createTime DESC
+    ORDER BY ol.create_time DESC
     LIMIT ?, ?
   `
 
@@ -98,12 +98,12 @@ const countOperationLogs = async ({ username, module, action, status, startTime,
   }
 
   if (startTime) {
-    where.push('ol.createTime >= ?')
+    where.push('ol.create_time >= ?')
     params.push(startTime)
   }
 
   if (endTime) {
-    where.push('ol.createTime <= ?')
+    where.push('ol.create_time <= ?')
     params.push(endTime)
   }
 
@@ -125,25 +125,25 @@ const countOperationLogs = async ({ username, module, action, status, startTime,
 const createOperationLog = async (data) => {
   const sql = `
     INSERT INTO OperationLog (
-      userId, username, action, module, method, requestUrl,
-      requestParams, responseStatus, responseMsg, ipAddress,
-      userAgent, executeTime, status
+      user_id, username, action, module, method, request_url,
+      request_params, response_status, response_msg, ip_address,
+      user_agent, execute_time, status
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `
 
   return query(sql, [
-    data.userId || null,
+    data.user_id || null,
     data.username || '',
     data.action || '',
     data.module || '',
     data.method || '',
-    data.requestUrl || '',
-    data.requestParams ? JSON.stringify(data.requestParams) : null,
-    data.responseStatus || '',
-    data.responseMsg || '',
-    data.ipAddress || '',
-    data.userAgent || '',
-    data.executeTime || 0,
+    data.request_url || '',
+    data.request_params ? JSON.stringify(data.request_params) : null,
+    data.response_status || '',
+    data.response_msg || '',
+    data.ip_address || '',
+    data.user_agent || '',
+    data.execute_time || 0,
     data.status !== undefined ? data.status : 1
   ])
 }

@@ -128,13 +128,7 @@ async function mysqldump(options = {}) {
 async function mysqlRestore(sql, options = {}) {
   const { database = dbConfig.database } = options
 
-  const args = [
-    `-h${dbConfig.host}`,
-    `-P${dbConfig.port}`,
-    `-u${dbConfig.user}`,
-    `-p${dbConfig.password}`,
-    database
-  ]
+  const args = [`-h${dbConfig.host}`, `-P${dbConfig.port}`, `-u${dbConfig.user}`, `-p${dbConfig.password}`, database]
 
   await execAsync(`echo '${sql.toString()}' | mysql ${args.join(' ')}`, {
     maxBuffer: 100 * 1024 * 1024
@@ -190,11 +184,7 @@ export async function createBackup(options = {}) {
  * @param {Object} options - 恢复选项
  */
 export async function restoreBackup(options) {
-  const {
-    filePath,
-    password = process.env.BACKUP_PASSWORD || 'default-backup-key',
-    compress = true
-  } = options
+  const { filePath, password = process.env.BACKUP_PASSWORD || 'default-backup-key', compress = true } = options
 
   logger.info(`开始恢复备份: ${basename(filePath)}`)
 
@@ -202,7 +192,7 @@ export async function restoreBackup(options) {
   const encrypted = await new Promise((resolve, reject) => {
     const chunks = []
     const rs = createReadStream(filePath)
-    rs.on('data', chunk => chunks.push(chunk))
+    rs.on('data', (chunk) => chunks.push(chunk))
     rs.on('end', () => resolve(Buffer.concat(chunks)))
     rs.on('error', reject)
   })
@@ -225,17 +215,14 @@ export async function restoreBackup(options) {
  * @returns {Promise<{valid: boolean, error?: string}>}
  */
 export async function verifyBackup(options) {
-  const {
-    filePath,
-    password = process.env.BACKUP_PASSWORD || 'default-backup-key'
-  } = options
+  const { filePath, password = process.env.BACKUP_PASSWORD || 'default-backup-key' } = options
 
   try {
     // 读取并解密
     const encrypted = await new Promise((resolve, reject) => {
       const chunks = []
       const rs = createReadStream(filePath)
-      rs.on('data', chunk => chunks.push(chunk))
+      rs.on('data', (chunk) => chunks.push(chunk))
       rs.on('end', () => resolve(Buffer.concat(chunks)))
       rs.on('error', reject)
     })
@@ -257,8 +244,8 @@ export async function cleanupOldBackups(options) {
   const { backupDir, maxAge = 30 * 24 * 60 * 60 * 1000, maxCount = 10 } = options
 
   const files = readdirSync(backupDir)
-    .filter(f => f.startsWith('backup-') && f.endsWith('.enc'))
-    .map(f => ({
+    .filter((f) => f.startsWith('backup-') && f.endsWith('.enc'))
+    .map((f) => ({
       name: f,
       path: join(backupDir, f),
       ...statSync(join(backupDir, f))
@@ -303,8 +290,8 @@ export async function cleanupOldBackups(options) {
 export function listBackups(backupDir) {
   try {
     return readdirSync(backupDir)
-      .filter(f => f.startsWith('backup-') && f.endsWith('.enc'))
-      .map(f => {
+      .filter((f) => f.startsWith('backup-') && f.endsWith('.enc'))
+      .map((f) => {
         const stats = statSync(join(backupDir, f))
         return {
           name: f,

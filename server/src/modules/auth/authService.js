@@ -13,6 +13,7 @@ import { hashPassword, comparePassword } from '../../utils/password.js'
 import { generateToken, generateRefreshToken, verifyRefreshToken } from '../../utils/jwt.js'
 import { buildMenuTree, extractPermissionCodes } from '../../utils/adminPermission.js'
 import { checkLoginLock, recordLoginFailure, clearLoginLock } from '../../utils/loginLimiter.js'
+import { getIpLocation } from '../../utils/ipLocation.js'
 import { query } from '../../db/connection.js'
 
 const parseRoleIds = (value, fallbackRoleId) => {
@@ -51,12 +52,12 @@ const formatUserInfo = (user) => ({
   email: user.email,
   status: user.status,
   avatar: user.avatar,
-  roleId: user.roleId,
-  roleIds: parseRoleIds(user.roleIds, user.roleId),
-  roleCode: user.roleCode,
-  roleCodes: parseRoleCodes(user.roleCodes, user.roleCode),
-  roleName: user.roleName,
-  roleNames: parseRoleNames(user.roleNames, user.roleName),
+  roleId: user.role_id,
+  roleIds: parseRoleIds(user.roleIds, user.role_id),
+  roleCode: user.role_code,
+  roleCodes: parseRoleCodes(user.roleCodes, user.role_code),
+  roleName: user.role_name,
+  roleNames: parseRoleNames(user.roleNames, user.role_name),
   roleDescription: user.roleDescription
 })
 
@@ -95,7 +96,7 @@ export const register = async ({ username, password, email }) => {
     username,
     email,
     passwordHash,
-    roleId: defaultRole.roleId
+    role_id: defaultRole.role_id
   })
 
   if (registerResult.affectedRows !== 1) {
@@ -104,7 +105,7 @@ export const register = async ({ username, password, email }) => {
 
   return {
     success: true,
-    data: { username, email, roleName: defaultRole.roleName }
+    data: { username, email, role_name: defaultRole.role_name }
   }
 }
 
@@ -126,18 +127,18 @@ export const login = async ({ username, password }) => {
     return { success: false, code: businessCode.userLoginFail }
   }
 
-  const roleIds = parseRoleIds(user.roleIds, user.roleId)
-  const roleCodes = parseRoleCodes(user.roleCodes, user.roleCode)
-  const roleNames = parseRoleNames(user.roleNames, user.roleName)
+  const roleIds = parseRoleIds(user.roleIds, user.role_id)
+  const roleCodes = parseRoleCodes(user.roleCodes, user.role_code)
+  const roleNames = parseRoleNames(user.roleNames, user.role_name)
   const permissionSnapshot = await buildPermissionSnapshot(roleIds)
   const token = generateToken({
     userId: user.id,
     username: user.username,
-    roleId: user.roleId,
+    roleId: user.role_id,
     roleIds,
-    roleCode: user.roleCode,
+    roleCode: user.role_code,
     roleCodes,
-    roleName: user.roleName,
+    roleName: user.role_name,
     roleNames
   })
 
@@ -157,7 +158,7 @@ export const login = async ({ username, password }) => {
  * 获取当前用户信息
  */
 export const getProfile = async (userId) => {
-  const currentUser = await adminAuthDao.findAdminUserById(userId)
+  const currentUser = await adminAuthDao.findAdminUserById(user_id)
   if (!currentUser) {
     return { success: false, code: businessCode.userNotFound }
   }
@@ -167,8 +168,8 @@ export const getProfile = async (userId) => {
 /**
  * 获取当前用户菜单
  */
-export const getMenus = async (roleIds, roleId) => {
-  const ids = parseRoleIds(roleIds, roleId)
+export const getMenus = async (roleIds, role_id) => {
+  const ids = parseRoleIds(roleIds, role_id)
   const permissionSnapshot = await buildPermissionSnapshot(ids)
   return { success: true, data: permissionSnapshot.menuTree }
 }
@@ -176,8 +177,8 @@ export const getMenus = async (roleIds, roleId) => {
 /**
  * 获取当前用户权限
  */
-export const getPermissions = async (roleIds, roleId) => {
-  const ids = parseRoleIds(roleIds, roleId)
+export const getPermissions = async (roleIds, role_id) => {
+  const ids = parseRoleIds(roleIds, role_id)
   const permissionSnapshot = await buildPermissionSnapshot(ids)
   return {
     success: true,
@@ -192,46 +193,68 @@ export const getPermissions = async (roleIds, roleId) => {
 // ─── 前端兼容接口 ────────────────────────────────────────────
 
 const detectBrowser = (ua) => {
-  if (!ua) return 'Unknown'
-  if (ua.includes('Edg/')) return 'Microsoft Edge'
-  if (ua.includes('Chrome/')) return 'Google Chrome'
-  if (ua.includes('Firefox/')) return 'Mozilla Firefox'
-  if (ua.includes('Safari/') && !ua.includes('Chrome/')) return 'Safari'
-  if (ua.includes('MSIE') || ua.includes('Trident/')) return 'Internet Explorer'
+  if (!ua) {
+    return 'Unknown'
+  }
+  if (ua.includes('Edg/')) {
+    return 'Microsoft Edge'
+  }
+  if (ua.includes('Chrome/')) {
+    return 'Google Chrome'
+  }
+  if (ua.includes('Firefox/')) {
+    return 'Mozilla Firefox'
+  }
+  if (ua.includes('Safari/') && !ua.includes('Chrome/')) {
+    return 'Safari'
+  }
+  if (ua.includes('MSIE') || ua.includes('Trident/')) {
+    return 'Internet Explorer'
+  }
   return 'Unknown'
 }
 
 const detectOS = (ua) => {
-  if (!ua) return 'Unknown'
+  if (!ua) {
+    return 'Unknown'
+  }
   if (ua.includes('Windows NT')) {
     const version = ua.match(/Windows NT (\d+\.\d+)/)?.[1]
     const versionMap = {
       '10.0': 'Windows 10/11',
-      '6.3': 'Windows 8.1',
-      '6.2': 'Windows 8',
-      '6.1': 'Windows 7'
+      6.3: 'Windows 8.1',
+      6.2: 'Windows 8',
+      6.1: 'Windows 7'
     }
     return versionMap[version] || 'Windows'
   }
-  if (ua.includes('Macintosh') || ua.includes('Mac OS X')) return 'macOS'
-  if (ua.includes('Linux')) return 'Linux'
-  if (ua.includes('Android')) return 'Android'
-  if (ua.includes('iPhone') || ua.includes('iPad')) return 'iOS'
+  if (ua.includes('Macintosh') || ua.includes('Mac OS X')) {
+    return 'macOS'
+  }
+  if (ua.includes('Linux')) {
+    return 'Linux'
+  }
+  if (ua.includes('Android')) {
+    return 'Android'
+  }
+  if (ua.includes('iPhone') || ua.includes('iPad')) {
+    return 'iOS'
+  }
   return 'Unknown'
 }
 
-const buildLoginLogData = ({ userId, username, loginIp, userAgent, status, message, sessionId }) => ({
-  userId,
+const buildLoginLogData = async ({ userId, username, loginIp, userAgent, status, message, sessionId }) => ({
+  user_id: userId,
   username,
-  loginType: 'password',
-  ipAddress: loginIp,
-  location: '',
+  login_type: 'password',
+  ip_address: loginIp,
+  location: await getIpLocation(loginIp),
   browser: detectBrowser(userAgent),
   os: detectOS(userAgent),
-  userAgent,
+  user_agent: userAgent,
   status,
   message,
-  sessionId: sessionId ?? null
+  session_id: sessionId ?? null
 })
 
 /**
@@ -256,15 +279,13 @@ export const frontendLogin = async ({ userName, password, loginIp, userAgent }) 
     // ── 记录失败并获取剩余次数 ──
     const failResult = await recordLoginFailure(username)
     await loginLogDao.createLoginLog(
-      buildLoginLogData({
+      await buildLoginLogData({
         userId: null,
         username,
         loginIp,
         userAgent,
         status: 0,
-        message: failResult.locked
-          ? '登录失败次数过多，账号已锁定'
-          : '用户名或密码错误'
+        message: failResult.locked ? '登录失败次数过多，账号已锁定' : '用户名或密码错误'
       })
     )
     return {
@@ -276,7 +297,7 @@ export const frontendLogin = async ({ userName, password, loginIp, userAgent }) 
 
   if (Number(user.status) !== 1) {
     await loginLogDao.createLoginLog(
-      buildLoginLogData({
+      await buildLoginLogData({
         userId: user.id,
         username,
         loginIp,
@@ -293,15 +314,13 @@ export const frontendLogin = async ({ userName, password, loginIp, userAgent }) 
     // ── 密码错误：记录失败 ──
     const failResult = await recordLoginFailure(username)
     await loginLogDao.createLoginLog(
-      buildLoginLogData({
+      await buildLoginLogData({
         userId: user.id,
         username,
         loginIp,
         userAgent,
         status: 0,
-        message: failResult.locked
-          ? '登录失败次数过多，账号已锁定'
-          : '用户名或密码错误'
+        message: failResult.locked ? '登录失败次数过多，账号已锁定' : '用户名或密码错误'
       })
     )
     return {
@@ -319,12 +338,12 @@ export const frontendLogin = async ({ userName, password, loginIp, userAgent }) 
   const payload = {
     userId: user.id,
     username: user.username,
-    roleId: user.roleId,
-    roleIds: parseRoleIds(user.roleIds, user.roleId),
-    roleCode: user.roleCode,
-    roleCodes: parseRoleCodes(user.roleCodes, user.roleCode),
-    roleName: user.roleName,
-    roleNames: parseRoleNames(user.roleNames, user.roleName),
+    roleId: user.role_id,
+    roleIds: parseRoleIds(user.roleIds, user.role_id),
+    roleCode: user.role_code,
+    roleCodes: parseRoleCodes(user.roleCodes, user.role_code),
+    roleName: user.role_name,
+    roleNames: parseRoleNames(user.roleNames, user.role_name),
     sessionId
   }
 
@@ -334,18 +353,18 @@ export const frontendLogin = async ({ userName, password, loginIp, userAgent }) 
   // 将 sessionId、登录信息写入用户表
   const sql = `
     UPDATE Users SET
-      sessionId = ?,
-      currentRefreshToken = ?,
-      loginIp = ?,
-      loginTime = NOW(),
-      sessionExpire = ?
+      session_id = ?,
+      current_refresh_token = ?,
+      login_ip = ?,
+      login_time = NOW(),
+      session_expire = ?
     WHERE id = ?
   `
   await query(sql, [sessionId, refreshToken, loginIp, sessionExpire, user.id])
 
   // 记录登录成功日志
   await loginLogDao.createLoginLog(
-    buildLoginLogData({
+    await buildLoginLogData({
       userId: user.id,
       username,
       loginIp,
@@ -372,7 +391,7 @@ export const frontendLogin = async ({ userName, password, loginIp, userAgent }) 
 
 /**
  * 前端兼容 - 获取用户信息（含按钮权限）
- * @param {number} userId
+ * @param {number} user_id
  */
 export const frontendGetUserInfo = async (userId) => {
   const currentUser = await adminAuthDao.findAdminUserById(userId)
@@ -380,10 +399,10 @@ export const frontendGetUserInfo = async (userId) => {
     return { success: false, code: businessCode.userNotFound }
   }
 
-  const roleIds = parseRoleIds(currentUser.roleIds, currentUser.roleId)
-  const roleCodes = parseRoleCodes(currentUser.roleCodes, currentUser.roleCode)
+  const roleIds = parseRoleIds(currentUser.roleIds, currentUser.role_id)
+  const roleCodes = parseRoleCodes(currentUser.roleCodes, currentUser.role_code)
   const buttons = await adminPermissionDao.findButtonsByRoleId(roleIds)
-  const buttonCodes = buttons.map((b) => b.buttonName)
+  const buttonCodes = buttons.map((b) => b.button_name)
 
   return {
     success: true,
@@ -408,7 +427,7 @@ export const frontendRefreshToken = async (refreshToken) => {
   try {
     const decoded = verifyRefreshToken(refreshToken)
 
-    // 单设备登录控制：校验用户表中的 currentRefreshToken 是否匹配
+    // 单设备登录控制：校验用户表中的 current_refresh_token 是否匹配
     const currentRefreshToken = await adminAuthDao.getUserRefreshToken(decoded.userId)
     if (currentRefreshToken !== refreshToken) {
       return { success: false, code: businessCode.accountKicked }
@@ -440,18 +459,18 @@ export const frontendRefreshToken = async (refreshToken) => {
 }
 
 /**
- * 前端兼容 - 登出（清除 sessionId 和 currentRefreshToken）
+ * 前端兼容 - 登出（清除 sessionId 和 current_refresh_token）
  * @param {number} userId
  */
 export const frontendLogout = async (userId) => {
   if (userId) {
     const sql = `
       UPDATE Users SET
-        sessionId = NULL,
-        currentRefreshToken = NULL,
-        loginIp = NULL,
-        loginTime = NULL,
-        sessionExpire = NULL
+        session_id = NULL,
+        current_refresh_token = NULL,
+        login_ip = NULL,
+        login_time = NULL,
+        session_expire = NULL
       WHERE id = ?
     `
     await query(sql, [userId])

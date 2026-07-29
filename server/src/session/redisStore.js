@@ -1,13 +1,13 @@
 /**
  * Redis Session Store for koa-session
- * 
+ *
  * 实现 koa-session 的外部存储接口，使用 Redis 存储 session 数据
- * 
+ *
  * 特性：
  * - 支持多进程/多机部署（中心化存储）
  * - 自动过期（TTL）
  * - 优雅降级（Redis 不可用时不阻塞请求）
- * 
+ *
  * koa-session 外部存储接口要求：
  * - get(key, maxAge, { rolling }) -> session data
  * - set(key, sess, maxAge, { rolling, changed }) -> void
@@ -47,10 +47,10 @@ export class RedisSessionStore {
    */
   async get(key, maxAge, { rolling }) {
     const redisKey = this._getKey(key)
-    
+
     try {
       const data = await this.redis.get(redisKey)
-      
+
       if (!data) {
         return null
       }
@@ -78,7 +78,7 @@ export class RedisSessionStore {
    */
   async set(key, sess, maxAge, { rolling, changed }) {
     const redisKey = this._getKey(key)
-    
+
     try {
       // 如果没有变化且不是 rolling 模式，跳过写入（减少 Redis 压力）
       if (!changed && !rolling) {
@@ -102,7 +102,7 @@ export class RedisSessionStore {
    */
   async destroy(key) {
     const redisKey = this._getKey(key)
-    
+
     try {
       await this.redis.del(redisKey)
     } catch (err) {
@@ -114,7 +114,7 @@ export class RedisSessionStore {
 
 /**
  * 创建 Redis Session Store 实例
- * 
+ *
  * @param {import('ioredis').Redis} redis - ioredis 客户端
  * @returns {RedisSessionStore}
  */
