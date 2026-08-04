@@ -4,11 +4,8 @@
     "jsx": "preserve",
     "jsxImportSource": "vue",
     "module": "ESNext",
-    "moduleResolution": "node",
     "lib": ["DOM", "ESNext"],
-    "baseUrl": "./",
     "paths": {
-      "@/*": ["src/*"],
       "~/*": ["./*"]
     },
     "resolveJsonModule": true,

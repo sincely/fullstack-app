@@ -5,7 +5,7 @@ import { enableStatusOptions, userGenderOptions } from '@/constants/business'
 import { useAntdForm, useFormRules } from '@/hooks/common/form'
 import { fetchCreateUser, fetchGetAllRoles, fetchUpdateUser } from '@/service/api'
 defineOptions({
-  name: 'UserOperateDrawer'
+  name: 'UserOperateModal'
 })
 
 const props = defineProps({
@@ -51,7 +51,7 @@ function createDefaultModel() {
     nickName: '',
     userPhone: '',
     userEmail: '',
-    roleId: undefined,
+    roleIds: [],
     status: '1',
     avatar: ''
   }
@@ -64,7 +64,7 @@ const rules = computed(() => {
     userName: requiredRule,
     ...(props.operateType === 'add' ? { password: requiredRule } : {}),
     userEmail: [requiredRule, patternRules.email],
-    roleId: requiredRule,
+    roleIds: requiredRule,
     status: requiredRule
   }
 })
@@ -82,14 +82,6 @@ async function getRoleOptions() {
       roleCode: item.roleCode
     }))
 
-    // mock 数据中缺少 roleCode，这里补齐当前用户已有角色
-    // 接入真实接口后可移除下面这段兜底逻辑
-    // const userRoleOptions = model.userRoles.map((item) => ({
-    //   label: item,
-    //   value: item
-    // }))
-    // 兜底逻辑结束
-
     roleOptions.value = [...options]
   }
 }
@@ -98,8 +90,7 @@ async function handleInitModel() {
   Object.assign(model, createDefaultModel())
 
   if (props.operateType === 'edit' && props.rowData) {
-    const currentRoleCode = props.rowData.roleCodes?.[0]
-    const matchedRole = roleOptions.value.find((item) => item.roleCode === currentRoleCode)
+    const roleIds = Array.isArray(props.rowData.roleIds) ? props.rowData.roleIds.map(Number).filter(Boolean) : []
 
     Object.assign(model, {
       id: props.rowData.id,
@@ -110,12 +101,12 @@ async function handleInitModel() {
       userPhone: props.rowData.userPhone ?? '',
       userEmail: props.rowData.userEmail ?? '',
       status: props.rowData.status ?? '1',
-      roleId: props.rowData.roleId ?? matchedRole?.value
+      roleIds
     })
   }
 }
 
-function closeDrawer() {
+function closeModal() {
   visible.value = false
 }
 
@@ -129,7 +120,7 @@ async function handleSubmit() {
       email: model.userEmail,
 
       status: model.status,
-      roleId: model.roleId,
+      roleIds: model.roleIds,
       phone: model.userPhone || undefined,
       nickName: model.nickName || undefined,
       avatar: model.avatar || undefined
@@ -146,7 +137,7 @@ async function handleSubmit() {
       gender: model.userGender,
       email: model.userEmail || undefined,
       status: model.status,
-      roleId: model.roleId,
+      roleIds: model.roleIds,
       phone: model.userPhone || undefined,
       nickName: model.nickName || undefined,
       avatar: model.avatar || undefined
@@ -159,7 +150,7 @@ async function handleSubmit() {
     window.$message?.success('更新成功')
   }
 
-  closeDrawer()
+  closeModal()
   emit('submitted')
 }
 
@@ -174,51 +165,82 @@ watch(visible, () => {
 </script>
 
 <template>
-  <ADrawer v-model:open="visible" :title="title" :width="360">
-    <AForm ref="formRef" layout="vertical" :model="model" :rules="rules">
-      <AFormItem :label="'用户名'" name="userName">
-        <AInput v-model:value="model.userName" :placeholder="'请输入用户名'" :disabled="props.operateType === 'edit'" />
-      </AFormItem>
-      <AFormItem :label="props.operateType === 'add' ? '密码' : '新密码'" name="password">
-        <AInputPassword
-          v-model:value="model.password"
-          :placeholder="props.operateType === 'add' ? '请输入密码' : '不修改可留空'"
-        />
-      </AFormItem>
-      <AFormItem :label="'性别'" name="userGender">
-        <ARadioGroup v-model:value="model.userGender">
-          <ARadio v-for="item in userGenderOptions" :key="item.value" :value="item.value">
-            {{ item.label }}
-          </ARadio>
-        </ARadioGroup>
-      </AFormItem>
-      <AFormItem :label="'昵称'" name="nickName">
-        <AInput v-model:value="model.nickName" :placeholder="'请输入昵称'" />
-      </AFormItem>
-      <AFormItem :label="'手机号'" name="userPhone">
-        <AInput v-model:value="model.userPhone" :placeholder="'请输入手机号'" />
-      </AFormItem>
-      <AFormItem :label="'邮箱'" name="userEmail">
-        <AInput v-model:value="model.userEmail" :placeholder="'请输入邮箱'" />
-      </AFormItem>
-      <AFormItem :label="'用户状态'" name="status">
-        <ARadioGroup v-model:value="model.status">
-          <ARadio v-for="item in enableStatusOptions" :key="item.value" :value="item.value">
-            {{ item.label }}
-          </ARadio>
-        </ARadioGroup>
-      </AFormItem>
-      <AFormItem :label="'用户角色'" name="roleId">
-        <ASelect v-model:value="model.roleId" :options="roleOptions" :placeholder="'请选择用户角色'" />
-      </AFormItem>
+  <AModal v-model:open="visible" :title="title" width="800px">
+    <AForm
+      ref="formRef"
+      :model="model"
+      :rules="rules"
+      :label-col="{ lg: 8, xs: 4 }"
+      label-wrap
+      class="pr-20px"
+    >
+      <ARow>
+        <ACol :lg="12" :xs="24">
+          <AFormItem :label="'用户名'" name="userName">
+            <AInput v-model:value="model.userName" :placeholder="'请输入用户名'" :disabled="props.operateType === 'edit'" />
+          </AFormItem>
+        </ACol>
+        <ACol :lg="12" :xs="24">
+          <AFormItem :label="props.operateType === 'add' ? '密码' : '新密码'" name="password">
+            <AInputPassword
+              v-model:value="model.password"
+              :placeholder="props.operateType === 'add' ? '请输入密码' : '不修改可留空'"
+            />
+          </AFormItem>
+        </ACol>
+        <ACol :lg="12" :xs="24">
+          <AFormItem :label="'性别'" name="userGender">
+            <ARadioGroup v-model:value="model.userGender">
+              <ARadio v-for="item in userGenderOptions" :key="item.value" :value="item.value">
+                {{ item.label }}
+              </ARadio>
+            </ARadioGroup>
+          </AFormItem>
+        </ACol>
+        <ACol :lg="12" :xs="24">
+          <AFormItem :label="'昵称'" name="nickName">
+            <AInput v-model:value="model.nickName" :placeholder="'请输入昵称'" />
+          </AFormItem>
+        </ACol>
+        <ACol :lg="12" :xs="24">
+          <AFormItem :label="'手机号'" name="userPhone">
+            <AInput v-model:value="model.userPhone" :placeholder="'请输入手机号'" />
+          </AFormItem>
+        </ACol>
+        <ACol :lg="12" :xs="24">
+          <AFormItem :label="'邮箱'" name="userEmail">
+            <AInput v-model:value="model.userEmail" :placeholder="'请输入邮箱'" />
+          </AFormItem>
+        </ACol>
+        <ACol :lg="12" :xs="24">
+          <AFormItem :label="'用户状态'" name="status">
+            <ARadioGroup v-model:value="model.status">
+              <ARadio v-for="item in enableStatusOptions" :key="item.value" :value="item.value">
+                {{ item.label }}
+              </ARadio>
+            </ARadioGroup>
+          </AFormItem>
+        </ACol>
+        <ACol :lg="12" :xs="24">
+          <AFormItem :label="'用户角色'" name="roleIds">
+            <ASelect
+              v-model:value="model.roleIds"
+              :options="roleOptions"
+              :placeholder="'请选择用户角色'"
+              mode="multiple"
+              :max-tag-count="3"
+            />
+          </AFormItem>
+        </ACol>
+      </ARow>
     </AForm>
     <template #footer>
       <ASpace :size="16">
-        <AButton @click="closeDrawer">{{ '取消' }}</AButton>
+        <AButton @click="closeModal">{{ '取消' }}</AButton>
         <AButton type="primary" @click="handleSubmit">{{ '确认' }}</AButton>
       </ASpace>
     </template>
-  </ADrawer>
+  </AModal>
 </template>
 
 <style scoped></style>

@@ -1,6 +1,5 @@
 import pinoHttp from 'pino-http'
 import logger from '../config/logger.js'
-import { log } from 'node:console'
 
 const httpLogger = pinoHttp({
   logger,
@@ -10,7 +9,7 @@ const httpLogger = pinoHttp({
       return { method: req.method, url: req.url, remoteAddress: req.remoteAddress, remotePort: req.remotePort }
     },
     res(res) {
-      return { statusCode: res.statusCode, statusMessage: res.statusMessage, body: res._body }
+      return { statusCode: res.statusCode, body: res._body }
     }
   },
   customLogLevel: function (req, res, err) {
@@ -47,8 +46,18 @@ const httpLogger = pinoHttp({
 export default async (ctx, next) => {
   httpLogger(ctx.req, ctx.res)
   ctx.log = ctx.req.log
+
+  // 拦截 res.end()，确保 _body 在响应真正结束时已挂载（koa-compress 会包裹 transform 流，
+  // 导致 middleware 内的 after-next 赋值时序不可靠）
+  const origEnd = ctx.res.end.bind(ctx.res)
+  ctx.res.end = function (...args) {
+    ctx.res._body = ctx.body
+    return origEnd(...args)
+  }
+
   await next()
-  // 将 Koa 解析的 query 和 body 挂载到原生 req 对象上，以便 pino serializer 访问
+
+  // 将 Koa 解析的 query 和 body 挂载到原生 req 对象上
   ctx.req.query = ctx.request.query
   ctx.req.body = ctx.request.body
 }

@@ -38,7 +38,7 @@ setInterval(() => {
  */
 export const createRateLimiter = (options = {}) => {
   const {
-    window = 15 * 60 * 1000, // 15 分钟
+    window = 30 * 60 * 1000, // 15 分钟
     maxRequests = 100, // 100 次请求
     keyGenerator = (ctx) => ctx.ip, // 基于 IP 限制
     whitelist = ['/api/health'], // 白名单
@@ -113,7 +113,7 @@ export const createRateLimiter = (options = {}) => {
  * - 登录接口：1 分钟内最多 20 次
  */
 export const rateLimiter = createRateLimiter({
-  window: 15 * 60 * 1000,
+  window: 60 * 60 * 1000,
   maxRequests: 100,
   blacklist: ['/api/login'],
   blacklistMaxRequests: 20

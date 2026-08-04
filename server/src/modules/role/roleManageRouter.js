@@ -45,27 +45,6 @@ roleManageRouter.post(
   errorControllerWrapper(RoleManageController.updateRoleRouteIds)
 )
 
-// 获取角色按钮 ID
-roleManageRouter.get(
-  '/systemManage/getRoleButtonIds',
-  ...useRoleManagePermission,
-  errorControllerWrapper(RoleManageController.getRoleButtonIds)
-)
-
-// 更新角色按钮 ID
-roleManageRouter.post(
-  '/systemManage/updateRoleButtonIds',
-  ...useRoleManagePermission,
-  errorControllerWrapper(RoleManageController.updateRoleButtonIds)
-)
-
-// 获取全部按钮
-roleManageRouter.get(
-  '/systemManage/getAllButtons',
-  ...useRoleManagePermission,
-  errorControllerWrapper(RoleManageController.getAllButtons)
-)
-
 // 新增角色
 roleManageRouter.post(
   '/systemManage/saveRole',

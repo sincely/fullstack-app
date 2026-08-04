@@ -121,13 +121,13 @@ export const listUsers = async (query) => {
  * 创建用户
  */
 export const createUser = async (body) => {
-  const { username, password, gender, age, idCard, email, address, status, avatar, roleId, nickName, phone } = body
+  const { username, password, gender, age, idCard, email, address, status, avatar, roleIds, nickName, phone } = body
 
-  const [existedUser, existedEmail, existedIdCard, role] = await Promise.all([
+  const [existedUser, existedEmail, existedIdCard, roles] = await Promise.all([
     adminUserDao.findUserByUsername(username),
     adminUserDao.findUserByEmail(email),
     adminUserDao.findUserByIdCard(idCard),
-    adminRoleDao.findRoleById(roleId)
+    adminRoleDao.findRolesByIds(roleIds)
   ])
 
   if (existedUser) {
@@ -139,7 +139,7 @@ export const createUser = async (body) => {
   if (existedIdCard) {
     return { success: false, code: businessCode.idCardExist }
   }
-  if (!role) {
+  if (roles.length !== roleIds.length) {
     return { success: false, code: businessCode.roleNotFound }
   }
 
@@ -155,7 +155,7 @@ export const createUser = async (body) => {
     address: address ?? null,
     status: toDbStatus(status),
     avatar: avatar ?? null,
-    roleIds: [roleId],
+    roleIds,
     passwordHash
   })
 
@@ -166,7 +166,7 @@ export const createUser = async (body) => {
  * 更新用户
  */
 export const updateUser = async (body) => {
-  const { id, password, email, idCard, roleId, ...rest } = body
+  const { id, password, email, idCard, roleIds, ...rest } = body
   const currentUser = await adminUserDao.findUserById(id)
 
   if (!currentUser) {
@@ -187,9 +187,9 @@ export const updateUser = async (body) => {
     }
   }
 
-  if (roleId) {
-    const role = await adminRoleDao.findRoleById(roleId)
-    if (!role) {
+  if (roleIds !== undefined) {
+    const roles = await adminRoleDao.findRolesByIds(roleIds)
+    if (roles.length !== roleIds.length) {
       return { success: false, code: businessCode.roleNotFound }
     }
   }
@@ -230,8 +230,8 @@ export const updateUser = async (body) => {
   }
 
   await adminUserDao.updateUser(id, payload)
-  if (roleId !== undefined) {
-    await adminUserDao.updateUserRoles(id, [roleId])
+  if (roleIds !== undefined) {
+    await adminUserDao.updateUserRoles(id, roleIds)
   }
 
   return { success: true }

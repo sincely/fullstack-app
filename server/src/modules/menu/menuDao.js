@@ -73,7 +73,7 @@ const createMenu = async (payload) => {
       parent_id, menu_type, menu_name, route_name, route_path,
       component, redirect, order_num, icon, icon_type,
       hide_in_menu, active_menu, multi_tab, keep_alive, status
-    ) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `
 
   const params = [
@@ -143,7 +143,6 @@ const deleteMenu = async (id) => {
   const connection = await getConnection()
   try {
     await connection.beginTransaction()
-    await connection.execute('delete from ButtonAuth where route_id = ?', [id])
     await connection.execute('delete from RoleRoute where route_id = ?', [id])
     const [result] = await connection.execute('delete from RouteAuth where id = ?', [id])
     await connection.commit()
@@ -202,82 +201,6 @@ const countMenus = async ({ keyword = '' } = {}) => {
 }
 
 /**
- * 查询全部菜单下的按钮配置。
- * @returns {Promise<Array<any>>}
- */
-const listMenuButtons = async () => {
-  const sql = `
-    select
-      button_id,
-      route_id,
-      route_name,
-      button_name,
-      button_label,
-      order_num,
-      status
-    from ButtonAuth
-    order by route_id asc, order_num asc, button_id asc
-  `
-
-  return query(sql)
-}
-
-/**
- * 重置单个菜单的按钮配置。
- * @param {number} route_id
- * @param {string} route_name
- * @param {Array<{code:string,desc?:string}>} buttons
- * @param {import('mysql2/promise').PoolConnection} [connection]
- * @returns {Promise<void>}
- */
-const replaceMenuButtons = async (route_id, route_name, buttons = [], connection) => {
-  const executor = connection || (await getConnection())
-  const safeButtons = buttons
-    .map((item, index) => ({
-      button_name: String(item.code || '').trim(),
-      button_label: String(item.desc || '').trim() || null,
-      order_num: index + 1
-    }))
-    .filter((item) => item.button_name)
-
-  try {
-    await executor.execute('delete from ButtonAuth where route_id = ?', [route_id])
-
-    if (safeButtons.length > 0) {
-      const valuesSql = safeButtons.map(() => '(?, ?, ?, ?, ?, 1)').join(', ')
-      const values = safeButtons.flatMap((item) => [
-        route_id,
-        route_name,
-        item.button_name,
-        item.button_label,
-        item.order_num
-      ])
-      await executor.execute(
-        `
-          insert into ButtonAuth (route_id, route_name, button_name, button_label, order_num, status)
-          values ${valuesSql}
-        `,
-        values
-      )
-    }
-  } finally {
-    if (!connection) {
-      executor.release()
-    }
-  }
-}
-
-/**
- * 同步按钮记录中的 route_name。
- * @param {number} route_id
- * @param {string} route_name
- * @returns {Promise<any>}
- */
-const updateMenuButtonRouteName = async (route_id, route_name) => {
-  return query('update ButtonAuth set route_name = ? where route_id = ?', [route_name, route_id])
-}
-
-/**
  * 批量删除菜单。
  * @param {number[]} ids
  * @returns {Promise<void>}
@@ -289,7 +212,6 @@ const deleteMenus = async (ids) => {
   try {
     await connection.beginTransaction()
     for (const id of safeIds) {
-      await connection.execute('delete from ButtonAuth where route_id = ?', [id])
       await connection.execute('delete from RoleRoute where route_id = ?', [id])
       await connection.execute('delete from RouteAuth where id = ?', [id])
     }
@@ -306,8 +228,6 @@ export default {
   listMenus,
   listMenusPaginated,
   countMenus,
-  listMenuButtons,
-  updateMenuButtonRouteName,
   findMenuById,
   findMenuByPath,
   findMenuByName,
@@ -315,6 +235,5 @@ export default {
   updateMenu,
   countChildren,
   deleteMenu,
-  deleteMenus,
-  replaceMenuButtons
+  deleteMenus
 }

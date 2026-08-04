@@ -14,7 +14,7 @@ import MenuOperateModal from './modules/menu-operate-modal.vue'
 const { bool: visible, setTrue: openModal } = useBoolean()
 const { tableWrapperRef, scrollConfig } = useTableScroll()
 
-const { columns, columnChecks, data, loading, getData } = useTable({
+const { columns, columnChecks, data, loading, getData, mobilePagination } = useTable({
   apiFn: fetchGetMenuList,
   apiParams: {
     current: 1,
@@ -35,7 +35,8 @@ const { columns, columnChecks, data, loading, getData } = useTable({
       customRender: ({ record }) => {
         const tagMap = {
           1: 'default',
-          2: 'processing'
+          2: 'processing',
+          3: 'warning'
         }
 
         const label = menuTypeRecord[record.menuType]
@@ -137,15 +138,22 @@ const { columns, columnChecks, data, loading, getData } = useTable({
       width: 60
     },
     {
+      key: 'updateTime',
+      dataIndex: 'updateTime',
+      title: '修改时间',
+      align: 'center',
+      minWidth: 150
+    },
+    {
       key: 'operate',
       title: '操作',
       align: 'center',
       width: 230,
       customRender: ({ record }) => (
         <div class="flex-center justify-end gap-8px">
-          {record.menuType === '1' && (
+          {(record.menuType === '1' || record.menuType === '2') && (
             <Button type="primary" ghost size="small" onClick={() => handleAddChildMenu(record)}>
-              {'新增子菜单'}
+              {'新增'}
             </Button>
           )}
           <Button type="primary" ghost size="small" onClick={() => handleEdit(record)}>
@@ -246,7 +254,7 @@ init()
         :loading="loading"
         row-key="id"
         :scroll="scrollConfig"
-        :pagination="false"
+        :pagination="mobilePagination"
         class="h-full"
       />
       <MenuOperateModal

@@ -1,27 +1,12 @@
-import logger from '../config/logger.js'
-
 /**
- * 创建错误响应对象，并联动日志记录完整错误堆栈
- * 统一返回 { code, msg, data } 格式，与 Controller 中的业务错误保持一致
+ * 创建错误响应对象，统一返回 { code, msg, data } 格式，与 Controller 中的业务错误保持一致
+ * 注意：此函数只负责构造响应，错误日志统一由 errorHandler 记录，避免同一错误被重复打印
  * @param {number} code - 业务错误码
  * @param {string} msg - 错误信息
  * @param {any} data - 错误详情
- * @param {Error} [cause] - 原始错误对象（可选，传入时自动记录完整堆栈）
+ * @param {Error} [cause] - 原始错误对象（可选，仅用于构造响应中的错误摘要）
  */
 export function createErrorResponse(code, msg, data, cause) {
-  // 联动日志：记录完整的错误堆栈，方便定位代码崩溃位置
-  const errSource = cause instanceof Error ? cause : data instanceof Error ? data : null
-  if (errSource) {
-    logger.error(
-      {
-        err: errSource,
-        code,
-        ...(data instanceof Error ? {} : { data })
-      },
-      msg
-    )
-  }
-
   return {
     code,
     msg,

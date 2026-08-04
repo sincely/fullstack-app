@@ -16,8 +16,7 @@ export const RoleCreateBodySchema = z.object({
   roleName: z.string().min(2, '角色名至少 2 位').max(50, '角色名最长 50 位'),
   roleCode: z.string().min(2, '角色编码至少 2 位').max(50, '角色编码最长 50 位'),
   roleDesc: z.string().max(255, '角色描述最长 255 位').optional().default(''),
-  status: adminStatusEnum.default('1'),
-  routeIds: z.array(z.coerce.number().int().positive()).default([])
+  status: adminStatusEnum.default('1')
 })
 
 // 更新角色请求体
@@ -28,8 +27,7 @@ export const RoleUpdateBodySchema = z
     roleName: z.string().min(2, '角色名至少 2 位').max(50, '角色名最长 50 位'),
     roleCode: z.string().min(2, '角色编码至少 2 位').max(50, '角色编码最长 50 位'),
     roleDesc: z.string().max(255, '角色描述最长 255 位').optional().default(''),
-    status: adminStatusEnum.default('1'),
-    routeIds: z.array(z.coerce.number().int().positive()).default([])
+    status: adminStatusEnum.default('1')
   })
   .refine((data) => Boolean(data.roleId || data.id), {
     message: '角色ID不能为空'

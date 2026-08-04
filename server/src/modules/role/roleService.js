@@ -4,7 +4,6 @@
  */
 
 import adminRoleDao from './roleDao.js'
-import adminPermissionDao from '../permission/permissionDao.js'
 import { getConnection } from '../../db/connection.js'
 import { businessCode } from '../../config/businessCode.js'
 import { normalizePagination } from '../../schemas/common/paginationSchema.js'
@@ -74,7 +73,7 @@ export const listRoles = async (query) => {
  * 创建角色
  */
 export const createRole = async (body) => {
-  const { roleName, roleCode, roleDesc, description, routeIds = [], status } = body
+  const { roleName, roleCode, roleDesc, description, status } = body
   const normalizedDescription = roleDesc ?? description ?? ''
   const existedRole = await adminRoleDao.findRoleByName(roleName, roleCode)
 
@@ -82,12 +81,11 @@ export const createRole = async (body) => {
     return { success: false, code: businessCode.roleExist }
   }
 
-  const result = await adminRoleDao.createRoleWithRoutes({
+  const result = await adminRoleDao.createRole({
     role_name: roleName,
     role_code: roleCode,
     description: normalizedDescription,
-    status: toDbStatus(status),
-    routeIds: [...new Set(routeIds)]
+    status: toDbStatus(status)
   })
 
   return { success: true, data: { roleId: result.role_id } }
@@ -97,7 +95,7 @@ export const createRole = async (body) => {
  * 更新角色
  */
 export const updateRole = async (body) => {
-  const { id, roleId: rawRoleId, roleName, roleCode, roleDesc, description, routeIds = [], status } = body
+  const { id, roleId: rawRoleId, roleName, roleCode, roleDesc, description, status } = body
   const roleId = Number(rawRoleId || id)
   const normalizedDescription = roleDesc ?? description ?? ''
   const currentRole = await adminRoleDao.findRoleById(roleId)
@@ -111,13 +109,11 @@ export const updateRole = async (body) => {
     return { success: false, code: businessCode.roleExist }
   }
 
-  await adminRoleDao.updateRoleWithRoutes({
-    role_id: roleId,
+  await adminRoleDao.updateRole(roleId, {
     role_name: roleName,
     role_code: roleCode,
     description: normalizedDescription,
-    status: toDbStatus(status),
-    routeIds: [...new Set(routeIds)]
+    status: toDbStatus(status)
   })
 
   return { success: true }
@@ -194,35 +190,4 @@ export const updateRoleRouteIds = async ({ roleId, routeIds }) => {
   } finally {
     connection.release()
   }
-}
-
-/**
- * 获取角色按钮 ID 列表
- */
-export const getRoleButtonIds = async (roleId) => {
-  const buttons = await adminPermissionDao.findButtonsByRoleId(Number(roleId))
-  const buttonIds = buttons.map((b) => b.button_id)
-  return { success: true, data: buttonIds }
-}
-
-/**
- * 更新角色按钮绑定
- */
-export const updateRoleButtonIds = async ({ roleId, buttonIds }) => {
-  const currentRole = await adminRoleDao.findRoleById(roleId)
-  if (!currentRole) {
-    return { success: false, code: businessCode.roleNotFound }
-  }
-
-  await adminPermissionDao.replaceRoleButtons(roleId, buttonIds)
-
-  return { success: true }
-}
-
-/**
- * 获取全部按钮
- */
-export const getAllButtons = async () => {
-  const buttons = await adminPermissionDao.findAllButtons()
-  return { success: true, data: buttons }
 }

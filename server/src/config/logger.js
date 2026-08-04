@@ -92,11 +92,25 @@ const logger = pino({
     },
     response(res) {
       return {
-        statusCode: res.statusCode
+        statusCode: res.statusCode,
+        body: res._body
       }
     },
-    // 使用 errWithCause 保留错误因果链（Node 16.9+ Error.cause 支持）
-    err: pino.stdSerializers.errWithCause
+    // 使用 errWithCause 保留错误因果链（Node 16.9+ Error.cause 支持），
+    // 并额外输出 cause 字段，避免只序列化 stack 导致真正的异常现场丢失
+    err: (err) => {
+      const serialized = pino.stdSerializers.errWithCause(err)
+      const causes = []
+      let current = err
+      while (current && typeof current.cause === 'object' && current.cause !== null && causes.length < 5) {
+        current = current.cause
+        causes.push(pino.stdSerializers.errWithCause(current))
+      }
+      if (causes.length > 0) {
+        serialized.cause = causes.length === 1 ? causes[0] : causes
+      }
+      return serialized
+    }
   }
 })
 

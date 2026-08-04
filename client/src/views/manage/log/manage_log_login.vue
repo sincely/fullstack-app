@@ -1,9 +1,11 @@
 <script setup lang="jsx">
 import { Button, message, Popconfirm, Tag } from 'ant-design-vue'
+import { ref } from 'vue'
 
 import { useTable, useTableOperate, useTableScroll } from '@/hooks/common/table'
 import { fetchBatchDeleteLoginLog, fetchClearLoginLogs, fetchGetLoginLogList } from '@/service/api'
 
+import LoginLogDetailModal from './modules/login-log-detail-modal.vue'
 import LoginLogSearch from './modules/login-log-search.vue'
 
 const { tableWrapperRef, scrollConfig } = useTableScroll()
@@ -117,6 +119,25 @@ const {
       title: '登录时间',
       align: 'center',
       width: 180
+    },
+    {
+      key: 'operate',
+      title: '操作',
+      align: 'center',
+      width: 140,
+      fixed: 'right',
+      customRender: ({ record }) => (
+        <div class="flex-center gap-8px">
+          <Button type="primary" size="small" onClick={() => handleDetail(record.id)}>
+            详情
+          </Button>
+          <Popconfirm title="确认删除该日志吗？" onConfirm={() => handleDelete(record.id)}>
+            <Button type="primary" danger size="small">
+              删除
+            </Button>
+          </Popconfirm>
+        </div>
+      )
     }
   ]
 })
@@ -134,6 +155,23 @@ async function handleClearAll() {
   const { error } = await fetchClearLoginLogs()
   if (!error) {
     message.success('登录日志已清空')
+    getData()
+  }
+}
+
+// 详情弹窗
+const detailModalVisible = ref(false)
+const currentLogId = ref(null)
+
+function handleDetail(id) {
+  currentLogId.value = id
+  detailModalVisible.value = true
+}
+
+async function handleDelete(id) {
+  const { error } = await fetchBatchDeleteLoginLog({ ids: [id] })
+  if (!error) {
+    message.success('删除成功')
     getData()
   }
 }
@@ -172,6 +210,7 @@ async function handleClearAll() {
         :pagination="mobilePagination"
         class="h-full"
       />
+      <LoginLogDetailModal v-model:visible="detailModalVisible" :log-id="currentLogId" />
     </ACard>
   </div>
 </template>

@@ -59,9 +59,25 @@ const clearOperationLogs = async (ctx) => {
   ctx.body = createSuccessResponse(businessCode.success, '操作日志已清空')
 }
 
+/**
+ * 删除单条操作日志
+ */
+const deleteOperationLog = async (ctx) => {
+  const { id } = ctx.request.body
+
+  if (!id) {
+    ctx.status = 400
+    return (ctx.body = createFailResponse(businessCode.paramError, '日志ID不能为空'))
+  }
+
+  await operationLogService.deleteOperationLog(Number(id))
+  ctx.body = createSuccessResponse(businessCode.success, '删除日志成功')
+}
+
 export default {
   listOperationLogs,
   getOperationLogDetail,
   batchDeleteOperationLogs,
-  clearOperationLogs
+  clearOperationLogs,
+  deleteOperationLog
 }

@@ -4,7 +4,7 @@ import authenticate from '../../middleware/authenticate.js'
 import authorizeRoute from '../../middleware/authorize.js'
 import { validateQuery, validateBody } from '../../middleware/validationMiddleware.js'
 import { errorControllerWrapper } from '../../utils/errorHandler.js'
-import { OperationLogListQuerySchema, LogBatchDeleteBodySchema } from '../../schemas/log/logSchema.js'
+import { OperationLogListQuerySchema, LogBatchDeleteBodySchema, LogSingleDeleteBodySchema } from '../../schemas/log/logSchema.js'
 
 const operationLogRouter = new Router()
 
@@ -38,6 +38,14 @@ operationLogRouter.post(
   '/log/clearOperationLogs',
   ...usePermission,
   errorControllerWrapper(OperationLogController.clearOperationLogs)
+)
+
+// 删除单条操作日志
+operationLogRouter.post(
+  '/log/deleteOperationLog',
+  ...usePermission,
+  validateBody(LogSingleDeleteBodySchema),
+  errorControllerWrapper(OperationLogController.deleteOperationLog)
 )
 
 export default operationLogRouter

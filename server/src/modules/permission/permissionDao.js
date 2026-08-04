@@ -18,8 +18,8 @@ const normalizeRoleIds = (roleIds) => {
 const buildInClause = (values) => values.map(() => '?').join(', ')
 
 /**
- * 根据角色 ID 查询可访问菜单列表。
- * @param {number} role_id
+ * 根据角色 ID 查询可访问菜单列表（含按钮节点 menu_type=3）。
+ * @param {number|number[]} role_id
  * @returns {Promise<Array<any>>}
  */
 const findMenusByRoleId = async (role_id) => {
@@ -41,8 +41,8 @@ const findMenusByRoleId = async (role_id) => {
 }
 
 /**
- * 根据角色 ID 查询可用按钮权限列表。
- * @param {number} role_id
+ * 根据角色 ID 查询按钮权限节点（menu_type=3 的 RouteAuth 行）。
+ * @param {number|number[]} role_id
  * @returns {Promise<Array<any>>}
  */
 const findButtonsByRoleId = async (role_id) => {
@@ -53,64 +53,22 @@ const findButtonsByRoleId = async (role_id) => {
 
   const sql = `
     select distinct
-      ba.button_id,
-      ba.route_id,
-      ba.route_name,
-      ba.button_name,
-      ba.button_label
-    from RoleButton rb
-    inner join ButtonAuth ba on ba.button_id = rb.button_id
-    where rb.role_id in (${buildInClause(roleIds)})
-    order by ba.route_id asc, ba.button_id asc
+      ra.id as button_id,
+      ra.parent_id as route_id,
+      ra.route_name,
+      ra.menu_name as button_name,
+      ra.menu_name as button_label
+    from RoleRoute rr
+    inner join RouteAuth ra on ra.id = rr.route_id
+    where rr.role_id in (${buildInClause(roleIds)})
+      and ra.menu_type = 3
+    order by ra.parent_id asc, ra.id asc
   `
 
   return query(sql, roleIds)
 }
 
-/**
- * 查询全部按钮权限。
- * @returns {Promise<Array<any>>}
- */
-const findAllButtons = async () => {
-  const sql = `
-    select
-      button_id,
-      route_id,
-      route_name,
-      button_name
-    from ButtonAuth
-    order by route_id asc, button_id asc
-  `
-  return query(sql)
-}
-
-const replaceRoleButtons = async (role_id, buttonIds) => {
-  const safeButtonIds = [...new Set((buttonIds || []).map((id) => Number(id)).filter(Boolean))]
-  const connection = await getConnection()
-
-  try {
-    await connection.beginTransaction()
-    await connection.execute('delete from RoleButton where role_id = ?', [role_id])
-
-    if (safeButtonIds.length > 0) {
-      const valuesSql = safeButtonIds.map(() => '(?, ?)').join(', ')
-      const values = safeButtonIds.flatMap((button_id) => [role_id, button_id])
-      await connection.execute(`insert into RoleButton (role_id, button_id) values ${valuesSql}`, values)
-    }
-
-    await connection.commit()
-    return { affectedRows: 1 }
-  } catch (error) {
-    await connection.rollback()
-    throw error
-  } finally {
-    connection.release()
-  }
-}
-
 export default {
   findMenusByRoleId,
-  findButtonsByRoleId,
-  findAllButtons,
-  replaceRoleButtons
+  findButtonsByRoleId
 }

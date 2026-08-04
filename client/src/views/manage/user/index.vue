@@ -11,7 +11,7 @@ import {
   fetchUpdateUserStatus
 } from '@/service/api'
 
-import UserOperateDrawer from './modules/user-operate-drawer.vue'
+import UserOperateModal from './modules/user-operate-modal.vue'
 import UserSearch from './modules/user-search.vue'
 
 const { tableWrapperRef, scrollConfig } = useTableScroll()
@@ -221,7 +221,7 @@ function edit(id) {
         class="h-full"
       />
 
-      <UserOperateDrawer
+      <UserOperateModal
         v-model:visible="drawerVisible"
         :operate-type="operateType"
         :row-data="editingData"

@@ -192,6 +192,17 @@ export const generatedRoutes = [
         }
       },
       {
+        name: 'manage_dict',
+        path: '/manage/dict',
+        component: 'view.manage_dict',
+        meta: {
+          title: '字典管理',
+          icon: 'mdi:book-open-outline',
+          order: 4,
+          roles: ['admin']
+        }
+      },
+      {
         name: 'manage_role',
         path: '/manage/role',
         component: 'view.manage_role',

@@ -5,11 +5,10 @@ import { computed, shallowRef } from 'vue'
 
 import { enableStatusRecord } from '@/constants/business'
 import { useTable, useTableOperate } from '@/hooks/common/table'
-import { fetchDeleteRole, fetchGetRoleList } from '@/service/api'
+import { fetchDeleteDict, fetchGetDictList } from '@/service/api'
 
-import RoleOperateModal from './modules/role-operate-modal.vue'
-import RolePermissionModal from './modules/role-permission-modal.vue'
-import RoleSearch from './modules/role-search.vue'
+import DictOperateModal from './modules/dict-operate-modal.vue'
+import DictSearch from './modules/dict-search.vue'
 
 const wrapperEl = shallowRef(null)
 const { height: wrapperElHeight } = useElementSize(wrapperEl)
@@ -32,13 +31,13 @@ const {
   searchParams,
   resetSearchParams
 } = useTable({
-  apiFn: fetchGetRoleList,
+  apiFn: fetchGetDictList,
   apiParams: {
     current: 1,
     size: 10,
     status: undefined,
-    roleName: undefined,
-    roleCode: undefined
+    dictName: undefined,
+    dictCode: undefined
   },
   columns: () => [
     {
@@ -49,29 +48,23 @@ const {
       align: 'center'
     },
     {
-      key: 'roleName',
-      dataIndex: 'roleName',
-      title: '角色名称',
+      key: 'dictName',
+      dataIndex: 'dictName',
+      title: '字典名称',
       align: 'center',
       minWidth: 120
     },
     {
-      key: 'roleCode',
-      dataIndex: 'roleCode',
-      title: '角色编码',
+      key: 'dictCode',
+      dataIndex: 'dictCode',
+      title: '字典编码',
       align: 'center',
-      minWidth: 120
-    },
-    {
-      key: 'roleDesc',
-      dataIndex: 'roleDesc',
-      title: '角色描述',
       minWidth: 120
     },
     {
       key: 'status',
       dataIndex: 'status',
-      title: '角色状态',
+      title: '状态',
       align: 'center',
       width: 100,
       customRender: ({ record }) => {
@@ -90,17 +83,20 @@ const {
       }
     },
     {
+      key: 'remark',
+      dataIndex: 'remark',
+      title: '备注',
+      minWidth: 150
+    },
+    {
       key: 'operate',
       title: '操作',
       align: 'center',
-      width: 200,
+      width: 150,
       customRender: ({ record }) => (
         <div class="flex-center gap-8px">
           <Button type="primary" ghost size="small" onClick={() => edit(record.id)}>
             {'编辑'}
-          </Button>
-          <Button type="primary" ghost size="small" onClick={() => assignPermission(record)}>
-            {'分配权限'}
           </Button>
           <Popconfirm onConfirm={() => handleDelete(record.id)} content={'确认删除吗？'}>
             <Button danger size="small">
@@ -125,17 +121,8 @@ const {
   onDeleted
 } = useTableOperate(data, getData)
 
-// 权限分配弹窗
-const permissionModalVisible = shallowRef(false)
-const permissionTargetRole = shallowRef(null)
-
-function assignPermission(record) {
-  permissionTargetRole.value = record
-  permissionModalVisible.value = true
-}
-
 async function handleBatchDelete() {
-  const deleteTasks = checkedRowKeys.value.map((id) => fetchDeleteRole({ id }))
+  const deleteTasks = checkedRowKeys.value.map((id) => fetchDeleteDict({ id }))
   const results = await Promise.all(deleteTasks)
 
   if (results.every((item) => !item.error)) {
@@ -144,7 +131,7 @@ async function handleBatchDelete() {
 }
 
 async function handleDelete(id) {
-  const { error } = await fetchDeleteRole({ id })
+  const { error } = await fetchDeleteDict({ id })
 
   if (!error) {
     onDeleted()
@@ -158,9 +145,9 @@ function edit(id) {
 
 <template>
   <div class="min-h-500px flex-col-stretch gap-16px overflow-hidden lt-sm:overflow-auto">
-    <RoleSearch v-model:model="searchParams" @reset="resetSearchParams" @search="getDataByPage" />
+    <DictSearch v-model:model="searchParams" @reset="resetSearchParams" @search="getDataByPage" />
     <ACard
-      :title="'角色列表'"
+      :title="'字典列表'"
       :bordered="false"
       :body-style="{ flex: 1, overflow: 'hidden' }"
       class="flex-col-stretch sm:flex-1-hidden card-wrapper"
@@ -187,15 +174,10 @@ function edit(id) {
         :scroll="scrollConfig"
         class="h-full"
       />
-      <RoleOperateModal
+      <DictOperateModal
         v-model:visible="drawerVisible"
         :operate-type="operateType"
         :row-data="editingData"
-        @submitted="getData"
-      />
-      <RolePermissionModal
-        v-model:visible="permissionModalVisible"
-        :row-data="permissionTargetRole"
         @submitted="getData"
       />
     </ACard>

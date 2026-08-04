@@ -16,7 +16,8 @@ export const userGenderOptions = transformRecordToOption(userGenderRecord)
 
 export const menuTypeRecord = {
   1: '目录',
-  2: '菜单'
+  2: '菜单',
+  3: '按钮'
 }
 
 export const menuTypeOptions = transformRecordToOption(menuTypeRecord)

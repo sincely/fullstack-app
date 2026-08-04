@@ -6,7 +6,21 @@
  */
 // 注意：此函数接收的是 DAO 查询出的数据库原始行（snake_case 字段）
 const normalizeMenu = (menu) => {
-  // 构建 meta 对象（前端路由仍需要 meta 格式）
+  // button (menu_type=3) 节点
+  if (Number(menu.menu_type) === 3) {
+    // route_name 格式为 _btn_{parentId}_{code}，提取原始权限标识
+    const parts = String(menu.route_name || '').split('_')
+    const permissionCode = parts.length >= 4 ? parts.slice(3).join('_') : menu.route_name || ''
+
+    return {
+      id: menu.id,
+      parentId: menu.parent_id ?? 0,
+      name: permissionCode || menu.menu_name,
+      meta: { title: menu.menu_name, isButton: true, permissionCode: permissionCode || '' }
+    }
+  }
+
+  // 目录 / 菜单节点
   const meta = {
     title: menu.menu_name,
     ...(menu.icon ? { icon: menu.icon } : {}),
@@ -44,8 +58,12 @@ export const buildMenuTree = (menuList) => {
 
   for (const menu of menuMap.values()) {
     if (menu.parentId && menuMap.has(menu.parentId)) {
-      menuMap.get(menu.parentId).children.push(menu)
-      continue
+      const parent = menuMap.get(menu.parentId)
+      // 目录可包含目录/菜单/按钮，菜单可包含按钮
+      if (Array.isArray(parent.children)) {
+        parent.children.push(menu)
+        continue
+      }
     }
     roots.push(menu)
   }

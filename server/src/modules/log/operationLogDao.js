@@ -53,9 +53,12 @@ const listOperationLogs = async ({ page, pageSize, username, module, action, sta
       ol.username,
       ol.action,
       ol.module,
+      ol.method,
+      ol.request_url,
       ol.request_params,
       ol.response_status,
       ol.response_msg,
+      ol.response_body,
       ol.ip_address,
       ol.user_agent,
       ol.execute_time,
@@ -126,9 +129,9 @@ const createOperationLog = async (data) => {
   const sql = `
     INSERT INTO OperationLog (
       user_id, username, action, module, method, request_url,
-      request_params, response_status, response_msg, ip_address,
+      request_params, response_status, response_msg, response_body, ip_address,
       user_agent, execute_time, status
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `
 
   return query(sql, [
@@ -141,6 +144,7 @@ const createOperationLog = async (data) => {
     data.request_params ? JSON.stringify(data.request_params) : null,
     data.response_status || '',
     data.response_msg || '',
+    data.response_body || null,
     data.ip_address || '',
     data.user_agent || '',
     data.execute_time || 0,
@@ -173,11 +177,19 @@ const getOperationLogById = async (id) => {
   return rows[0] || null
 }
 
+/**
+ * 删除单条操作日志
+ */
+const deleteOperationLogById = async (id) => {
+  return query('DELETE FROM OperationLog WHERE id = ?', [id])
+}
+
 export default {
   listOperationLogs,
   countOperationLogs,
   createOperationLog,
   batchDeleteOperationLogs,
   clearOperationLogs,
-  getOperationLogById
+  getOperationLogById,
+  deleteOperationLogById
 }

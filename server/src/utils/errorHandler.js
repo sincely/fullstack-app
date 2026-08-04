@@ -51,18 +51,18 @@ export const errorControllerWrapper = (controller) => {
         return
       }
 
-      // 非预期异常（5xx）：error 级别，记录完整堆栈方便定位崩溃位置
-      const wrappedErr = new Error(`Unhandled error: ${err.message || 'Unknown error'}`, { cause: err })
-
+      // 非预期异常（5xx）：error 级别，记录完整堆栈方便定位崩溃位置。
+      // 直接记录原始 err（其 .stack 经 async/await 携带完整调用链），
+      // 不再用 new Error(...{cause}) 包装——包装后的 .stack 只有当前这一行，会吞掉真实现场。
       ctx.status = 500
-      ctx.body = createErrorResponse(businessCode.error, 'Something went wrong', null, wrappedErr)
+      ctx.body = createErrorResponse(businessCode.error, 'Something went wrong', null, err)
       logger.error(
         {
-          err: wrappedErr,
+          err,
           status: 500,
           ...requestInfo
         },
-        wrappedErr.message
+        err.message
       )
     }
   }

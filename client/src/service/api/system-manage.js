@@ -42,7 +42,7 @@ export function fetchGetRoleRouteIds(params) {
 
 /**
  * 更新角色菜单 ID
- * @description 更新角色绑定的菜单权限
+ * @description 更新角色绑定的菜单权限（含按钮节点 ID）
  * @param {Record<string, any>} data 请求体
  * @returns {Promise<any>} 请求结果
  */
@@ -51,46 +51,6 @@ export function fetchUpdateRoleRouteIds(data) {
     url: '/systemManage/updateRoleRouteIds',
     method: 'post',
     data
-  })
-}
-
-/**
- * 获取角色按钮 ID
- * @description 根据角色查询按钮权限 ID 列表
- * @param {Record<string, any>} params 查询参数
- * @returns {Promise<any>} 请求结果
- */
-export function fetchGetRoleButtonIds(params) {
-  return request({
-    url: '/systemManage/getRoleButtonIds',
-    method: 'get',
-    params
-  })
-}
-
-/**
- * 更新角色按钮 ID
- * @description 更新角色绑定的按钮权限
- * @param {Record<string, any>} data 请求体
- * @returns {Promise<any>} 请求结果
- */
-export function fetchUpdateRoleButtonIds(data) {
-  return request({
-    url: '/systemManage/updateRoleButtonIds',
-    method: 'post',
-    data
-  })
-}
-
-/**
- * 获取全部按钮
- * @description 获取系统全部按钮权限项
- * @returns {Promise<any>} 请求结果
- */
-export function fetchGetAllButtons() {
-  return request({
-    url: '/systemManage/getAllButtons',
-    method: 'get'
   })
 }
 
@@ -357,6 +317,34 @@ export function fetchBatchDeleteOperationLog(data) {
 }
 
 /**
+ * 获取操作日志详情
+ * @description 根据ID查询操作日志详情
+ * @param {number} id 日志ID
+ * @returns {Promise<any>} 请求结果
+ */
+export function fetchGetOperationLogDetail(id) {
+  return request({
+    url: '/log/getOperationLogDetail',
+    method: 'get',
+    params: { id }
+  })
+}
+
+/**
+ * 删除操作日志
+ * @description 删除单条操作日志
+ * @param {Record<string, any>} data 请求体 {id: number}
+ * @returns {Promise<any>} 请求结果
+ */
+export function fetchDeleteOperationLog(data) {
+  return request({
+    url: '/log/deleteOperationLog',
+    method: 'post',
+    data
+  })
+}
+
+/**
  * 清空操作日志
  * @description 清空所有操作日志
  * @returns {Promise<any>} 请求结果
@@ -385,6 +373,20 @@ export function fetchGetLoginLogList(params) {
 }
 
 /**
+ * 获取登录日志详情
+ * @description 根据ID查询登录日志详情
+ * @param {number} id 日志ID
+ * @returns {Promise<any>} 请求结果
+ */
+export function fetchGetLoginLogDetail(id) {
+  return request({
+    url: '/log/getLoginLogDetail',
+    method: 'get',
+    params: { id }
+  })
+}
+
+/**
  * 批量删除登录日志
  * @description 批量删除登录日志
  * @param {Record<string, any>} data 请求体 {ids: number[]}
@@ -407,5 +409,63 @@ export function fetchClearLoginLogs() {
   return request({
     url: '/log/clearLoginLogs',
     method: 'post'
+  })
+}
+
+// ==================== 字典管理 ====================
+
+/**
+ * 获取字典列表
+ * @description 分页查询字典列表数据
+ * @param {Record<string, any>} params 查询参数
+ * @returns {Promise<any>} 请求结果
+ */
+export function fetchGetDictList(params) {
+  return request({
+    url: '/systemManage/getDictList',
+    method: 'get',
+    params
+  })
+}
+
+/**
+ * 新增字典
+ * @description 创建字典
+ * @param {Record<string, any>} data 请求体
+ * @returns {Promise<any>} 请求结果
+ */
+export function fetchCreateDict(data) {
+  return request({
+    url: '/systemManage/saveDict',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 更新字典
+ * @description 更新字典信息
+ * @param {Record<string, any>} data 请求体
+ * @returns {Promise<any>} 请求结果
+ */
+export function fetchUpdateDict(data) {
+  return request({
+    url: '/systemManage/updateDict',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 删除字典
+ * @description 删除指定字典
+ * @param {Record<string, any>} data 请求体
+ * @returns {Promise<any>} 请求结果
+ */
+export function fetchDeleteDict(data) {
+  return request({
+    url: '/systemManage/deleteDict',
+    method: 'post',
+    data
   })
 }

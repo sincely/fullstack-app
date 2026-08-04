@@ -35,7 +35,7 @@ export const UserCreateBodySchema = z.object({
   address: z.string().max(255, '地址最长 255 位').nullable().optional(),
   status: userStatusEnum.default('1'),
   avatar: z.string().max(255, '头像地址最长 255 位').nullable().optional(),
-  roleId: z.coerce.number().int().positive()
+  roleIds: z.array(z.coerce.number().int().positive()).min(1, '至少选择一个角色')
 })
 
 // 更新用户请求体（至少提供一个变更字段）
@@ -52,7 +52,7 @@ export const UserUpdateBodySchema = z
     address: z.string().max(255, '地址最长 255 位').nullable().optional(),
     status: userStatusEnum.optional(),
     avatar: z.string().max(255, '头像地址最长 255 位').nullable().optional(),
-    roleId: z.coerce.number().int().positive().optional()
+    roleIds: z.array(z.coerce.number().int().positive()).min(1, '至少选择一个角色').optional()
   })
   .refine((data) => Object.keys(data).length > 1, {
     message: '至少提供一个需要更新的字段'

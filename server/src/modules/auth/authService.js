@@ -62,8 +62,15 @@ const formatUserInfo = (user) => ({
 })
 
 const buildPermissionSnapshot = async (roleIds) => {
-  const menus = await adminPermissionDao.findMenusByRoleId(roleIds)
-  const buttons = await adminPermissionDao.findButtonsByRoleId(roleIds)
+  const allRows = await adminPermissionDao.findMenusByRoleId(roleIds)
+  // 分离菜单（目录/菜单）和按钮（menu_type=3）
+  const menus = allRows.filter((row) => Number(row.menu_type) !== 3)
+  const buttons = allRows.filter((row) => Number(row.menu_type) === 3).map((row) => ({
+    button_name: row.route_name || row.menu_name,
+    button_label: row.menu_name,
+    route_id: row.parent_id,
+    route_name: row.route_name || ''
+  }))
 
   return {
     menuTree: buildMenuTree(menus),

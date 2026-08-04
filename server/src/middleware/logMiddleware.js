@@ -152,6 +152,7 @@ export const operationLogMiddleware = async (ctx, next) => {
       request_params: requestParams,
       responseStatus: String(responseBody?.code || ctx.status),
       response_msg: responseBody?.msg || '',
+      response_body: responseBody ? JSON.stringify(responseBody) : null,
       ipAddress: getClientIp(ctx),
       user_agent: ctx.headers['user-agent'] || '',
       executeTime: execute_time,

@@ -112,6 +112,21 @@ const findRoleById = async (role_id) => {
 }
 
 /**
+ * 根据角色 ID 集合批量查询角色（用于多角色绑定校验）。
+ * @param {number[]} role_ids
+ * @returns {Promise<any[]>}
+ */
+const findRolesByIds = async (role_ids) => {
+  if (!Array.isArray(role_ids) || role_ids.length === 0) {
+    return []
+  }
+
+  const placeholders = role_ids.map(() => '?').join(', ')
+  const sql = `select role_id from Roles where role_id in (${placeholders})`
+  return query(sql, role_ids)
+}
+
+/**
  * 根据角色名或角色编码查询角色（用于唯一性校验）。
  * @param {string} role_name
  * @param {string} [role_code]
@@ -135,65 +150,30 @@ const getRouteIdsByRoleId = async (role_id) => {
 }
 
 /**
- * 创建角色并绑定路由（事务）。
- * @param {{role_name:string,role_code:string,description:string,status:number,routeIds:number[]}} payload
+ * 创建角色（仅 Roles 表，不涉及路由绑定）。
+ * @param {{role_name:string,role_code:string,description:string,status:number}} payload
  * @returns {Promise<{role_id:number, affectedRows:number}>}
  */
-const createRoleWithRoutes = async ({ role_name, role_code, description, status, routeIds }) => {
-  const connection = await getConnection()
-  try {
-    await connection.beginTransaction()
-    const [roleResult] = await connection.execute(
-      'insert into Roles (role_code, role_name, description, status) values (?, ?, ?, ?)',
-      [role_code || buildRoleCode(role_name), role_name, description, Number(status ?? 1)]
-    )
-    const role_id = roleResult.insertId
-
-    if (routeIds.length > 0) {
-      const valuesSql = routeIds.map(() => '(?, ?)').join(', ')
-      const values = routeIds.flatMap((route_id) => [role_id, route_id])
-      await connection.execute(`insert into RoleRoute (role_id, route_id) values ${valuesSql}`, values)
-    }
-
-    await connection.commit()
-    return { role_id, affectedRows: roleResult.affectedRows }
-  } catch (error) {
-    await connection.rollback()
-    throw error
-  } finally {
-    connection.release()
-  }
+const createRole = async ({ role_name, role_code, description, status }) => {
+  const result = await query(
+    'insert into Roles (role_code, role_name, description, status) values (?, ?, ?, ?)',
+    [role_code || buildRoleCode(role_name), role_name, description, Number(status ?? 1)]
+  )
+  return { role_id: result.insertId, affectedRows: result.affectedRows }
 }
 
 /**
- * 更新角色信息并重建角色路由关系（事务）。
- * @param {{role_id:number,role_name:string,role_code:string,description:string,status:number,routeIds:number[]}} payload
+ * 更新角色（仅 Roles 表，不涉及路由绑定）。
+ * @param {number} role_id
+ * @param {{role_name:string,role_code:string,description:string,status:number}} payload
  * @returns {Promise<{affectedRows:number}>}
  */
-const updateRoleWithRoutes = async ({ role_id, role_name, role_code, description, status, routeIds }) => {
-  const connection = await getConnection()
-  try {
-    await connection.beginTransaction()
-    await connection.execute(
-      'update Roles set role_name = ?, role_code = ?, description = ?, status = ? where role_id = ?',
-      [role_name, role_code || buildRoleCode(role_name), description, Number(status ?? 1), role_id]
-    )
-    await connection.execute('delete from RoleRoute where role_id = ?', [role_id])
-
-    if (routeIds.length > 0) {
-      const valuesSql = routeIds.map(() => '(?, ?)').join(', ')
-      const values = routeIds.flatMap((route_id) => [role_id, route_id])
-      await connection.execute(`insert into RoleRoute (role_id, route_id) values ${valuesSql}`, values)
-    }
-
-    await connection.commit()
-    return { affectedRows: 1 }
-  } catch (error) {
-    await connection.rollback()
-    throw error
-  } finally {
-    connection.release()
-  }
+const updateRole = async (role_id, { role_name, role_code, description, status }) => {
+  const result = await query(
+    'update Roles set role_name = ?, role_code = ?, description = ?, status = ? where role_id = ?',
+    [role_name, role_code || buildRoleCode(role_name), description, Number(status ?? 1), role_id]
+  )
+  return { affectedRows: result.affectedRows }
 }
 
 /**
@@ -234,10 +214,11 @@ export default {
   listAllRoles,
   countRoles,
   findRoleById,
+  findRolesByIds,
   findRoleByName,
   getRouteIdsByRoleId,
-  createRoleWithRoutes,
-  updateRoleWithRoutes,
+  createRole,
+  updateRole,
   deleteRole,
   countUsersByRoleId
 }

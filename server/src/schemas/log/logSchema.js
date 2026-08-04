@@ -26,3 +26,8 @@ export const LoginLogListQuerySchema = createPaginatedQuerySchema({
 export const LogBatchDeleteBodySchema = z.object({
   ids: z.array(z.coerce.number().int().positive()).min(1, '至少选择一条日志')
 })
+
+// 单条删除日志请求体
+export const LogSingleDeleteBodySchema = z.object({
+  id: z.coerce.number().int().positive('日志ID必须为正整数')
+})

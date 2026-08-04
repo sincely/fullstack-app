@@ -1,12 +1,17 @@
 <script setup lang="jsx">
 import { Button, message, Popconfirm, Tag } from 'ant-design-vue'
+import { ref } from 'vue'
 
 import { useTable, useTableOperate, useTableScroll } from '@/hooks/common/table'
-import { fetchBatchDeleteOperationLog, fetchClearOperationLogs, fetchGetOperationLogList } from '@/service/api'
+import { fetchBatchDeleteOperationLog, fetchClearOperationLogs, fetchDeleteOperationLog, fetchGetOperationLogList } from '@/service/api'
 
+import OperationLogDetailModal from './modules/operation-log-detail-modal.vue'
 import OperationLogSearch from './modules/operation-log-search.vue'
 
 const { tableWrapperRef, scrollConfig } = useTableScroll()
+
+const detailVisible = ref(false)
+const currentLogId = ref(null)
 
 const statusRecord = {
   1: { text: '成功', color: 'success' },
@@ -48,21 +53,21 @@ const {
       dataIndex: 'username',
       title: '操作用户',
       align: 'center',
-      minWidth: 100
+    //  minWidth: 100
     },
     {
       key: 'action',
       dataIndex: 'action',
       title: '操作类型',
       align: 'center',
-      width: 100
+      // width: 100
     },
     {
       key: 'module',
       dataIndex: 'module',
       title: '系统模块',
       align: 'center',
-      width: 120
+      // width: 120
     },
     {
       key: 'ipAddress',
@@ -96,6 +101,22 @@ const {
       title: '操作时间',
       align: 'center',
       width: 180
+    },
+    {
+      key: 'operate',
+      dataIndex: 'operate',
+      title: '操作',
+      align: 'center',
+      width: 160,
+      fixed: 'right',
+      customRender: ({ record }) => (
+        <div class="flex-center gap-8px">
+          <Button type="link" size="small" onClick={() => showDetail(record.id)}>详情</Button>
+          <Popconfirm title="确认删除该日志吗？" onConfirm={() => handleDelete(record.id)}>
+            <Button type="link" size="small" danger>删除</Button>
+          </Popconfirm>
+        </div>
+      )
     }
   ]
 })
@@ -113,6 +134,19 @@ async function handleClearAll() {
   const { error } = await fetchClearOperationLogs()
   if (!error) {
     message.success('操作日志已清空')
+    getData()
+  }
+}
+
+function showDetail(id) {
+  currentLogId.value = id
+  detailVisible.value = true
+}
+
+async function handleDelete(id) {
+  const { error } = await fetchDeleteOperationLog({ id })
+  if (!error) {
+    message.success('删除成功')
     getData()
   }
 }
@@ -152,5 +186,6 @@ async function handleClearAll() {
         class="h-full"
       />
     </ACard>
+    <OperationLogDetailModal v-model:visible="detailVisible" :log-id="currentLogId" />
   </div>
 </template>

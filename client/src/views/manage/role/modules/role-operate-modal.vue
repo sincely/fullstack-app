@@ -1,16 +1,12 @@
 <script setup>
-import { useBoolean } from '@sa/hooks'
 import { computed, reactive, watch } from 'vue'
 
 import { enableStatusOptions } from '@/constants/business'
 import { useAntdForm, useFormRules } from '@/hooks/common/form'
 import { fetchCreateRole, fetchUpdateRole } from '@/service/api'
 
-import ButtonAuthModal from './button-auth-modal.vue'
-import MenuAuthModal from './menu-auth-modal.vue'
-
 defineOptions({
-  name: 'RoleOperateDrawer'
+  name: 'RoleOperateModal'
 })
 
 const props = defineProps({
@@ -32,8 +28,6 @@ const visible = defineModel('visible', {
 
 const { formRef, validate, resetFields } = useAntdForm()
 const { defaultRequiredRule } = useFormRules()
-const { bool: menuAuthVisible, setTrue: openMenuAuthModal } = useBoolean()
-const { bool: buttonAuthVisible, setTrue: openButtonAuthModal } = useBoolean()
 
 const title = computed(() => {
   const titles = {
@@ -47,12 +41,10 @@ const model = reactive(createDefaultModel())
 
 function createDefaultModel() {
   return {
-    id: undefined,
     roleName: '',
     roleCode: '',
     roleDesc: '',
-    status: '1',
-    routeIds: []
+    status: '1'
   }
 }
 
@@ -61,10 +53,6 @@ const rules = {
   roleCode: defaultRequiredRule,
   status: defaultRequiredRule
 }
-
-const roleId = computed(() => props.rowData?.id || -1)
-
-const isEdit = computed(() => props.operateType === 'edit')
 
 function handleUpdateModelWhenEdit() {
   if (props.operateType === 'add') {
@@ -77,22 +65,24 @@ function handleUpdateModelWhenEdit() {
   }
 }
 
-function closeDrawer() {
+function closeModal() {
   visible.value = false
 }
 
 async function handleSubmit() {
   await validate()
+
   const submitApi = props.operateType === 'edit' ? fetchUpdateRole : fetchCreateRole
+
   const payload = {
     roleName: model.roleName,
     roleCode: model.roleCode,
     roleDesc: model.roleDesc,
-    status: model.status,
-    routeIds: props.operateType === 'edit' ? props.rowData?.routeIds || model.routeIds || [] : []
+    status: model.status
   }
 
   if (props.operateType === 'edit') {
+    payload.id = props.rowData.id
     payload.roleId = props.rowData.id
   }
 
@@ -103,7 +93,7 @@ async function handleSubmit() {
   }
 
   window.$message?.success(props.operateType === 'edit' ? '更新成功' : '创建成功')
-  closeDrawer()
+  closeModal()
   emit('submitted')
 }
 
@@ -116,7 +106,7 @@ watch(visible, () => {
 </script>
 
 <template>
-  <ADrawer v-model:open="visible" :title="title" :width="360">
+  <AModal v-model:open="visible" :title="title" width="500px">
     <AForm ref="formRef" :model="model" :rules="rules">
       <AFormItem :label="'角色名称'" name="roleName">
         <AInput v-model:value="model.roleName" :placeholder="'请输入角色名称'" />
@@ -126,24 +116,24 @@ watch(visible, () => {
       </AFormItem>
       <AFormItem :label="'角色状态'" name="status">
         <ARadioGroup v-model:value="model.status">
-          <ARadio v-for="item in enableStatusOptions" :key="item.value" :value="item.value" :label="item.label" />
+          <ARadio
+            v-for="item in enableStatusOptions"
+            :key="item.value"
+            :value="item.value"
+          >
+            {{ item.label }}
+          </ARadio>
         </ARadioGroup>
       </AFormItem>
       <AFormItem :label="'角色描述'" name="roleDesc">
-        <AInput v-model:value="model.roleDesc" :placeholder="'请输入角色描述'" />
+        <ATextarea v-model:value="model.roleDesc" :placeholder="'请输入角色描述'" :rows="3" />
       </AFormItem>
     </AForm>
-    <ASpace v-if="isEdit">
-      <AButton @click="openMenuAuthModal">{{ '菜单权限' }}</AButton>
-      <MenuAuthModal v-model:visible="menuAuthVisible" :role-id="roleId" />
-      <AButton @click="openButtonAuthModal">{{ '按钮权限' }}</AButton>
-      <ButtonAuthModal v-model:visible="buttonAuthVisible" :role-id="roleId" />
-    </ASpace>
     <template #footer>
-      <div class="flex-y-center justify-end gap-12px">
-        <AButton @click="closeDrawer">{{ '取消' }}</AButton>
-        <AButton type="primary" @click="handleSubmit">{{ '确认' }}</AButton>
-      </div>
+      <ASpace justify="end" :size="16">
+        <AButton @click="closeModal">取消</AButton>
+        <AButton type="primary" @click="handleSubmit">确认</AButton>
+      </ASpace>
     </template>
-  </ADrawer>
+  </AModal>
 </template>

@@ -34,7 +34,9 @@ export const businessCode = {
   userDeleteSelfDenied: 40019, // 不能删除自己
   idCardExist: 40020, // 身份证号已存在
   userDisableSelfDenied: 40021, // 不能禁用自己
-  accountLocked: 40022 // 账号已锁定（登录失败次数过多）
+  accountLocked: 40022, // 账号已锁定（登录失败次数过多）
+  dictNameExist: 40023, // 字典名称或编码已存在
+  dictNotFound: 40024 // 字典不存在
 }
 
 export const businessMsg = {
@@ -62,5 +64,7 @@ export const businessMsg = {
   [businessCode.userDeleteSelfDenied]: '不能删除当前登录账号',
   [businessCode.idCardExist]: '身份证号已存在',
   [businessCode.userDisableSelfDenied]: '不能禁用当前登录账号',
-  [businessCode.accountLocked]: '登录失败次数过多，账号已锁定，请稍后再试'
+  [businessCode.accountLocked]: '登录失败次数过多，账号已锁定，请稍后再试',
+  [businessCode.dictNameExist]: '字典名称或编码已存在',
+  [businessCode.dictNotFound]: '字典不存在'
 }

@@ -59,6 +59,9 @@ INSERT INTO `ButtonAuth` (`button_id`, `route_id`, `route_name`, `button_name`, 
 INSERT INTO `ButtonAuth` (`button_id`, `route_id`, `route_name`, `button_name`, `button_label`, `order_num`, `status`, `create_by`, `create_time`, `update_by`, `update_time`) VALUES (14, 16, 'manage_user', 'user:add', '新增用户', 1, 1, 'Edward Smith', '1993-12-21 02:24:52', 'Timothy Thomas', '1993-12-21 02:24:52');
 INSERT INTO `ButtonAuth` (`button_id`, `route_id`, `route_name`, `button_name`, `button_label`, `order_num`, `status`, `create_by`, `create_time`, `update_by`, `update_time`) VALUES (15, 16, 'manage_user', 'user:edit', '编辑用户', 2, 1, 'Edward Smith', '1993-12-21 02:24:52', 'Timothy Thomas', '1993-12-21 02:24:52');
 INSERT INTO `ButtonAuth` (`button_id`, `route_id`, `route_name`, `button_name`, `button_label`, `order_num`, `status`, `create_by`, `create_time`, `update_by`, `update_time`) VALUES (16, 16, 'manage_user', 'user:delete', '删除用户', 3, 1, 'Edward Smith', '1993-12-21 02:24:52', 'Timothy Thomas', '1993-12-21 02:24:52');
+INSERT INTO `ButtonAuth` (`button_id`, `route_id`, `route_name`, `button_name`, `button_label`, `order_num`, `status`, `create_by`, `create_time`, `update_by`, `update_time`) VALUES (17, 28, 'manage_dict', 'dict:add', '新增字典', 1, 1, 'System', NOW(), 'System', NOW());
+INSERT INTO `ButtonAuth` (`button_id`, `route_id`, `route_name`, `button_name`, `button_label`, `order_num`, `status`, `create_by`, `create_time`, `update_by`, `update_time`) VALUES (18, 28, 'manage_dict', 'dict:edit', '编辑字典', 2, 1, 'System', NOW(), 'System', NOW());
+INSERT INTO `ButtonAuth` (`button_id`, `route_id`, `route_name`, `button_name`, `button_label`, `order_num`, `status`, `create_by`, `create_time`, `update_by`, `update_time`) VALUES (19, 28, 'manage_dict', 'dict:delete', '删除字典', 3, 1, 'System', NOW(), 'System', NOW());
 COMMIT;
 
 -- ----------------------------
@@ -112,6 +115,7 @@ CREATE TABLE `OperationLog` (
   `request_params` text COMMENT '请求参数(JSON)',
   `response_status` varchar(10) DEFAULT NULL COMMENT '响应状态码',
   `response_msg` varchar(255) DEFAULT NULL COMMENT '响应消息',
+  `response_body` text COMMENT '响应体(JSON)',
   `ip_address` varchar(45) DEFAULT NULL COMMENT 'IP地址',
   `user_agent` varchar(500) DEFAULT NULL COMMENT '浏览器标识',
   `execute_time` int DEFAULT NULL COMMENT '执行时间(毫秒)',
@@ -285,6 +289,8 @@ INSERT INTO `RoleRoute` (`role_route_id`, `role_id`, `route_id`, `create_time`) 
 INSERT INTO `RoleRoute` (`role_route_id`, `role_id`, `route_id`, `create_time`) VALUES (91, 2, 24, '2026-05-27 23:24:49');
 INSERT INTO `RoleRoute` (`role_route_id`, `role_id`, `route_id`, `create_time`) VALUES (92, 2, 13, '2026-05-27 23:24:49');
 INSERT INTO `RoleRoute` (`role_route_id`, `role_id`, `route_id`, `create_time`) VALUES (93, 2, 25, '2026-05-27 23:24:49');
+INSERT INTO `RoleRoute` (`role_route_id`, `role_id`, `route_id`, `create_time`) VALUES (94, 1, 28, NOW());
+INSERT INTO `RoleRoute` (`role_route_id`, `role_id`, `route_id`, `create_time`) VALUES (95, 3, 28, NOW());
 COMMIT;
 
 -- ----------------------------
@@ -381,6 +387,7 @@ INSERT INTO `RouteAuth` (`id`, `parent_id`, `menu_type`, `menu_name`, `route_nam
 INSERT INTO `RouteAuth` (`id`, `parent_id`, `menu_type`, `menu_name`, `route_name`, `route_path`, `component`, `redirect`, `order_num`, `icon`, `icon_type`, `i18n_key`, `hide_in_menu`, `active_menu`, `multi_tab`, `keep_alive`, `status`, `create_by`, `create_time`, `update_by`, `update_time`) VALUES (25, NULL, 1, '日志管理', 'log', '/log', 'layout.base', NULL, 8, 'mdi:file-document-outline', 1, NULL, 0, NULL, 0, 0, 1, 'System', '2026-05-27 23:18:18', 'System', '2026-05-27 23:49:01');
 INSERT INTO `RouteAuth` (`id`, `parent_id`, `menu_type`, `menu_name`, `route_name`, `route_path`, `component`, `redirect`, `order_num`, `icon`, `icon_type`, `i18n_key`, `hide_in_menu`, `active_menu`, `multi_tab`, `keep_alive`, `status`, `create_by`, `create_time`, `update_by`, `update_time`) VALUES (26, 25, 2, '操作日志', 'log_operation', '/log/operation', 'view.manage_log_operation', NULL, 1, 'mdi:clipboard-text', 1, NULL, 0, NULL, 0, 1, 1, 'System', '2026-05-27 23:18:18', 'System', '2026-05-27 23:49:01');
 INSERT INTO `RouteAuth` (`id`, `parent_id`, `menu_type`, `menu_name`, `route_name`, `route_path`, `component`, `redirect`, `order_num`, `icon`, `icon_type`, `i18n_key`, `hide_in_menu`, `active_menu`, `multi_tab`, `keep_alive`, `status`, `create_by`, `create_time`, `update_by`, `update_time`) VALUES (27, 25, 2, '登录日志', 'log_login', '/log/login', 'view.manage_log_login', NULL, 2, 'mdi:login-variant', 1, NULL, 0, NULL, 0, 1, 1, 'System', '2026-05-27 23:18:18', 'System', '2026-05-27 23:49:01');
+INSERT INTO `RouteAuth` (`id`, `parent_id`, `menu_type`, `menu_name`, `route_name`, `route_path`, `component`, `redirect`, `order_num`, `icon`, `icon_type`, `i18n_key`, `hide_in_menu`, `active_menu`, `multi_tab`, `keep_alive`, `status`, `create_by`, `create_time`, `update_by`, `update_time`) VALUES (28, 13, 2, '字典管理', 'manage_dict', '/manage/dict', 'view.manage_dict', NULL, 4, 'mdi:book-open-outline', 1, NULL, 0, NULL, 0, 0, 1, 'System', NOW(), 'System', NOW());
 COMMIT;
 
 -- ----------------------------
@@ -479,5 +486,24 @@ INSERT INTO `Users` (`id`, `username`, `nick_name`, `gender`, `status`, `age`, `
 INSERT INTO `Users` (`id`, `username`, `nick_name`, `gender`, `status`, `age`, `phone`, `id_card`, `email`, `address`, `avatar`, `password`, `current_refresh_token`, `session_id`, `login_ip`, `login_time`, `session_expire`, `create_by`, `create_time`, `update_by`, `update_time`) VALUES (5, 'werwer', '12312', 'male', 1, NULL, '15651376329', NULL, '1738248422@qq.com', NULL, NULL, '$2b$10$Rjh2GERNOJocRFHPuyfmouty3/89LJdl7UCDW2Fgdwoj8E8/KMv56', NULL, NULL, NULL, NULL, NULL, '', '2026-05-27 23:50:03', '', '2026-05-27 23:50:03');
 INSERT INTO `Users` (`id`, `username`, `nick_name`, `gender`, `status`, `age`, `phone`, `id_card`, `email`, `address`, `avatar`, `password`, `current_refresh_token`, `session_id`, `login_ip`, `login_time`, `session_expire`, `create_by`, `create_time`, `update_by`, `update_time`) VALUES (6, '123', '123123', 'male', 1, NULL, '15651376322', NULL, '1738248432@qq.com', NULL, NULL, '$2b$10$3QPEF0fhZGZp7EjY0JqZZOBTut03FEp9NqfVC9yOKEBhLh8c8p2Zy', NULL, NULL, NULL, NULL, NULL, '', '2026-05-28 00:05:17', '', '2026-05-28 00:05:17');
 COMMIT;
+
+-- ----------------------------
+-- Table structure for Dict
+-- ----------------------------
+DROP TABLE IF EXISTS `Dict`;
+CREATE TABLE `Dict` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `dict_name` varchar(100) NOT NULL COMMENT '字典名称',
+  `dict_code` varchar(100) NOT NULL COMMENT '字典编码',
+  `status` tinyint NOT NULL DEFAULT '1' COMMENT '状态：1=启用 0=禁用',
+  `remark` varchar(500) DEFAULT '' COMMENT '备注',
+  `create_by` varchar(50) DEFAULT '' COMMENT '创建人',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_by` varchar(50) DEFAULT '' COMMENT '更新人',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_dict_name` (`dict_name`),
+  UNIQUE KEY `uk_dict_code` (`dict_code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='字典管理表';
 
 SET FOREIGN_KEY_CHECKS = 1;

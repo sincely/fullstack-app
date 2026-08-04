@@ -20,6 +20,7 @@ const formatOperationLogRow = (row) => ({
   requestParams: row.request_params,
   responseStatus: row.response_status,
   responseMsg: row.response_msg,
+  responseBody: row.response_body,
   ipAddress: row.ip_address,
   userAgent: row.user_agent,
   executeTime: row.execute_time,
@@ -73,6 +74,14 @@ export const getOperationLogDetail = async (id) => {
     }
   }
 
+  if (formatted.responseBody) {
+    try {
+      formatted.responseBody = JSON.parse(formatted.responseBody)
+    } catch {
+      // 保持原样
+    }
+  }
+
   return formatted
 }
 
@@ -89,4 +98,12 @@ export const batchDeleteOperationLogs = async (ids) => {
  */
 export const clearOperationLogs = async () => {
   await operationLogDao.clearOperationLogs()
+}
+
+/**
+ * 删除单条操作日志
+ * @param {number} id
+ */
+export const deleteOperationLog = async (id) => {
+  await operationLogDao.deleteOperationLogById(id)
 }

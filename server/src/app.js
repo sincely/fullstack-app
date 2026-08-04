@@ -137,8 +137,25 @@ if (!process.env.VERCEL) {
     }
 
     // ── 启动 HTTP 服务器 ──
-    const server = app.listen(Port, () => {
-      logger.info(`服务器启动在 http://localhost:${Port}`)
+    const server = app.listen(Port)
+
+    server.on('error', (err) => {
+      if (err.code === 'EADDRINUSE') {
+        logger.error(`端口 ${Port} 已被占用，尝试使用备用端口 ${Port + 1}`)
+        setTimeout(() => {
+          server.close()
+          server.listen(Port + 1)
+        }, 1500)
+      } else {
+        logger.fatal({ err }, '服务器启动失败')
+        process.exit(1)
+      }
+    })
+
+    server.on('listening', () => {
+      const port = server.address().port
+      const isFallback = port !== Port
+      logger.info(`服务器启动在 http://localhost:${port}${isFallback ? '（备用端口）' : ''}`)
     })
 
     // ── 优雅关闭 ──
