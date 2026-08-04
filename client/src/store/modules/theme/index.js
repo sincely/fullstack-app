@@ -83,6 +83,15 @@ export const useThemeStore = defineStore(SetupStoreId.Theme, () => {
   }
 
   /**
+   * 设置布局一级菜单与子级菜单位置反转
+   *
+   * @param reverse 是否反转
+   */
+  function setLayoutReverseHorizontalMix(reverse) {
+    settings.value.layout.reverseHorizontalMix = reverse
+  }
+
+  /**
    * 更新主题颜色
    *
    * @param key 主题颜色键
@@ -154,6 +163,7 @@ export const useThemeStore = defineStore(SetupStoreId.Theme, () => {
     toggleThemeScheme,
     setThemeScheme,
     updateThemeColors,
-    setThemeLayout
+    setThemeLayout,
+    setLayoutReverseHorizontalMix
   }
 })

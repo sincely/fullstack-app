@@ -75,6 +75,9 @@ function transformElegantRouteToVueRoute(route, layouts, views) {
       const singleLevelRoute = {
         path,
         component: layouts[layout],
+        meta: {
+          title: route.meta?.title || ''
+        },
         children: [
           {
             name,

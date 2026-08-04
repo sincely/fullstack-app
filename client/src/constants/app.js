@@ -1,5 +1,9 @@
 import { transformRecordToOption } from '@/utils/common'
 
+export const GLOBAL_HEADER_MENU_ID = '__GLOBAL_HEADER_MENU__'
+
+export const GLOBAL_SIDER_MENU_ID = '__GLOBAL_SIDER_MENU__'
+
 export const themeSchemaRecord = {
   light: '亮色模式',
   dark: '暗黑模式',

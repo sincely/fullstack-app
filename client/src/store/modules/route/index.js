@@ -322,18 +322,6 @@ export const useRouteStore = defineStore(SetupStoreId.Route, () => {
     return getSelectedMenuKeyPathByKey(selectedKey, menus.value)
   }
 
-  /**
-   * 根据 key 获取选中菜单的路由元信息
-   *
-   * @param selectedKey 选中的菜单 key
-   */
-  function getSelectedMenuMetaByKey(selectedKey) {
-    // router.options.routes 仅包含静态路由，需要使用 router.getRoutes() 获取完整路由
-    const allRoutes = router.getRoutes()
-
-    return allRoutes.find((route) => route.name === selectedKey)?.meta || null
-  }
-
   return {
     resetStore,
     routeHome,
@@ -350,7 +338,6 @@ export const useRouteStore = defineStore(SetupStoreId.Route, () => {
     isInitAuthRoute,
     setIsInitAuthRoute,
     getIsAuthRouteExist,
-    getSelectedMenuKeyPath,
-    getSelectedMenuMetaByKey
+    getSelectedMenuKeyPath
   }
 })

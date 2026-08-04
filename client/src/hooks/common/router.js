@@ -24,15 +24,34 @@ export function useRouterPush(inSetup = true) {
       name: key
     }
 
-    if (query) {
+    if (Object.keys(query || {}).length) {
       routeLocation.query = query
     }
 
-    if (params) {
+    if (Object.keys(params || {}).length) {
       routeLocation.params = params
     }
 
     return routerPush(routeLocation)
+  }
+
+  /**
+   * 跳转到指定路由，并携带该路由 meta 中配置的 query 参数
+   *
+   * @param key 路由键
+   */
+  async function routerPushByKeyWithMetaQuery(key) {
+    const allRoutes = router.getRoutes()
+
+    const meta = allRoutes.find((item) => item.name === key)?.meta || null
+
+    const query = {}
+
+    meta?.query?.forEach((item) => {
+      query[item.key] = item.value
+    })
+
+    return routerPushByKey(key, { query })
   }
 
   async function toHome() {
@@ -90,6 +109,7 @@ export function useRouterPush(inSetup = true) {
     routerPush,
     routerBack,
     routerPushByKey,
+    routerPushByKeyWithMetaQuery,
     toLogin,
     toggleLoginModule,
     redirectFromLogin
