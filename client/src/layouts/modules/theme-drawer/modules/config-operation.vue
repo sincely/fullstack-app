@@ -47,9 +47,9 @@ onMounted(() => {
 
 <template>
   <div class="flex justify-between">
-    <AButton danger @click="handleReset">重置配置</AButton>
+    <a-button danger @click="handleReset">重置配置</a-button>
     <div ref="domRef">
-      <AButton type="primary">复制配置</AButton>
+      <a-button type="primary">复制配置</a-button>
     </div>
   </div>
 </template>

@@ -55,15 +55,15 @@ function getPopupContainer(triggerNode) {
 <template>
   <!-- define component start: Button -->
   <DefineButton v-slot="{ $slots, className }">
-    <AButton type="text" :class="className">
+    <a-button type="text" :class="className">
       <div class="flex-center gap-8px">
         <component :is="$slots.default" />
       </div>
-    </AButton>
+    </a-button>
   </DefineButton>
   <!-- define component end: Button -->
 
-  <ATooltip
+  <a-tooltip
     v-if="tooltipContent"
     :placement="tooltipPlacement"
     :get-popup-container="getPopupContainer"
@@ -74,7 +74,7 @@ function getPopupContainer(triggerNode) {
         <SvgIcon :icon="icon" />
       </slot>
     </Button>
-  </ATooltip>
+  </a-tooltip>
   <Button v-else :class-name="cls" v-bind="$attrs">
     <slot>
       <SvgIcon :icon="icon" />

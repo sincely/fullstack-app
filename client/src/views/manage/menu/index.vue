@@ -229,7 +229,7 @@ init()
 
 <template>
   <div class="min-h-500px flex-col-stretch gap-16px overflow-hidden lt-sm:overflow-auto">
-    <ACard
+    <a-card
       :title="'菜单列表'"
       :bordered="false"
       :body-style="{ flex: 1, overflow: 'hidden' }"
@@ -245,7 +245,7 @@ init()
           @refresh="getData"
         />
       </template>
-      <ATable
+      <a-table
         ref="tableWrapperRef"
         :columns="columns"
         :data-source="data"
@@ -264,6 +264,6 @@ init()
         :all-pages="allPages"
         @submitted="getData"
       />
-    </ACard>
+    </a-card>
   </div>
 </template>

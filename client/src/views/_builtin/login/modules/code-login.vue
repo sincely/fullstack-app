@@ -35,21 +35,21 @@ async function handleSubmit() {
 </script>
 
 <template>
-  <AForm ref="formRef" :model="model" :rules="rules">
-    <AFormItem name="phone">
-      <AInput v-model:value="model.phone" size="large" :placeholder="'请输入手机号'" />
-    </AFormItem>
-    <AFormItem name="code">
+  <a-form ref="formRef" :model="model" :rules="rules">
+    <a-form-item name="phone">
+      <a-input v-model:value="model.phone" size="large" :placeholder="'请输入手机号'" />
+    </a-form-item>
+    <a-form-item name="code">
       <div class="w-full flex-y-center gap-16px">
-        <AInput v-model:value="model.code" size="large" :placeholder="'请输入验证码'" />
-        <AButton size="large" :disabled="isCounting" :loading="loading" @click="getCaptcha(model.phone)">
+        <a-input v-model:value="model.code" size="large" :placeholder="'请输入验证码'" />
+        <a-button size="large" :disabled="isCounting" :loading="loading" @click="getCaptcha(model.phone)">
           {{ label }}
-        </AButton>
+        </a-button>
       </div>
-    </AFormItem>
-    <ASpace direction="vertical" size="large" class="w-full">
-      <AButton type="primary" block size="large" shape="round" @click="handleSubmit">确认</AButton>
-      <AButton block size="large" shape="round" @click="toggleLoginModule('pwd-login')">返回</AButton>
-    </ASpace>
-  </AForm>
+    </a-form-item>
+    <a-space direction="vertical" size="large" class="w-full">
+      <a-button type="primary" block size="large" shape="round" @click="handleSubmit">确认</a-button>
+      <a-button block size="large" shape="round" @click="toggleLoginModule('pwd-login')">返回</a-button>
+    </a-space>
+  </a-form>
 </template>

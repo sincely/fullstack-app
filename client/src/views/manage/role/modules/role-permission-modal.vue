@@ -99,14 +99,14 @@ watch(visible, () => {
 </script>
 
 <template>
-  <AModal v-model:open="visible" :title="`分配权限 - ${rowData?.roleName || ''}`" width="700px">
-    <AAlert
+  <a-modal v-model:open="visible" :title="`分配权限 - ${rowData?.roleName || ''}`" width="700px">
+    <a-alert
       message="勾选目录/菜单/按钮节点，保存后该角色将拥有相应的访问和操作权限"
       type="info"
       show-icon
       class="mb-12px"
     />
-    <ATree
+    <a-tree
       v-model:checked-keys="authChecks"
       :tree-data="authTree"
       checkable
@@ -115,10 +115,10 @@ watch(visible, () => {
       :default-expand-all="true"
     />
     <template #footer>
-      <ASpace justify="end" :size="16">
-        <AButton @click="handleCancel">取消</AButton>
-        <AButton type="primary" :loading="loading" @click="handleSubmit">确认</AButton>
-      </ASpace>
+      <a-space justify="end" :size="16">
+        <a-button @click="handleCancel">取消</a-button>
+        <a-button type="primary" :loading="loading" @click="handleSubmit">确认</a-button>
+      </a-space>
     </template>
-  </AModal>
+  </a-modal>
 </template>

@@ -28,6 +28,6 @@ const icon = computed(() => iconMap[props.type])
     <div class="flex text-400px text-primary">
       <SvgIcon :local-icon="icon" />
     </div>
-    <AButton type="primary" @click="routerPushByKey('root')">返回首页</AButton>
+    <a-button type="primary" @click="routerPushByKey('root')">返回首页</a-button>
   </div>
 </template>

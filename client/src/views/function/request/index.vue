@@ -15,15 +15,15 @@ async function refreshToken() {
 </script>
 
 <template>
-  <ASpace direction="vertical" :size="16">
-    <ACard :title="'请求失败后登出用户'" :bordered="false" size="small" class="card-wrapper">
-      <AButton @click="logout">{{ '触发' }}</AButton>
-    </ACard>
-    <ACard :title="'请求失败后弹出模态框再登出用户'" :bordered="false" size="small" class="card-wrapper">
-      <AButton @click="logoutWithModal">{{ '触发' }}</AButton>
-    </ACard>
-    <ACard :title="'请求的token已过期，刷新token'" :bordered="false" size="small" class="card-wrapper">
-      <AButton @click="refreshToken">{{ '触发' }}</AButton>
-    </ACard>
-  </ASpace>
+  <a-space direction="vertical" :size="16">
+    <a-card :title="'请求失败后登出用户'" :bordered="false" size="small" class="card-wrapper">
+      <a-button @click="logout">{{ '触发' }}</a-button>
+    </a-card>
+    <a-card :title="'请求失败后弹出模态框再登出用户'" :bordered="false" size="small" class="card-wrapper">
+      <a-button @click="logoutWithModal">{{ '触发' }}</a-button>
+    </a-card>
+    <a-card :title="'请求的token已过期，刷新token'" :bordered="false" size="small" class="card-wrapper">
+      <a-button @click="refreshToken">{{ '触发' }}</a-button>
+    </a-card>
+  </a-space>
 </template>

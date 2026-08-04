@@ -61,7 +61,7 @@ function getGradientColor(color) {
 </script>
 
 <template>
-  <ACard :bordered="false" size="small" class="card-wrapper">
+  <a-card :bordered="false" size="small" class="card-wrapper">
     <!-- define component start: GradientBg -->
     <DefineGradientBg v-slot="{ $slots, gradientColor }">
       <div class="rd-8px px-16px pb-4px pt-8px text-white" :style="{ backgroundImage: gradientColor }">
@@ -70,8 +70,8 @@ function getGradientColor(color) {
     </DefineGradientBg>
     <!-- define component end: GradientBg -->
 
-    <ARow :gutter="[16, 16]">
-      <ACol v-for="item in cardData" :key="item.key" :span="24" :md="12" :lg="6">
+    <a-row :gutter="[16, 16]">
+      <a-col v-for="item in cardData" :key="item.key" :span="24" :md="12" :lg="6">
         <GradientBg :gradient-color="getGradientColor(item.color)" class="flex-1">
           <h3 class="text-16px">{{ item.title }}</h3>
           <div class="flex justify-between pt-12px">
@@ -84,7 +84,7 @@ function getGradientColor(color) {
             />
           </div>
         </GradientBg>
-      </ACol>
-    </ARow>
-  </ACard>
+      </a-col>
+    </a-row>
+  </a-card>
 </template>

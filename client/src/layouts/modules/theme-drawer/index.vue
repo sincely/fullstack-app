@@ -17,7 +17,7 @@ const appStore = useAppStore()
 </script>
 
 <template>
-  <ADrawer
+  <a-drawer
     :open="appStore.themeDrawerVisible"
     title="主题配置"
     :closable="false"
@@ -38,5 +38,5 @@ const appStore = useAppStore()
     <template #footer>
       <ConfigOperation />
     </template>
-  </ADrawer>
+  </a-drawer>
 </template>

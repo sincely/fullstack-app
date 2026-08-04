@@ -60,14 +60,14 @@ function handleChangeMode(mode) {
       :class="[mode === key ? 'border-primary' : 'border-transparent']"
       @click="handleChangeMode(key)"
     >
-      <ATooltip :placement="item.placement" :title="themeLayoutModeRecord[key]">
+      <a-tooltip :placement="item.placement" :title="themeLayoutModeRecord[key]">
         <div
           class="h-64px w-96px gap-6px rd-4px p-6px shadow dark:shadow-coolGray-5"
           :class="[key.includes('vertical') ? 'flex' : 'flex-col']"
         >
           <slot :name="key"></slot>
         </div>
-      </ATooltip>
+      </a-tooltip>
     </div>
   </div>
 </template>

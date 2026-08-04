@@ -42,18 +42,18 @@ const showSiderInverted = computed(() => !themeStore.darkMode && themeStore.layo
 </script>
 
 <template>
-  <ADivider>主题模式</ADivider>
+  <a-divider>主题模式</a-divider>
   <div class="flex-col-stretch gap-16px">
     <div class="i-flex-center">
-      <ASegmented :value="themeStore.themeScheme" :options="options" class="bg-layout" @change="handleSegmentChange">
+      <a-segmented :value="themeStore.themeScheme" :options="options" class="bg-layout" @change="handleSegmentChange">
         <template #label="{ payload }">
           <ButtonIcon :icon="payload.icon" class="h-28px text-icon-small" />
         </template>
-      </ASegmented>
+      </a-segmented>
     </div>
     <Transition name="sider-inverted">
       <SettingItem v-if="showSiderInverted" label="深色侧边栏">
-        <ASwitch v-model:checked="themeStore.sider.inverted" />
+        <a-switch v-model:checked="themeStore.sider.inverted" />
       </SettingItem>
     </Transition>
   </div>

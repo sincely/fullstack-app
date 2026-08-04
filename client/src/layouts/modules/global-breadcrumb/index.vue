@@ -38,17 +38,17 @@ function handleClickMenu(key) {
   </DefineBreadcrumbContent>
   <!-- define component end: BreadcrumbContent -->
 
-  <ABreadcrumb v-if="themeStore.header.breadcrumb.visible" v-bind="attrs">
-    <ABreadcrumbItem v-for="item in routeStore.breadcrumbs" :key="item.key">
+  <a-breadcrumb v-if="themeStore.header.breadcrumb.visible" v-bind="attrs">
+    <a-breadcrumb-item v-for="item in routeStore.breadcrumbs" :key="item.key">
       <BreadcrumbContent :breadcrumb="item" />
 
       <template v-if="item.children?.length" #overlay>
-        <AMenu>
-          <AMenuItem v-for="option in item.children" :key="option.key" @click="handleClickMenu(option.routeKey)">
+        <a-menu>
+          <a-menu-item v-for="option in item.children" :key="option.key" @click="handleClickMenu(option.routeKey)">
             <BreadcrumbContent :breadcrumb="option" />
-          </AMenuItem>
-        </AMenu>
+          </a-menu-item>
+        </a-menu>
       </template>
-    </ABreadcrumbItem>
-  </ABreadcrumb>
+    </a-breadcrumb-item>
+  </a-breadcrumb>
 </template>

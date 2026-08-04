@@ -85,53 +85,53 @@ watch(visible, (val) => {
 </script>
 
 <template>
-  <AModal v-model:open="visible" title="登录日志详情" width="600px" :footer="null">
-    <ASpin :spinning="loading">
-      <ADescriptions :column="2" bordered size="small">
-        <ADescriptionsItem :label="'日志ID'">
+  <a-modal v-model:open="visible" title="登录日志详情" width="600px" :footer="null">
+    <a-spin :spinning="loading">
+      <a-descriptions :column="2" bordered size="small">
+        <a-descriptions-item :label="'日志ID'">
           {{ detail.id }}
-        </ADescriptionsItem>
-        <ADescriptionsItem :label="'用户ID'">
+        </a-descriptions-item>
+        <a-descriptions-item :label="'用户ID'">
           {{ detail.userId }}
-        </ADescriptionsItem>
-        <ADescriptionsItem :label="'用户名'">
+        </a-descriptions-item>
+        <a-descriptions-item :label="'用户名'">
           {{ detail.username }}
-        </ADescriptionsItem>
-        <ADescriptionsItem :label="'登录方式'">
+        </a-descriptions-item>
+        <a-descriptions-item :label="'登录方式'">
           {{ loginTypeMap[detail.loginType] || detail.loginType }}
-        </ADescriptionsItem>
-        <ADescriptionsItem :label="'IP地址'">
+        </a-descriptions-item>
+        <a-descriptions-item :label="'IP地址'">
           {{ detail.ipAddress }}
-        </ADescriptionsItem>
-        <ADescriptionsItem :label="'登录地点'">
+        </a-descriptions-item>
+        <a-descriptions-item :label="'登录地点'">
           {{ detail.location }}
-        </ADescriptionsItem>
-        <ADescriptionsItem :label="'浏览器'">
+        </a-descriptions-item>
+        <a-descriptions-item :label="'浏览器'">
           {{ detail.browser }}
-        </ADescriptionsItem>
-        <ADescriptionsItem :label="'操作系统'">
+        </a-descriptions-item>
+        <a-descriptions-item :label="'操作系统'">
           {{ detail.os }}
-        </ADescriptionsItem>
-        <ADescriptionsItem :label="'登录状态'">
+        </a-descriptions-item>
+        <a-descriptions-item :label="'登录状态'">
           <template v-if="detail.status !== null">
-            <ATag :color="statusRecord[detail.status]?.color">
+            <a-tag :color="statusRecord[detail.status]?.color">
               {{ statusRecord[detail.status]?.text }}
-            </ATag>
+            </a-tag>
           </template>
-        </ADescriptionsItem>
-        <ADescriptionsItem :label="'提示信息'">
+        </a-descriptions-item>
+        <a-descriptions-item :label="'提示信息'">
           {{ detail.message }}
-        </ADescriptionsItem>
-        <ADescriptionsItem :label="'Session ID'" :span="2">
+        </a-descriptions-item>
+        <a-descriptions-item :label="'Session ID'" :span="2">
           {{ detail.sessionId }}
-        </ADescriptionsItem>
-        <ADescriptionsItem :label="'User Agent'" :span="2">
+        </a-descriptions-item>
+        <a-descriptions-item :label="'User Agent'" :span="2">
           <div class="break-all text-12px">{{ detail.userAgent }}</div>
-        </ADescriptionsItem>
-        <ADescriptionsItem :label="'登录时间'" :span="2">
+        </a-descriptions-item>
+        <a-descriptions-item :label="'登录时间'" :span="2">
           {{ detail.createTime }}
-        </ADescriptionsItem>
-      </ADescriptions>
-    </ASpin>
-  </AModal>
+        </a-descriptions-item>
+      </a-descriptions>
+    </a-spin>
+  </a-modal>
 </template>

@@ -35,20 +35,20 @@ const newses = computed(() => [
 </script>
 
 <template>
-  <ACard :title="'项目动态'" :bordered="false" size="small" class="card-wrapper">
+  <a-card :title="'项目动态'" :bordered="false" size="small" class="card-wrapper">
     <template #extra>
       <a class="text-primary" href="javascript:;">{{ '更多动态' }}</a>
     </template>
-    <AList :data-source="newses">
+    <a-list :data-source="newses">
       <template #renderItem="{ item }">
-        <AListItem>
-          <AListItemMeta :title="item.content" :description="item.time">
+        <a-list-item>
+          <a-list-item-meta :title="item.content" :description="item.time">
             <template #avatar>
               <SoybeanAvatar class="size-48px!" />
             </template>
-          </AListItemMeta>
-        </AListItem>
+          </a-list-item-meta>
+        </a-list-item>
       </template>
-    </AList>
-  </ACard>
+    </a-list>
+  </a-card>
 </template>

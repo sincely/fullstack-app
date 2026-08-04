@@ -84,61 +84,61 @@ watch(visible, (val) => {
 </script>
 
 <template>
-  <AModal v-model:open="visible" title="操作日志详情" width="700px" :footer="null">
-    <ASpin :spinning="loading">
-      <ADescriptions :column="2" bordered size="small">
-        <ADescriptionsItem :label="'日志ID'">
+  <a-modal v-model:open="visible" title="操作日志详情" width="700px" :footer="null">
+    <a-spin :spinning="loading">
+      <a-descriptions :column="2" bordered size="small">
+        <a-descriptions-item :label="'日志ID'">
           {{ detail.id }}
-        </ADescriptionsItem>
-        <ADescriptionsItem :label="'操作用户'">
+        </a-descriptions-item>
+        <a-descriptions-item :label="'操作用户'">
           {{ detail.username }}
-        </ADescriptionsItem>
-        <ADescriptionsItem :label="'操作类型'">
+        </a-descriptions-item>
+        <a-descriptions-item :label="'操作类型'">
           {{ detail.action }}
-        </ADescriptionsItem>
-        <ADescriptionsItem :label="'系统模块'">
+        </a-descriptions-item>
+        <a-descriptions-item :label="'系统模块'">
           {{ detail.module }}
-        </ADescriptionsItem>
-        <ADescriptionsItem :label="'请求方法'">
+        </a-descriptions-item>
+        <a-descriptions-item :label="'请求方法'">
           {{ detail.method }}
-        </ADescriptionsItem>
-        <ADescriptionsItem :label="'请求URL'">
+        </a-descriptions-item>
+        <a-descriptions-item :label="'请求URL'">
           {{ detail.requestUrl }}
-        </ADescriptionsItem>
-        <ADescriptionsItem :label="'IP地址'">
+        </a-descriptions-item>
+        <a-descriptions-item :label="'IP地址'">
           {{ detail.ipAddress }}
-        </ADescriptionsItem>
-        <ADescriptionsItem :label="'执行时间'">
+        </a-descriptions-item>
+        <a-descriptions-item :label="'执行时间'">
           <template v-if="detail.executeTime !== null">
             {{ detail.executeTime }}ms
           </template>
-        </ADescriptionsItem>
-        <ADescriptionsItem :label="'状态'">
+        </a-descriptions-item>
+        <a-descriptions-item :label="'状态'">
           <template v-if="detail.status !== null">
-            <ATag :color="statusRecord[detail.status]?.color">
+            <a-tag :color="statusRecord[detail.status]?.color">
               {{ statusRecord[detail.status]?.text }}
-            </ATag>
+            </a-tag>
           </template>
-        </ADescriptionsItem>
-        <ADescriptionsItem :label="'操作时间'">
+        </a-descriptions-item>
+        <a-descriptions-item :label="'操作时间'">
           {{ detail.createTime }}
-        </ADescriptionsItem>
-        <ADescriptionsItem :label="'返回参数'" :span="2">
+        </a-descriptions-item>
+        <a-descriptions-item :label="'返回参数'" :span="2">
           <div v-if="detail.responseBody" class="max-h-200px overflow-auto">
             <pre class="m-0 text-12px whitespace-pre-wrap break-all">{{ JSON.stringify(detail.responseBody, null, 2) }}</pre>
           </div>
           <span v-else class="text-gray-400">无</span>
-        </ADescriptionsItem>
-        <ADescriptionsItem :label="'请求参数'" :span="2">
+        </a-descriptions-item>
+        <a-descriptions-item :label="'请求参数'" :span="2">
           <div v-if="detail.requestParams" class="max-h-200px overflow-auto">
             <pre class="m-0 text-12px whitespace-pre-wrap break-all">{{ JSON.stringify(detail.requestParams, null, 2) }}</pre>
           </div>
           <span v-else class="text-gray-400">无</span>
-        </ADescriptionsItem>
-        <ADescriptionsItem :label="'User Agent'" :span="2">
+        </a-descriptions-item>
+        <a-descriptions-item :label="'User Agent'" :span="2">
           <div class="break-all text-12px">{{ detail.userAgent }}</div>
-        </ADescriptionsItem>
-      </ADescriptions>
-    </ASpin>
-  </AModal>
+        </a-descriptions-item>
+      </a-descriptions>
+    </a-spin>
+  </a-modal>
 </template>

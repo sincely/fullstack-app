@@ -45,17 +45,17 @@ async function handleToggleAccount(account) {
 </script>
 
 <template>
-  <ASpace direction="vertical" :size="16">
-    <ACard :title="'切换权限'" :bordered="false" size="small" class="card-wrapper">
-      <ADescriptions layout="vertical" bordered size="small" :column="1">
-        <ADescriptionsItem :label="'用户角色'">
-          <ASpace>
-            <ATag v-for="role in authStore.userInfo.roles" :key="role">{{ role }}</ATag>
-          </ASpace>
-        </ADescriptionsItem>
-        <ADescriptionsItem ions-item :label="'切换账号'">
-          <ASpace>
-            <AButton
+  <a-space direction="vertical" :size="16">
+    <a-card :title="'切换权限'" :bordered="false" size="small" class="card-wrapper">
+      <a-descriptions layout="vertical" bordered size="small" :column="1">
+        <a-descriptions-item :label="'用户角色'">
+          <a-space>
+            <a-tag v-for="role in authStore.userInfo.roles" :key="role">{{ role }}</a-tag>
+          </a-space>
+        </a-descriptions-item>
+        <a-descriptions-item ions-item :label="'切换账号'">
+          <a-space>
+            <a-button
               v-for="account in accounts"
               :key="account.key"
               :loading="loading && loginAccount === account.key"
@@ -63,19 +63,19 @@ async function handleToggleAccount(account) {
               @click="handleToggleAccount(account)"
             >
               {{ account.label }}
-            </AButton>
-          </ASpace>
-        </ADescriptionsItem>
-      </ADescriptions>
-    </ACard>
-    <ACard :title="'权限钩子函数 `hasAuth`'" :bordered="false" size="small" class="card-wrapper">
-      <ASpace>
-        <AButton v-if="hasAuth('B_CODE1')">{{ '超级管理员可见' }}</AButton>
-        <AButton v-if="hasAuth('B_CODE2')">{{ '管理员可见' }}</AButton>
-        <AButton v-if="hasAuth('B_CODE3')">
+            </a-button>
+          </a-space>
+        </a-descriptions-item>
+      </a-descriptions>
+    </a-card>
+    <a-card :title="'权限钩子函数 `hasAuth`'" :bordered="false" size="small" class="card-wrapper">
+      <a-space>
+        <a-button v-if="hasAuth('B_CODE1')">{{ '超级管理员可见' }}</a-button>
+        <a-button v-if="hasAuth('B_CODE2')">{{ '管理员可见' }}</a-button>
+        <a-button v-if="hasAuth('B_CODE3')">
           {{ '管理员和用户可见' }}
-        </AButton>
-      </ASpace>
-    </ACard>
-  </ASpace>
+        </a-button>
+      </a-space>
+    </a-card>
+  </a-space>
 </template>

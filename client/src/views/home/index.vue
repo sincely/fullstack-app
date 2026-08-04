@@ -8,24 +8,24 @@ import ProjectNews from './modules/project-news.vue'
 </script>
 
 <template>
-  <ASpace direction="vertical" :size="16">
+  <a-space direction="vertical" :size="16">
     <HeaderBanner />
     <CardData />
-    <ARow :gutter="[16, 16]">
-      <ACol :span="24" :lg="14">
+    <a-row :gutter="[16, 16]">
+      <a-col :span="24" :lg="14">
         <LineChart />
-      </ACol>
-      <ACol :span="24" :lg="10">
+      </a-col>
+      <a-col :span="24" :lg="10">
         <PieChart />
-      </ACol>
-    </ARow>
-    <ARow :gutter="[16, 16]">
-      <ACol :span="24" :lg="14">
+      </a-col>
+    </a-row>
+    <a-row :gutter="[16, 16]">
+      <a-col :span="24" :lg="14">
         <ProjectNews />
-      </ACol>
-      <ACol :span="24" :lg="10">
+      </a-col>
+      <a-col :span="24" :lg="10">
         <CreativityBanner />
-      </ACol>
-    </ARow>
-  </ASpace>
+      </a-col>
+    </a-row>
+  </a-space>
 </template>

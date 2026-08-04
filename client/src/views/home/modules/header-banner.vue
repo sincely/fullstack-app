@@ -29,9 +29,9 @@ const statisticData = computed(() => [
 </script>
 
 <template>
-  <ACard :bordered="false" class="card-wrapper">
-    <ARow :gutter="[16, 16]">
-      <ACol :span="24" :md="18">
+  <a-card :bordered="false" class="card-wrapper">
+    <a-row :gutter="[16, 16]">
+      <a-col :span="24" :md="18">
         <div class="flex-y-center">
           <div class="size-72px shrink-0 overflow-hidden rd-1/2">
             <img src="@/assets/imgs/soybean.jpg" class="size-full" />
@@ -45,12 +45,12 @@ const statisticData = computed(() => [
             </p>
           </div>
         </div>
-      </ACol>
-      <ACol :span="24" :md="6">
-        <ASpace class="w-full justify-end" :size="24">
-          <AStatistic v-for="item in statisticData" :key="item.id" class="whitespace-nowrap" v-bind="item" />
-        </ASpace>
-      </ACol>
-    </ARow>
-  </ACard>
+      </a-col>
+      <a-col :span="24" :md="6">
+        <a-space class="w-full justify-end" :size="24">
+          <a-statistic v-for="item in statisticData" :key="item.id" class="whitespace-nowrap" v-bind="item" />
+        </a-space>
+      </a-col>
+    </a-row>
+  </a-card>
 </template>

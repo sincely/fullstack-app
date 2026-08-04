@@ -192,7 +192,7 @@ function edit(id) {
 <template>
   <div class="min-h-500px flex-col-stretch gap-16px overflow-hidden lt-sm:overflow-auto">
     <UserSearch v-model:model="searchParams" @reset="resetSearchParams" @search="getDataByPage" />
-    <ACard
+    <a-card
       :title="'用户列表'"
       :bordered="false"
       :body-style="{ flex: 1, overflow: 'hidden' }"
@@ -208,7 +208,7 @@ function edit(id) {
           @refresh="getData"
         />
       </template>
-      <ATable
+      <a-table
         ref="tableWrapperRef"
         :columns="columns"
         :data-source="data"
@@ -227,6 +227,6 @@ function edit(id) {
         :row-data="editingData"
         @submitted="getDataByPage"
       />
-    </ACard>
+    </a-card>
   </div>
 </template>

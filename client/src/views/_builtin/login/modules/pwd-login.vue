@@ -36,30 +36,30 @@ async function handleSubmit() {
 </script>
 
 <template>
-  <AForm ref="formRef" :model="model" :rules="rules">
-    <AFormItem name="userName">
-      <AInput v-model:value="model.userName" size="large" :placeholder="'请输入用户名'" />
-    </AFormItem>
-    <AFormItem name="password">
-      <AInputPassword v-model:value="model.password" size="large" :placeholder="'请输入密码'" />
-    </AFormItem>
-    <ASpace direction="vertical" size="large" class="w-full">
+  <a-form ref="formRef" :model="model" :rules="rules">
+    <a-form-item name="userName">
+      <a-input v-model:value="model.userName" size="large" :placeholder="'请输入用户名'" />
+    </a-form-item>
+    <a-form-item name="password">
+      <a-input-password v-model:value="model.password" size="large" :placeholder="'请输入密码'" />
+    </a-form-item>
+    <a-space direction="vertical" size="large" class="w-full">
       <div class="flex-y-center justify-between">
-        <ACheckbox>{{ '记住我' }}</ACheckbox>
-        <AButton type="text" @click="toggleLoginModule('reset-pwd')">忘记密码？</AButton>
+        <a-checkbox>{{ '记住我' }}</a-checkbox>
+        <a-button type="text" @click="toggleLoginModule('reset-pwd')">忘记密码？</a-button>
       </div>
-      <AButton type="primary" block size="large" shape="round" :loading="authStore.loginLoading" @click="handleSubmit">
+      <a-button type="primary" block size="large" shape="round" :loading="authStore.loginLoading" @click="handleSubmit">
         确认
-      </AButton>
+      </a-button>
       <div class="flex-y-center justify-between">
-        <AButton class="h-34px flex-1" block @click="toggleLoginModule('code-login')">
+        <a-button class="h-34px flex-1" block @click="toggleLoginModule('code-login')">
           {{ loginModuleRecord['code-login'] }}
-        </AButton>
+        </a-button>
         <div class="w-12px"></div>
-        <AButton class="h-34px flex-1" block @click="toggleLoginModule('register')">
+        <a-button class="h-34px flex-1" block @click="toggleLoginModule('register')">
           {{ loginModuleRecord.register }}
-        </AButton>
+        </a-button>
       </div>
-    </ASpace>
-  </AForm>
+    </a-space>
+  </a-form>
 </template>

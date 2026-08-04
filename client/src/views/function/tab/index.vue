@@ -19,37 +19,37 @@ function resetTabLabel() {
 </script>
 
 <template>
-  <ASpace direction="vertical" :size="16">
-    <ACard :title="'标签页操作'" :bordered="false" size="small" class="card-wrapper">
-      <ADivider orientation="left">{{ '添加标签页' }}</ADivider>
-      <AButton @click="routerPushByKey('about')">{{ '跳转到关于页面' }}</AButton>
+  <a-space direction="vertical" :size="16">
+    <a-card :title="'标签页操作'" :bordered="false" size="small" class="card-wrapper">
+      <a-divider orientation="left">{{ '添加标签页' }}</a-divider>
+      <a-button @click="routerPushByKey('about')">{{ '跳转到关于页面' }}</a-button>
 
-      <ADivider orientation="left">{{ '关闭标签页' }}</ADivider>
-      <ASpace :size="16">
-        <AButton @click="tabStore.removeActiveTab">
+      <a-divider orientation="left">{{ '关闭标签页' }}</a-divider>
+      <a-space :size="16">
+        <a-button @click="tabStore.removeActiveTab">
           {{ '关闭当前标签页' }}
-        </AButton>
-        <AButton @click="tabStore.removeTabByRouteName('about')">
+        </a-button>
+        <a-button @click="tabStore.removeTabByRouteName('about')">
           {{ '关闭"关于"标签页' }}
-        </AButton>
-      </ASpace>
+        </a-button>
+      </a-space>
 
-      <ADivider orientation="left">{{ '添加多标签页' }}</ADivider>
-      <ASpace :size="16" wrap class="m-0!">
-        <AButton @click="routerPushByKey('function_multi-tab')">
+      <a-divider orientation="left">{{ '添加多标签页' }}</a-divider>
+      <a-space :size="16" wrap class="m-0!">
+        <a-button @click="routerPushByKey('function_multi-tab')">
           {{ '跳转到多标签页页面' }}
-        </AButton>
-        <AButton @click="routerPushByKey('function_multi-tab', { query: { a: '1' } })">
+        </a-button>
+        <a-button @click="routerPushByKey('function_multi-tab', { query: { a: '1' } })">
           {{ '跳转到多标签页页面(带有查询参数)' }}
-        </AButton>
-      </ASpace>
-    </ACard>
-    <ACard :title="'标签页标题'" :bordered="false" size="small" class="card-wrapper">
-      <ADivider orientation="left">{{ '修改标题' }}</ADivider>
-      <AInputSearch v-model:value="tabLabel" :enter-button="'修改'" class="max-w-240px" @search="changeTabLabel" />
+        </a-button>
+      </a-space>
+    </a-card>
+    <a-card :title="'标签页标题'" :bordered="false" size="small" class="card-wrapper">
+      <a-divider orientation="left">{{ '修改标题' }}</a-divider>
+      <a-input-search v-model:value="tabLabel" :enter-button="'修改'" class="max-w-240px" @search="changeTabLabel" />
 
-      <ADivider orientation="left">{{ '重置标题' }}</ADivider>
-      <AButton @click="resetTabLabel">{{ '重置' }}</AButton>
-    </ACard>
-  </ASpace>
+      <a-divider orientation="left">{{ '重置标题' }}</a-divider>
+      <a-button @click="resetTabLabel">{{ '重置' }}</a-button>
+    </a-card>
+  </a-space>
 </template>

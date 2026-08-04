@@ -5,7 +5,7 @@ defineOptions({
 </script>
 
 <template>
-  <ACard
+  <a-card
     :title="'创意'"
     :bordered="false"
     size="small"
@@ -15,5 +15,5 @@ defineOptions({
     <div class="h-full flex-center">
       <icon-local-banner class="text-400px text-primary sm:text-320px" />
     </div>
-  </ACard>
+  </a-card>
 </template>

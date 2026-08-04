@@ -165,8 +165,8 @@ watch(visible, () => {
 </script>
 
 <template>
-  <AModal v-model:open="visible" :title="title" width="800px">
-    <AForm
+  <a-modal v-model:open="visible" :title="title" width="800px">
+    <a-form
       ref="formRef"
       :model="model"
       :rules="rules"
@@ -174,73 +174,73 @@ watch(visible, () => {
       label-wrap
       class="pr-20px"
     >
-      <ARow>
-        <ACol :lg="12" :xs="24">
-          <AFormItem :label="'用户名'" name="userName">
-            <AInput v-model:value="model.userName" :placeholder="'请输入用户名'" :disabled="props.operateType === 'edit'" />
-          </AFormItem>
-        </ACol>
-        <ACol :lg="12" :xs="24">
-          <AFormItem :label="props.operateType === 'add' ? '密码' : '新密码'" name="password">
-            <AInputPassword
+      <a-row>
+        <a-col :lg="12" :xs="24">
+          <a-form-item :label="'用户名'" name="userName">
+            <a-input v-model:value="model.userName" :placeholder="'请输入用户名'" :disabled="props.operateType === 'edit'" />
+          </a-form-item>
+        </a-col>
+        <a-col :lg="12" :xs="24">
+          <a-form-item :label="props.operateType === 'add' ? '密码' : '新密码'" name="password">
+            <a-input-password
               v-model:value="model.password"
               :placeholder="props.operateType === 'add' ? '请输入密码' : '不修改可留空'"
             />
-          </AFormItem>
-        </ACol>
-        <ACol :lg="12" :xs="24">
-          <AFormItem :label="'性别'" name="userGender">
-            <ARadioGroup v-model:value="model.userGender">
-              <ARadio v-for="item in userGenderOptions" :key="item.value" :value="item.value">
+          </a-form-item>
+        </a-col>
+        <a-col :lg="12" :xs="24">
+          <a-form-item :label="'性别'" name="userGender">
+            <a-radio-group v-model:value="model.userGender">
+              <a-radio v-for="item in userGenderOptions" :key="item.value" :value="item.value">
                 {{ item.label }}
-              </ARadio>
-            </ARadioGroup>
-          </AFormItem>
-        </ACol>
-        <ACol :lg="12" :xs="24">
-          <AFormItem :label="'昵称'" name="nickName">
-            <AInput v-model:value="model.nickName" :placeholder="'请输入昵称'" />
-          </AFormItem>
-        </ACol>
-        <ACol :lg="12" :xs="24">
-          <AFormItem :label="'手机号'" name="userPhone">
-            <AInput v-model:value="model.userPhone" :placeholder="'请输入手机号'" />
-          </AFormItem>
-        </ACol>
-        <ACol :lg="12" :xs="24">
-          <AFormItem :label="'邮箱'" name="userEmail">
-            <AInput v-model:value="model.userEmail" :placeholder="'请输入邮箱'" />
-          </AFormItem>
-        </ACol>
-        <ACol :lg="12" :xs="24">
-          <AFormItem :label="'用户状态'" name="status">
-            <ARadioGroup v-model:value="model.status">
-              <ARadio v-for="item in enableStatusOptions" :key="item.value" :value="item.value">
+              </a-radio>
+            </a-radio-group>
+          </a-form-item>
+        </a-col>
+        <a-col :lg="12" :xs="24">
+          <a-form-item :label="'昵称'" name="nickName">
+            <a-input v-model:value="model.nickName" :placeholder="'请输入昵称'" />
+          </a-form-item>
+        </a-col>
+        <a-col :lg="12" :xs="24">
+          <a-form-item :label="'手机号'" name="userPhone">
+            <a-input v-model:value="model.userPhone" :placeholder="'请输入手机号'" />
+          </a-form-item>
+        </a-col>
+        <a-col :lg="12" :xs="24">
+          <a-form-item :label="'邮箱'" name="userEmail">
+            <a-input v-model:value="model.userEmail" :placeholder="'请输入邮箱'" />
+          </a-form-item>
+        </a-col>
+        <a-col :lg="12" :xs="24">
+          <a-form-item :label="'用户状态'" name="status">
+            <a-radio-group v-model:value="model.status">
+              <a-radio v-for="item in enableStatusOptions" :key="item.value" :value="item.value">
                 {{ item.label }}
-              </ARadio>
-            </ARadioGroup>
-          </AFormItem>
-        </ACol>
-        <ACol :lg="12" :xs="24">
-          <AFormItem :label="'用户角色'" name="roleIds">
-            <ASelect
+              </a-radio>
+            </a-radio-group>
+          </a-form-item>
+        </a-col>
+        <a-col :lg="12" :xs="24">
+          <a-form-item :label="'用户角色'" name="roleIds">
+            <a-select
               v-model:value="model.roleIds"
               :options="roleOptions"
               :placeholder="'请选择用户角色'"
               mode="multiple"
               :max-tag-count="3"
             />
-          </AFormItem>
-        </ACol>
-      </ARow>
-    </AForm>
+          </a-form-item>
+        </a-col>
+      </a-row>
+    </a-form>
     <template #footer>
-      <ASpace :size="16">
-        <AButton @click="closeModal">{{ '取消' }}</AButton>
-        <AButton type="primary" @click="handleSubmit">{{ '确认' }}</AButton>
-      </ASpace>
+      <a-space :size="16">
+        <a-button @click="closeModal">{{ '取消' }}</a-button>
+        <a-button type="primary" @click="handleSubmit">{{ '确认' }}</a-button>
+      </a-space>
     </template>
-  </AModal>
+  </a-modal>
 </template>
 
 <style scoped></style>

@@ -84,7 +84,7 @@ function handleClickMenu(menuInfo) {
 
 <template>
   <SimpleScrollbar class="menu-wrapper" :class="{ 'select-menu': !darkTheme }">
-    <AMenu
+    <a-menu
       :mode="mode"
       :theme="menuTheme"
       :items="menus"

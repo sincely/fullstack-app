@@ -251,10 +251,10 @@ watch(
 </script>
 
 <template>
-  <AModal v-model:open="visible" :title="title" width="800px">
+  <a-modal v-model:open="visible" :title="title" width="800px">
     <div class="h-480px">
       <SimpleScrollbar>
-        <AForm
+        <a-form
           ref="formRef"
           :model="model"
           :rules="rules"
@@ -262,193 +262,193 @@ watch(
           label-wrap
           class="pr-20px"
         >
-          <ARow>
+          <a-row>
             <!-- 菜单类型 -->
-            <ACol :lg="12" :xs="24">
-              <AFormItem :label="'菜单类型'" name="menuType">
-                <ARadioGroup
+            <a-col :lg="12" :xs="24">
+              <a-form-item :label="'菜单类型'" name="menuType">
+                <a-radio-group
                   v-model:value="model.menuType"
                   :disabled="disabledMenuType"
                 >
-                  <ARadio v-for="item in menuTypeOptions" :key="item.value" :value="item.value">
+                  <a-radio v-for="item in menuTypeOptions" :key="item.value" :value="item.value">
                     {{ item.label }}
-                  </ARadio>
-                </ARadioGroup>
-              </AFormItem>
-            </ACol>
+                  </a-radio>
+                </a-radio-group>
+              </a-form-item>
+            </a-col>
 
             <!-- 名称：按钮名称 / 菜单名称 -->
-            <ACol :lg="12" :xs="24">
-              <AFormItem :label="isButton ? '权限名称' : '菜单名称'" name="menuName">
-                <AInput
+            <a-col :lg="12" :xs="24">
+              <a-form-item :label="isButton ? '权限名称' : '菜单名称'" name="menuName">
+                <a-input
                   v-model:value="model.menuName"
                   :placeholder="isButton ? '请输入权限名称，如新增' : '请输入菜单名称'"
                 />
-              </AFormItem>
-            </ACol>
+              </a-form-item>
+            </a-col>
 
             <!-- ====== 按钮类型字段 ====== -->
             <template v-if="isButton">
-              <ACol :lg="12" :xs="24">
-                <AFormItem :label="'权限标识'" name="routeName">
-                  <AInput v-model:value="model.routeName" :placeholder="'请输入权限标识，如 add'" />
-                </AFormItem>
-              </ACol>
+              <a-col :lg="12" :xs="24">
+                <a-form-item :label="'权限标识'" name="routeName">
+                  <a-input v-model:value="model.routeName" :placeholder="'请输入权限标识，如 add'" />
+                </a-form-item>
+              </a-col>
 
-              <ACol :lg="12" :xs="24">
-                <AFormItem :label="'排序'" name="order">
-                  <AInputNumber v-model:value="model.order" class="w-full" :placeholder="'请输入排序'" />
-                </AFormItem>
-              </ACol>
+              <a-col :lg="12" :xs="24">
+                <a-form-item :label="'排序'" name="order">
+                  <a-input-number v-model:value="model.order" class="w-full" :placeholder="'请输入排序'" />
+                </a-form-item>
+              </a-col>
 
-              <ACol :lg="12" :xs="24">
-                <AFormItem :label="'是否启用'" name="status">
-                  <ARadioGroup v-model:value="model.status">
-                    <ARadio
+              <a-col :lg="12" :xs="24">
+                <a-form-item :label="'是否启用'" name="status">
+                  <a-radio-group v-model:value="model.status">
+                    <a-radio
                       v-for="item in enableStatusOptions"
                       :key="item.value"
                       :value="item.value"
                     >
                       {{ item.label }}
-                    </ARadio>
-                  </ARadioGroup>
-                </AFormItem>
-              </ACol>
+                    </a-radio>
+                  </a-radio-group>
+                </a-form-item>
+              </a-col>
             </template>
 
             <!-- ====== 目录/菜单类型字段 ====== -->
             <template v-if="!isButton">
-              <ACol :lg="12" :xs="24">
-                <AFormItem :label="'路由名称'" name="routeName">
-                  <AInput v-model:value="model.routeName" :placeholder="'请输入路由名称'" />
-                </AFormItem>
-              </ACol>
-              <ACol :lg="12" :xs="24">
-                <AFormItem :label="'路由路径'" name="routePath">
-                  <AInput v-model:value="model.routePath" disabled :placeholder="'请输入路由路径'" />
-                </AFormItem>
-              </ACol>
-              <ACol :lg="12" :xs="24">
-                <AFormItem :label="'路径参数'" name="pathParam">
-                  <AInput v-model:value="model.pathParam" :placeholder="'请输入路径参数'" />
-                </AFormItem>
-              </ACol>
-              <ACol v-if="showLayout" :lg="12" :xs="24">
-                <AFormItem :label="'布局'" name="layout">
-                  <ASelect
+              <a-col :lg="12" :xs="24">
+                <a-form-item :label="'路由名称'" name="routeName">
+                  <a-input v-model:value="model.routeName" :placeholder="'请输入路由名称'" />
+                </a-form-item>
+              </a-col>
+              <a-col :lg="12" :xs="24">
+                <a-form-item :label="'路由路径'" name="routePath">
+                  <a-input v-model:value="model.routePath" disabled :placeholder="'请输入路由路径'" />
+                </a-form-item>
+              </a-col>
+              <a-col :lg="12" :xs="24">
+                <a-form-item :label="'路径参数'" name="pathParam">
+                  <a-input v-model:value="model.pathParam" :placeholder="'请输入路径参数'" />
+                </a-form-item>
+              </a-col>
+              <a-col v-if="showLayout" :lg="12" :xs="24">
+                <a-form-item :label="'布局'" name="layout">
+                  <a-select
                     v-model:value="model.layout"
                     :options="layoutOptions"
                     :placeholder="'请选择布局组件'"
                   />
-                </AFormItem>
-              </ACol>
-              <ACol v-if="showPage" :lg="12" :xs="24">
-                <AFormItem :label="'页面组件'" name="page">
-                  <ASelect
+                </a-form-item>
+              </a-col>
+              <a-col v-if="showPage" :lg="12" :xs="24">
+                <a-form-item :label="'页面组件'" name="page">
+                  <a-select
                     v-model:value="model.page"
                     :options="pageOptions"
                     :placeholder="'请选择页面组件'"
                   />
-                </AFormItem>
-              </ACol>
+                </a-form-item>
+              </a-col>
 
-              <ACol :lg="12" :xs="24">
-                <AFormItem :label="'排序'" name="order">
-                  <AInputNumber v-model:value="model.order" class="w-full" :placeholder="'请输入排序'" />
-                </AFormItem>
-              </ACol>
+              <a-col :lg="12" :xs="24">
+                <a-form-item :label="'排序'" name="order">
+                  <a-input-number v-model:value="model.order" class="w-full" :placeholder="'请输入排序'" />
+                </a-form-item>
+              </a-col>
 
-              <ACol :lg="12" :xs="24">
-                <AFormItem :label="'图标类型'" name="iconType">
-                  <ARadioGroup v-model:value="model.iconType">
-                    <ARadio
+              <a-col :lg="12" :xs="24">
+                <a-form-item :label="'图标类型'" name="iconType">
+                  <a-radio-group v-model:value="model.iconType">
+                    <a-radio
                       v-for="item in menuIconTypeOptions"
                       :key="item.value"
                       :value="item.value"
                     >
                       {{ item.label }}
-                    </ARadio>
-                  </ARadioGroup>
-                </AFormItem>
-              </ACol>
-              <ACol :lg="12" :xs="24">
-                <AFormItem :label="'图标'" name="icon">
+                    </a-radio>
+                  </a-radio-group>
+                </a-form-item>
+              </a-col>
+              <a-col :lg="12" :xs="24">
+                <a-form-item :label="'图标'" name="icon">
                   <template v-if="model.iconType === '1'">
-                    <AInput v-model:value="model.icon" :placeholder="'请输入图标'" class="flex-1">
+                    <a-input v-model:value="model.icon" :placeholder="'请输入图标'" class="flex-1">
                       <template #suffix>
                         <SvgIcon v-if="model.icon" :icon="model.icon" class="text-icon" />
                       </template>
-                    </AInput>
+                    </a-input>
                   </template>
                   <template v-if="model.iconType === '2'">
-                    <ASelect
+                    <a-select
                       v-model:value="model.icon"
                       :placeholder="'请选择本地图标'"
                       :options="localIconOptions"
                     />
                   </template>
-                </AFormItem>
-              </ACol>
-              <ACol :lg="12" :xs="24">
-                <AFormItem :label="'缓存路由'" name="keepAlive">
-                  <ARadioGroup v-model:value="model.keepAlive">
-                    <ARadio :value="true">{{ '是' }}</ARadio>
-                    <ARadio :value="false">{{ '否' }}</ARadio>
-                  </ARadioGroup>
-                </AFormItem>
-              </ACol>
-              <ACol :lg="12" :xs="24">
-                <AFormItem :label="'常量路由'" name="constant">
-                  <ARadioGroup v-model:value="model.constant">
-                    <ARadio :value="true">{{ '是' }}</ARadio>
-                    <ARadio :value="false">{{ '否' }}</ARadio>
-                  </ARadioGroup>
-                </AFormItem>
-              </ACol>
-              <ACol :lg="12" :xs="24">
-                <AFormItem :label="'外链'" name="href">
-                  <AInput v-model:value="model.href" :placeholder="'请输入外链'" />
-                </AFormItem>
-              </ACol>
-              <ACol :lg="12" :xs="24">
-                <AFormItem :label="'隐藏菜单'" name="hideInMenu">
-                  <ARadioGroup v-model:value="model.hideInMenu">
-                    <ARadio :value="true">{{ '是' }}</ARadio>
-                    <ARadio :value="false">{{ '否' }}</ARadio>
-                  </ARadioGroup>
-                </AFormItem>
-              </ACol>
-              <ACol v-if="model.hideInMenu" :lg="12" :xs="24">
-                <AFormItem :label="'高亮的菜单'" name="activeMenu">
-                  <ASelect
+                </a-form-item>
+              </a-col>
+              <a-col :lg="12" :xs="24">
+                <a-form-item :label="'缓存路由'" name="keepAlive">
+                  <a-radio-group v-model:value="model.keepAlive">
+                    <a-radio :value="true">{{ '是' }}</a-radio>
+                    <a-radio :value="false">{{ '否' }}</a-radio>
+                  </a-radio-group>
+                </a-form-item>
+              </a-col>
+              <a-col :lg="12" :xs="24">
+                <a-form-item :label="'常量路由'" name="constant">
+                  <a-radio-group v-model:value="model.constant">
+                    <a-radio :value="true">{{ '是' }}</a-radio>
+                    <a-radio :value="false">{{ '否' }}</a-radio>
+                  </a-radio-group>
+                </a-form-item>
+              </a-col>
+              <a-col :lg="12" :xs="24">
+                <a-form-item :label="'外链'" name="href">
+                  <a-input v-model:value="model.href" :placeholder="'请输入外链'" />
+                </a-form-item>
+              </a-col>
+              <a-col :lg="12" :xs="24">
+                <a-form-item :label="'隐藏菜单'" name="hideInMenu">
+                  <a-radio-group v-model:value="model.hideInMenu">
+                    <a-radio :value="true">{{ '是' }}</a-radio>
+                    <a-radio :value="false">{{ '否' }}</a-radio>
+                  </a-radio-group>
+                </a-form-item>
+              </a-col>
+              <a-col v-if="model.hideInMenu" :lg="12" :xs="24">
+                <a-form-item :label="'高亮的菜单'" name="activeMenu">
+                  <a-select
                     v-model:value="model.activeMenu"
                     :options="pageOptions"
                     clearable
                     :placeholder="'请输入高亮的菜单的路由名称'"
                   />
-                </AFormItem>
-              </ACol>
-              <ACol :lg="12" :xs="24">
-                <AFormItem :label="'支持多页签'" name="multiTab">
-                  <ARadioGroup v-model:value="model.multiTab">
-                    <ARadio :value="true" :label="'是'" />
-                    <ARadio :value="false" :label="'否'" />
-                  </ARadioGroup>
-                </AFormItem>
-              </ACol>
-              <ACol :lg="12" :xs="24">
-                <AFormItem :label="'固定在页签中的序号'" name="fixedIndexInTab">
-                  <AInputNumber
+                </a-form-item>
+              </a-col>
+              <a-col :lg="12" :xs="24">
+                <a-form-item :label="'支持多页签'" name="multiTab">
+                  <a-radio-group v-model:value="model.multiTab">
+                    <a-radio :value="true" :label="'是'" />
+                    <a-radio :value="false" :label="'否'" />
+                  </a-radio-group>
+                </a-form-item>
+              </a-col>
+              <a-col :lg="12" :xs="24">
+                <a-form-item :label="'固定在页签中的序号'" name="fixedIndexInTab">
+                  <a-input-number
                     v-model:value="model.fixedIndexInTab"
                     class="w-full"
                     clearable
                     :placeholder="'请输入固定在页签中的序号'"
                   />
-                </AFormItem>
-              </ACol>
-              <ACol :span="24">
-                <AFormItem :label-col="{ span: 4 }" :label="'路由参数'" name="query">
-                  <AButton
+                </a-form-item>
+              </a-col>
+              <a-col :span="24">
+                <a-form-item :label-col="{ span: 4 }" :label="'路由参数'" name="query">
+                  <a-button
                     v-if="model.query.length === 0"
                     type="dashed"
                     block
@@ -458,75 +458,75 @@ watch(
                       <icon-carbon-add class="align-sub text-icon" />
                     </template>
                     <span class="ml-8px">{{ '新增' }}</span>
-                  </AButton>
+                  </a-button>
                   <template v-else>
                     <div
                       v-for="(item, index) in model.query"
                       :key="index"
                       class="flex gap-3"
                     >
-                      <ACol :span="9">
-                        <AFormItem :name="['query', index, 'key']">
-                          <AInput
+                      <a-col :span="9">
+                        <a-form-item :name="['query', index, 'key']">
+                          <a-input
                             v-model:value="item.key"
                             :placeholder="'请输入路由参数键'"
                             class="flex-1"
                           />
-                        </AFormItem>
-                      </ACol>
-                      <ACol :span="9">
-                        <AFormItem :name="['query', index, 'value']">
-                          <AInput
+                        </a-form-item>
+                      </a-col>
+                      <a-col :span="9">
+                        <a-form-item :name="['query', index, 'value']">
+                          <a-input
                             v-model:value="item.value"
                             :placeholder="'请输入路由参数值'"
                             class="flex-1"
                           />
-                        </AFormItem>
-                      </ACol>
-                      <ACol :span="5">
-                        <ASpace class="ml-12px">
-                          <AButton size="middle" @click="addQuery(index)">
+                        </a-form-item>
+                      </a-col>
+                      <a-col :span="5">
+                        <a-space class="ml-12px">
+                          <a-button size="middle" @click="addQuery(index)">
                             <template #icon>
                               <icon-ic:round-plus class="align-sub text-icon" />
                             </template>
-                          </AButton>
-                          <AButton size="middle" @click="removeQuery(index)">
+                          </a-button>
+                          <a-button size="middle" @click="removeQuery(index)">
                             <template #icon>
                               <icon-ic-round-remove class="align-sub text-icon" />
                             </template>
-                          </AButton>
-                        </ASpace>
-                      </ACol>
+                          </a-button>
+                        </a-space>
+                      </a-col>
                     </div>
                   </template>
-                </AFormItem>
-              </ACol>
+                </a-form-item>
+              </a-col>
 
-              <ACol :lg="12" :xs="24">
-                <AFormItem :label="'状态'" name="status">
-                  <ARadioGroup v-model:value="model.status">
-                    <ARadio
+              <a-col :lg="12" :xs="24">
+                <a-form-item :label="'状态'" name="status">
+                  <a-radio-group v-model:value="model.status">
+                    <a-radio
                       v-for="item in enableStatusOptions"
                       :key="item.value"
                       :value="item.value"
                     >
                       {{ item.label }}
-                    </ARadio>
-                  </ARadioGroup>
-                </AFormItem>
-              </ACol>
+                    </a-radio>
+                  </a-radio-group>
+                </a-form-item>
+              </a-col>
             </template>
-          </ARow>
-        </AForm>
+          </a-row>
+        </a-form>
       </SimpleScrollbar>
     </div>
     <template #footer>
-      <ASpace justify="end" :size="16">
-        <AButton @click="closeModal">{{ '取消' }}</AButton>
-        <AButton type="primary" @click="handleSubmit">{{ '确认' }}</AButton>
-      </ASpace>
+      <a-space justify="end" :size="16">
+        <a-button @click="closeModal">{{ '取消' }}</a-button>
+        <a-button type="primary" @click="handleSubmit">{{ '确认' }}</a-button>
+      </a-space>
     </template>
-  </AModal>
+  </a-modal>
 </template>
 
 <style scoped></style>

@@ -180,7 +180,7 @@ async function handleDelete(id) {
 <template>
   <div class="min-h-500px flex-col-stretch gap-16px overflow-hidden lt-sm:overflow-auto">
     <LoginLogSearch v-model:model="searchParams" @reset="resetSearchParams" @search="getDataByPage" />
-    <ACard
+    <a-card
       title="登录日志"
       :bordered="false"
       :body-style="{ flex: 1, overflow: 'hidden' }"
@@ -188,17 +188,17 @@ async function handleDelete(id) {
     >
       <template #extra>
         <div class="flex gap-8px">
-          <APopconfirm title="确认批量删除选中的日志吗？" @confirm="handleBatchDelete">
-            <AButton :disabled="checkedRowKeys.length === 0" danger size="small">批量删除</AButton>
-          </APopconfirm>
-          <APopconfirm title="确认清空所有登录日志吗？此操作不可恢复！" @confirm="handleClearAll">
-            <AButton danger size="small">清空日志</AButton>
-          </APopconfirm>
-          <AButton size="small" @click="getData">刷新</AButton>
+          <a-popconfirm title="确认批量删除选中的日志吗？" @confirm="handleBatchDelete">
+            <a-button :disabled="checkedRowKeys.length === 0" danger size="small">批量删除</a-button>
+          </a-popconfirm>
+          <a-popconfirm title="确认清空所有登录日志吗？此操作不可恢复！" @confirm="handleClearAll">
+            <a-button danger size="small">清空日志</a-button>
+          </a-popconfirm>
+          <a-button size="small" @click="getData">刷新</a-button>
         </div>
       </template>
 
-      <ATable
+      <a-table
         ref="tableWrapperRef"
         :columns="columns"
         :data-source="data"
@@ -211,6 +211,6 @@ async function handleDelete(id) {
         class="h-full"
       />
       <LoginLogDetailModal v-model:visible="detailModalVisible" :log-id="currentLogId" />
-    </ACard>
+    </a-card>
   </div>
 </template>

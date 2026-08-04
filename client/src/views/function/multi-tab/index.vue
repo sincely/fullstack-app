@@ -14,7 +14,7 @@ const routeQuery = computed(() => JSON.stringify(route.query))
   <div>
     <LookForward>
       <div>
-        <AButton @click="routerPushByKey('function_tab')">{{ '返回标签页功能页' }}</AButton>
+        <a-button @click="routerPushByKey('function_tab')">{{ '返回标签页功能页' }}</a-button>
         <div class="py-24px">{{ '路由参数' }}: {{ routeQuery }}</div>
       </div>
     </LookForward>

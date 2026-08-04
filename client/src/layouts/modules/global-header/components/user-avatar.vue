@@ -36,28 +36,28 @@ async function logout() {
 </script>
 
 <template>
-  <AButton v-if="!authStore.isLogin" @click="loginOrRegister">登录 / 注册</AButton>
-  <ADropdown v-else placement="bottomRight" trigger="click">
+  <a-button v-if="!authStore.isLogin" @click="loginOrRegister">登录 / 注册</a-button>
+  <a-dropdown v-else placement="bottomRight" trigger="click">
     <ButtonIcon>
       <SvgIcon icon="ph:user-circle" class="text-icon-large" />
       <span class="text-16px font-medium">{{ authStore.userInfo.userName }}</span>
     </ButtonIcon>
     <template #overlay>
-      <AMenu>
-        <AMenuItem @click="routerPushByKey('user-center')">
+      <a-menu>
+        <a-menu-item @click="routerPushByKey('user-center')">
           <div class="flex-center gap-8px">
             <SvgIcon icon="ph:user-circle" class="text-icon" />
             个人中心
           </div>
-        </AMenuItem>
-        <AMenuDivider />
-        <AMenuItem @click="logout">
+        </a-menu-item>
+        <a-menu-divider />
+        <a-menu-item @click="logout">
           <div class="flex-center gap-8px">
             <SvgIcon icon="ph:sign-out" class="text-icon" />
             退出登录
           </div>
-        </AMenuItem>
-      </AMenu>
+        </a-menu-item>
+      </a-menu>
     </template>
-  </ADropdown>
+  </a-dropdown>
 </template>

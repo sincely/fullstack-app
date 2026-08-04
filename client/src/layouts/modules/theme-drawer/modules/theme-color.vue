@@ -25,11 +25,11 @@ function handleUpdateColor(color, key) {
 </script>
 
 <template>
-  <ADivider>主题颜色</ADivider>
+  <a-divider>主题颜色</a-divider>
   <div class="flex-col-stretch gap-12px">
     <SettingItem v-for="(_, key) in themeStore.themeColors" :key="key" :label="themeColorLabelRecord[key] || key">
       <template v-if="key === 'info'" #suffix>
-        <ACheckbox v-model:checked="themeStore.isInfoFollowPrimary">跟随主色</ACheckbox>
+        <a-checkbox v-model:checked="themeStore.isInfoFollowPrimary">跟随主色</a-checkbox>
       </template>
       <ColorPicker
         :color="themeStore.themeColors[key]"

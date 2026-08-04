@@ -159,7 +159,7 @@ function edit(id) {
 <template>
   <div class="min-h-500px flex-col-stretch gap-16px overflow-hidden lt-sm:overflow-auto">
     <RoleSearch v-model:model="searchParams" @reset="resetSearchParams" @search="getDataByPage" />
-    <ACard
+    <a-card
       :title="'角色列表'"
       :bordered="false"
       :body-style="{ flex: 1, overflow: 'hidden' }"
@@ -175,7 +175,7 @@ function edit(id) {
           @refresh="getData"
         />
       </template>
-      <ATable
+      <a-table
         ref="wrapperEl"
         :columns="columns"
         :data-source="data"
@@ -198,6 +198,6 @@ function edit(id) {
         :row-data="permissionTargetRole"
         @submitted="getData"
       />
-    </ACard>
+    </a-card>
   </div>
 </template>

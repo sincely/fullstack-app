@@ -91,11 +91,11 @@ const dropdownAction = {
 </script>
 
 <template>
-  <ADropdown :trigger="trigger" placement="bottom" destroy-popup-on-hide>
+  <a-dropdown :trigger="trigger" placement="bottom" destroy-popup-on-hide>
     <slot></slot>
     <template #overlay>
-      <AMenu>
-        <AMenuItem
+      <a-menu>
+        <a-menu-item
           v-for="option in options"
           :key="option.key"
           :disabled="option.disabled"
@@ -105,8 +105,8 @@ const dropdownAction = {
             <SvgIcon :icon="option.icon" class="text-icon" />
             <span>{{ option.label }}</span>
           </div>
-        </AMenuItem>
-      </AMenu>
+        </a-menu-item>
+      </a-menu>
     </template>
-  </ADropdown>
+  </a-dropdown>
 </template>
