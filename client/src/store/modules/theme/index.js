@@ -1,3 +1,4 @@
+import { getPaletteColorByNumber } from '@sa/color'
 import { useEventListener, usePreferredColorScheme } from '@vueuse/core'
 import { defineStore } from 'pinia'
 import { computed, effectScope, onScopeDispose, ref, toRefs, watch } from 'vue'
@@ -98,10 +99,17 @@ export const useThemeStore = defineStore(SetupStoreId.Theme, () => {
    * @param color 主题颜色值
    */
   function updateThemeColors(key, color) {
+    let colorValue = color
+
+    if (settings.value.recommendColor) {
+      // 根据提供的颜色和颜色名称获取配色方案，并选用合适的颜色
+      colorValue = getPaletteColorByNumber(color, 500, true)
+    }
+
     if (key === 'primary') {
-      settings.value.themeColor = color
+      settings.value.themeColor = colorValue
     } else {
-      settings.value.otherColor[key] = color
+      settings.value.otherColor[key] = colorValue
     }
   }
 

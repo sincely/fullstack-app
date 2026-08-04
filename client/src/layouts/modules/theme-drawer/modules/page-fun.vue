@@ -1,7 +1,12 @@
 <script setup>
 import { computed } from 'vue'
 
-import { themePageAnimationModeOptions, themeScrollModeOptions, themeTabModeOptions } from '@/constants/app'
+import {
+  resetCacheStrategyOptions,
+  themePageAnimationModeOptions,
+  themeScrollModeOptions,
+  themeTabModeOptions
+} from '@/constants/app'
 import { useThemeStore } from '@/store/modules/theme'
 
 import SettingItem from '../components/setting-item.vue'
@@ -22,6 +27,13 @@ const isWrapperScrollMode = computed(() => themeStore.layout.scrollMode === 'wra
 <template>
   <a-divider>页面功能</a-divider>
   <TransitionGroup tag="div" name="setting-list" class="flex-col-stretch gap-12px">
+    <SettingItem key="0" :label="'重置缓存策略'">
+      <a-select v-model:value="themeStore.resetCacheStrategy" class="w-120px">
+        <a-select-option v-for="option in resetCacheStrategyOptions" :key="option.value" :value="option.value">
+          {{ option.label }}
+        </a-select-option>
+      </a-select>
+    </SettingItem>
     <SettingItem key="1" :label="'滚动模式'">
       <a-select v-model:value="themeStore.layout.scrollMode" class="w-120px">
         <a-select-option v-for="option in themeScrollModeOptions" :key="option.value" :value="option.value">
@@ -93,6 +105,12 @@ const isWrapperScrollMode = computed(() => themeStore.layout.scrollMode === 'wra
     </SettingItem>
     <SettingItem v-if="themeStore.footer.visible && layoutMode === 'horizontal-mix'" key="7-3" :label="'底部局右'">
       <a-switch v-model:checked="themeStore.footer.right" />
+    </SettingItem>
+    <SettingItem key="8" :label="'显示全屏水印'">
+      <a-switch v-model:checked="themeStore.watermark.visible" />
+    </SettingItem>
+    <SettingItem v-if="themeStore.watermark.visible" key="8-1" :label="'水印文本'">
+      <a-input v-model:value="themeStore.watermark.text" placeholder="SoybeanAdmin" class="w-120px" />
     </SettingItem>
   </TransitionGroup>
 </template>

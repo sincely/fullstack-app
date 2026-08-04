@@ -1,6 +1,6 @@
 import { useBoolean } from '@sa/hooks'
 import { defineStore } from 'pinia'
-import { computed, ref, shallowRef } from 'vue'
+import { computed, nextTick, ref, shallowRef } from 'vue'
 
 import { SetupStoreId } from '@/enum'
 import { router } from '@/router'
@@ -9,7 +9,6 @@ import { createStaticRoutes, getAuthVueRoutes } from '@/router/routes'
 import { ROOT_ROUTE } from '@/router/routes/builtin'
 import { fetchGetConstantRoutes, fetchGetUserRoutes, fetchIsRouteExist } from '@/service/api'
 
-import { useAppStore } from '../app'
 import { useAuthStore } from '../auth'
 import { useTabStore } from '../tab'
 import {
@@ -25,7 +24,6 @@ import {
 } from './shared'
 
 export const useRouteStore = defineStore(SetupStoreId.Route, () => {
-  const appStore = useAppStore()
   const authStore = useAuthStore()
   const tabStore = useTabStore()
   const { bool: isInitConstantRoute, setBool: setIsInitConstantRoute } = useBoolean()
@@ -91,6 +89,13 @@ export const useRouteStore = defineStore(SetupStoreId.Route, () => {
   const cacheRoutes = ref([])
 
   /**
+   * 排除缓存的路由
+   *
+   * 用于重置路由缓存
+   */
+  const excludeCacheRoutes = ref([])
+
+  /**
    * 计算缓存路由
    *
    * @param routes Vue 路由
@@ -100,51 +105,19 @@ export const useRouteStore = defineStore(SetupStoreId.Route, () => {
   }
 
   /**
-   * 添加缓存路由
+   * 重置路由缓存
    *
+   * @default router.currentRoute.value.name 当前路由名称
    * @param routeKey
    */
-  function addCacheRoutes(routeKey) {
-    if (cacheRoutes.value.includes(routeKey)) return
+  async function resetRouteCache(routeKey) {
+    const routeName = routeKey || router.currentRoute.value.name
 
-    cacheRoutes.value.push(routeKey)
-  }
+    excludeCacheRoutes.value.push(routeName)
 
-  /**
-   * 移除缓存路由
-   *
-   * @param routeKey
-   */
-  function removeCacheRoutes(routeKey) {
-    const index = cacheRoutes.value.findIndex((item) => item === routeKey)
+    await nextTick()
 
-    if (index === -1) return
-
-    cacheRoutes.value.splice(index, 1)
-  }
-
-  /**
-   * 按路由键重建缓存
-   *
-   * @param routeKey
-   */
-  async function reCacheRoutesByKey(routeKey) {
-    removeCacheRoutes(routeKey)
-
-    await appStore.reloadPage()
-
-    addCacheRoutes(routeKey)
-  }
-
-  /**
-   * 按多个路由键重建缓存
-   *
-   * @param routeKeys
-   */
-  async function reCacheRoutesByKeys(routeKeys) {
-    for await (const key of routeKeys) {
-      await reCacheRoutesByKey(key)
-    }
+    excludeCacheRoutes.value = []
   }
 
   /** 全局面包屑 */
@@ -329,8 +302,8 @@ export const useRouteStore = defineStore(SetupStoreId.Route, () => {
     searchMenus,
     updateGlobalMenusByLocale,
     cacheRoutes,
-    reCacheRoutesByKey,
-    reCacheRoutesByKeys,
+    excludeCacheRoutes,
+    resetRouteCache,
     breadcrumbs,
     initConstantRoute,
     isInitConstantRoute,

@@ -54,3 +54,10 @@ export const themePageAnimationModeRecord = {
 }
 
 export const themePageAnimationModeOptions = transformRecordToOption(themePageAnimationModeRecord)
+
+export const resetCacheStrategyRecord = {
+  close: '关闭页面',
+  refresh: '刷新页面'
+}
+
+export const resetCacheStrategyOptions = transformRecordToOption(resetCacheStrategyRecord)

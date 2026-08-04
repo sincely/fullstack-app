@@ -6,10 +6,12 @@ import { effectScope, onScopeDispose, ref, watch } from 'vue'
 import { SetupStoreId } from '@/enum'
 import { setDayjsLocale } from '@/locales/dayjs'
 
+import { useRouteStore } from '../route'
 import { useThemeStore } from '../theme'
 
 export const useAppStore = defineStore(SetupStoreId.App, () => {
   const themeStore = useThemeStore()
+  const routeStore = useRouteStore()
   const scope = effectScope()
   const breakpoints = useBreakpoints(breakpointsTailwind)
   const { bool: themeDrawerVisible, setTrue: openThemeDrawer, setFalse: closeThemeDrawer } = useBoolean()
@@ -37,6 +39,10 @@ export const useAppStore = defineStore(SetupStoreId.App, () => {
     }
 
     setReloadFlag(true)
+
+    if (themeStore.resetCacheStrategy === 'refresh') {
+      routeStore.resetRouteCache()
+    }
   }
 
   const locale = ref('zh-CN')

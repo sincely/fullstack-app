@@ -1,5 +1,6 @@
 export const themeSettings = {
   themeScheme: 'light',
+  recommendColor: false,
   themeColor: '#646cff',
   otherColor: {
     info: '#2080f0',
@@ -8,6 +9,7 @@ export const themeSettings = {
     error: '#f5222d'
   },
   isInfoFollowPrimary: true,
+  resetCacheStrategy: 'close',
   layout: {
     mode: 'vertical',
     scrollMode: 'content',
@@ -44,6 +46,10 @@ export const themeSettings = {
     fixed: false,
     height: 48,
     right: true
+  },
+  watermark: {
+    visible: false,
+    text: 'SoybeanAdmin'
   }
 }
 
@@ -52,4 +58,10 @@ export const themeSettings = {
  *
  * 发布新版本时，可通过 `overrideThemeSettings` 覆盖部分主题配置
  */
-export const overrideThemeSettings = {}
+export const overrideThemeSettings = {
+  resetCacheStrategy: 'close',
+  watermark: {
+    visible: false,
+    text: 'SoybeanAdmin'
+  }
+}

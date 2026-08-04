@@ -27,7 +27,7 @@ const routeStore = useRouteStore()
       @before-leave="appStore.setContentXScrollable(true)"
       @after-enter="appStore.setContentXScrollable(false)"
     >
-      <KeepAlive :include="routeStore.cacheRoutes">
+      <KeepAlive :include="routeStore.cacheRoutes" :exclude="routeStore.excludeCacheRoutes">
         <component
           :is="Component"
           v-if="appStore.reloadFlag"
