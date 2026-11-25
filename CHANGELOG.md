@@ -3,6 +3,39 @@
 All notable changes to this project will be documented in this file.
 
 
+## [1.0.3](https://github.com/sincely/fullstack-app/compare/v1.0.2...v1.0.3) (2026-11-25)
+
+### ✨ Features
+
+* 启用并优化 Redis 会话存储支持 ([76b1638](https://github.com/sincely/fullstack-app/commit/76b1638dd05b6c06e2376fc15372509d2fb902f7))
+* 增加登录失败锁定及解锁功能 ([becf0bd](https://github.com/sincely/fullstack-app/commit/becf0bda6bbe627cd03bb43003fc53b2e850633d))
+* 更新 Dockerfile 和构建脚本，优化容器端口配置及构建流程 ([eb9c289](https://github.com/sincely/fullstack-app/commit/eb9c289709858bb26953af3f572682d60e96adc3))
+* 更新 Dockerfile，使用 pnpm 9.15.9 并设置国内 npm 镜像源；升级 Redis 镜像至 8.8.0 ([c792644](https://github.com/sincely/fullstack-app/commit/c7926447a02263f3990b486fdc3dd43544beb5f6))
+* 更新 Dockerfile，添加 .env 文件复制并忽略脚本安装 ([118d89a](https://github.com/sincely/fullstack-app/commit/118d89adb4a23267a409a7a4fe970e03ec591d64))
+* 更新环境配置和菜单服务，调整端口及字段命名为下划线格式 ([db25f6b](https://github.com/sincely/fullstack-app/commit/db25f6ba4cf41c5d12eeef46d11a01a7484b2e0d))
+* 添加 Docker 支持，包括客户端和服务器的 Dockerfile、Nginx 配置及 Docker Compose 文件 ([4546c59](https://github.com/sincely/fullstack-app/commit/4546c59731610c794eb8b96178c692ae961678b9))
+* 添加前端 camelCase 到数据库 snake_case 字段映射，动态更新用户信息 ([6eb7bb1](https://github.com/sincely/fullstack-app/commit/6eb7bb168953033e01004372074fdd9a8a678246))
+* 添加操作日志模块字段支持 ([7ddaeed](https://github.com/sincely/fullstack-app/commit/7ddaeed27c162d884fd70efabd119d34435dd200))
+* 添加系统模块字段支持并优化搜索表单 ([1452e38](https://github.com/sincely/fullstack-app/commit/1452e383498a7568320908fc9c23b77b7791e350))
+
+### 🐞 Bug Fixes
+
+* 优化后端错误码处理逻辑及环境变量配置 ([0f61640](https://github.com/sincely/fullstack-app/commit/0f616407f4d9f0d465fcf98e211ac7f530ef1191))
+* 修正日志序列化器和移除调试输出 ([e39e7e7](https://github.com/sincely/fullstack-app/commit/e39e7e78663619e1e6b93fdbd2bc910f703605fe))
+
+### 📝 Documentation
+
+* 添加缓存雪崩、击穿、穿透方案文档 ([56a820e](https://github.com/sincely/fullstack-app/commit/56a820e509dc9d944329ae8603fbec307047b4d1))
+
+### 🔧 Chores
+
+* 依赖与工具链统一 ([48290a5](https://github.com/sincely/fullstack-app/commit/48290a52ff8ff282e2752994534c3b0c6b593720))
+
+### ♻️ Code Refactoring
+
+* 移除调试日志并使用日志记录器替代 ([01f31eb](https://github.com/sincely/fullstack-app/commit/01f31eb05e56a90c8515d5813cb2ac387ba648c1))
+* 统一数据库字段命名为下划线格式 ([e4780b7](https://github.com/sincely/fullstack-app/commit/e4780b70f7b57df36b90d6e6c397b9776ca9da68))
+
 ## [1.0.2](https://github.com/sincely/fullstack-app/compare/v1.0.1...v1.0.2) (2026-07-23)
 
 ### ✨ Features
