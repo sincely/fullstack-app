@@ -7,8 +7,8 @@ const ADMIN_USER_ROLE_AGGREGATE_SQL = `
     group_concat(distinct ur.role_id order by ur.role_id asc) as roleIds,
     group_concat(distinct r.role_code order by ur.role_id asc) as roleCodes,
     group_concat(distinct r.role_name order by ur.role_id asc) as roleNames
-  from UserRole ur
-  inner join Roles r on r.role_id = ur.role_id
+  from sys_user_role ur
+  inner join sys_role r on r.role_id = ur.role_id
   group by ur.user_id
 `
 
@@ -28,9 +28,9 @@ const getAdminUserBaseSql = `
     r.role_code,
     r.role_name,
     r.description as roleDescription
-  from Users u
+  from sys_user u
   left join (${ADMIN_USER_ROLE_AGGREGATE_SQL}) roleAgg on roleAgg.user_id = u.id
-  left join Roles r on r.role_id = roleAgg.role_id
+  left join sys_role r on r.role_id = roleAgg.role_id
 `
 
 /**
@@ -73,7 +73,7 @@ const findAdminUserById = async (user_id) => {
  * @returns {Promise<void>}
  */
 const updateUserRefreshToken = async (user_id, refreshToken) => {
-  const sql = 'update Users set current_refresh_token = ? where id = ?'
+  const sql = 'update sys_user set current_refresh_token = ? where id = ?'
   await query(sql, [refreshToken, user_id])
 }
 
@@ -83,7 +83,7 @@ const updateUserRefreshToken = async (user_id, refreshToken) => {
  * @returns {Promise<string|null>}
  */
 const getUserRefreshToken = async (user_id) => {
-  const sql = 'select current_refresh_token from Users where id = ? limit 1'
+  const sql = 'select current_refresh_token from sys_user where id = ? limit 1'
   const rows = await query(sql, [user_id])
   return rows[0]?.current_refresh_token || null
 }
@@ -95,7 +95,7 @@ const getUserRefreshToken = async (user_id) => {
  */
 const findRoleByName = async (role_name) => {
   const sql =
-    'select role_id, role_code, role_name, description from Roles where role_name = ? or role_code = ? limit 1'
+    'select role_id, role_code, role_name, description from sys_role where role_name = ? or role_code = ? limit 1'
   const rows = await query(sql, [role_name, role_name])
   return rows[0] || null
 }
@@ -123,13 +123,16 @@ const createAdminUser = async ({ username, email, passwordHash, role_id }) => {
     await connection.beginTransaction()
     const [userResult] = await connection.execute(
       `
-        insert into Users (username, gender, age, id_card, email, address, status, avatar, password)
+        insert into sys_user (username, gender, age, id_card, email, address, status, avatar, password)
         values (?, 'other', null, ?, ?, null, 1, null, ?)
       `,
       [username, createRegisterIdCard(), email, passwordHash]
     )
 
-    await connection.execute('insert into UserRole (user_id, role_id) values (?, ?)', [userResult.insertId, role_id])
+    await connection.execute('insert into sys_user_role (user_id, role_id) values (?, ?)', [
+      userResult.insertId,
+      role_id
+    ])
     await connection.commit()
     return userResult
   } catch (error) {

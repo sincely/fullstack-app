@@ -49,11 +49,11 @@
 
 你当前项目已经具备这些核心方向：
 
-- `Users`
-- `Roles`
-- `RouteAuth`
-- `RoleRoute`
-- `ButtonAuth`
+- `sys_user`
+- `sys_role`
+- `sys_route_auth`
+- `sys_role_route`
+- `sys_button_auth`
 
 后续可以在现有结构上继续规范化。
 
@@ -761,11 +761,11 @@ user -> user_role -> role -> role_permission -> permission
 
 你当前项目已有：
 
-- `Users`
-- `Roles`
-- `RouteAuth`
-- `RoleRoute`
-- `ButtonAuth`
+- `sys_user`
+- `sys_role`
+- `sys_route_auth`
+- `sys_role_route`
+- `sys_button_auth`
 
 如果继续迭代，建议这样逐步规范化：
 
@@ -777,7 +777,7 @@ user -> user_role -> role -> role_permission -> permission
 
 ### 23.2 中期
 
-- 把 `Users` / `Roles` / `RouteAuth` 逐步迁移为统一小写下划线风格
+- ✅ 已完成：表名统一为小写下划线 + 系统表 `sys_` 前缀（`sys_user` / `sys_role` / `sys_route_auth`，见 `src/db/migrations/20261125000001_rename_system_tables.js`）
 - 增加审计字段
 - 引入逻辑删除字段
 
@@ -917,11 +917,11 @@ admin_role_permission
 
 如果你现在不想大改现有表结构，可以先这样做：
 
-- 保留现有 `Users`
-- 保留现有 `Roles`
-- 保留现有 `RouteAuth`
-- 保留现有 `RoleRoute`
-- 保留现有 `ButtonAuth`
+- 保留现有 `sys_user`
+- 保留现有 `sys_role`
+- 保留现有 `sys_route_auth`
+- 保留现有 `sys_role_route`
+- 保留现有 `sys_button_auth`
 
 然后在新功能里逐步引入规范：
 

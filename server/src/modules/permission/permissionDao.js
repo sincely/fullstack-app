@@ -31,8 +31,8 @@ const findMenusByRoleId = async (role_id) => {
   const sql = `
     select distinct
       ${MENU_COLUMNS}
-    from RoleRoute rr
-    inner join RouteAuth ra on ra.id = rr.route_id
+    from sys_role_route rr
+    inner join sys_route_auth ra on ra.id = rr.route_id
     where rr.role_id in (${buildInClause(roleIds)})
     order by coalesce(ra.parent_id, 0), ra.order_num asc, ra.id asc
   `
@@ -41,7 +41,7 @@ const findMenusByRoleId = async (role_id) => {
 }
 
 /**
- * 根据角色 ID 查询按钮权限节点（menu_type=3 的 RouteAuth 行）。
+ * 根据角色 ID 查询按钮权限节点（menu_type=3 的 sys_route_auth 行）。
  * @param {number|number[]} role_id
  * @returns {Promise<Array<any>>}
  */
@@ -58,8 +58,8 @@ const findButtonsByRoleId = async (role_id) => {
       ra.route_name,
       ra.menu_name as button_name,
       ra.menu_name as button_label
-    from RoleRoute rr
-    inner join RouteAuth ra on ra.id = rr.route_id
+    from sys_role_route rr
+    inner join sys_route_auth ra on ra.id = rr.route_id
     where rr.role_id in (${buildInClause(roleIds)})
       and ra.menu_type = 3
     order by ra.parent_id asc, ra.id asc

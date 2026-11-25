@@ -359,7 +359,7 @@ export const frontendLogin = async ({ userName, password, loginIp, userAgent }) 
 
   // 将 sessionId、登录信息写入用户表
   const sql = `
-    UPDATE Users SET
+    UPDATE sys_user SET
       session_id = ?,
       current_refresh_token = ?,
       login_ip = ?,
@@ -472,7 +472,7 @@ export const frontendRefreshToken = async (refreshToken) => {
 export const frontendLogout = async (userId) => {
   if (userId) {
     const sql = `
-      UPDATE Users SET
+      UPDATE sys_user SET
         session_id = NULL,
         current_refresh_token = NULL,
         login_ip = NULL,

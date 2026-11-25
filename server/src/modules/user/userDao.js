@@ -1,7 +1,7 @@
 import { getConnection, query } from '../../db/connection.js'
 
 /**
- * 用户查询公共字段（适配新表结构，多角色通过 UserRole 关联）。
+ * 用户查询公共字段（适配新表结构，多角色通过 sys_user_role 关联）。
  */
 const USER_COLUMNS = `
   u.id, u.username, u.nick_name, u.gender, u.age, u.phone,
@@ -15,8 +15,8 @@ const USER_ROLE_AGGREGATE_SQL = `
     min(ur.role_id) as role_id,
     group_concat(distinct ur.role_id order by ur.role_id asc) as roleIds,
     group_concat(distinct r.role_name order by r.role_name asc) as roleNames
-  from UserRole ur
-  left join Roles r on r.role_id = ur.role_id
+  from sys_user_role ur
+  left join sys_role r on r.role_id = ur.role_id
   group by ur.user_id
 `
 
@@ -47,7 +47,7 @@ const buildUserFilters = ({ keyword, status, gender }) => {
 
 /**
  * 查询用户列表（含角色信息）。
- * 多角色场景：通过 UserRole 关联获取 roleIds 数组。
+ * 多角色场景：通过 sys_user_role 关联获取 roleIds 数组。
  */
 const listUsers = async ({ keyword, status, gender, role_id, page, pageSize }) => {
   const { whereSql, params } = buildUserFilters({ keyword, status, gender })
@@ -58,7 +58,7 @@ const listUsers = async ({ keyword, status, gender, role_id, page, pageSize }) =
   const queryParams = [...params]
 
   if (role_id) {
-    extraWhere.push('exists (select 1 from UserRole urf where urf.user_id = u.id and urf.role_id = ?)')
+    extraWhere.push('exists (select 1 from sys_user_role urf where urf.user_id = u.id and urf.role_id = ?)')
     queryParams.push(Number(role_id))
   }
 
@@ -70,7 +70,7 @@ const listUsers = async ({ keyword, status, gender, role_id, page, pageSize }) =
       roleAgg.role_id,
       roleAgg.roleIds,
       roleAgg.roleNames
-    from Users u
+    from sys_user u
     left join (${USER_ROLE_AGGREGATE_SQL}) roleAgg on roleAgg.user_id = u.id
     ${finalWhereSql ? `where ${finalWhereSql}` : ''}
     order by u.id desc
@@ -89,7 +89,7 @@ const countUsers = async ({ keyword, status, gender, role_id }) => {
   const queryParams = [...params]
 
   if (role_id) {
-    extraWhere.push('exists (select 1 from UserRole ur where ur.user_id = u.id and ur.role_id = ?)')
+    extraWhere.push('exists (select 1 from sys_user_role ur where ur.user_id = u.id and ur.role_id = ?)')
     queryParams.push(Number(role_id))
   }
 
@@ -97,7 +97,7 @@ const countUsers = async ({ keyword, status, gender, role_id }) => {
 
   const sql = `
     select count(*) as total
-    from Users u
+    from sys_user u
     ${finalWhereSql ? `where ${finalWhereSql}` : ''}
   `
   const rows = await query(sql, queryParams)
@@ -115,7 +115,7 @@ const findUserById = async (id) => {
       roleAgg.role_id,
       roleAgg.roleIds,
       roleAgg.roleNames
-    from Users u
+    from sys_user u
     left join (${USER_ROLE_AGGREGATE_SQL}) roleAgg on roleAgg.user_id = u.id
     where u.id = ?
     limit 1
@@ -125,19 +125,19 @@ const findUserById = async (id) => {
 }
 
 const findUserByUsername = async (username) => {
-  const sql = 'select id, username from Users where username = ? limit 1'
+  const sql = 'select id, username from sys_user where username = ? limit 1'
   const rows = await query(sql, [username])
   return rows[0] || null
 }
 
 const findUserByEmail = async (email) => {
-  const sql = 'select id, email from Users where email = ? limit 1'
+  const sql = 'select id, email from sys_user where email = ? limit 1'
   const rows = await query(sql, [email])
   return rows[0] || null
 }
 
 const findUserByIdCard = async (id_card) => {
-  const sql = 'select id, id_card from Users where id_card = ? limit 1'
+  const sql = 'select id, id_card from sys_user where id_card = ? limit 1'
   const rows = await query(sql, [id_card])
   return rows[0] || null
 }
@@ -166,7 +166,7 @@ const createUser = async ({
     await connection.beginTransaction()
 
     const [userResult] = await connection.execute(
-      `insert into Users (username, nick_name, gender, age, phone, id_card, email, address, status, avatar, password)
+      `insert into sys_user (username, nick_name, gender, age, phone, id_card, email, address, status, avatar, password)
        values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         username,
@@ -188,7 +188,7 @@ const createUser = async ({
     if (roleIds && roleIds.length > 0) {
       const valuesSql = roleIds.map(() => '(?, ?)').join(', ')
       const values = roleIds.flatMap((role_id) => [user_id, role_id])
-      await connection.execute(`insert into UserRole (user_id, role_id) values ${valuesSql}`, values)
+      await connection.execute(`insert into sys_user_role (user_id, role_id) values ${valuesSql}`, values)
     }
 
     await connection.commit()
@@ -217,7 +217,7 @@ const updateUser = async (id, payload) => {
     return { affectedRows: 0 }
   }
 
-  const sql = `update Users set ${fields.join(', ')} where id = ?`
+  const sql = `update sys_user set ${fields.join(', ')} where id = ?`
   return query(sql, [...params, id])
 }
 
@@ -230,12 +230,12 @@ const updateUserRoles = async (user_id, roleIds) => {
   const connection = await getConnection()
   try {
     await connection.beginTransaction()
-    await connection.execute('delete from UserRole where user_id = ?', [user_id])
+    await connection.execute('delete from sys_user_role where user_id = ?', [user_id])
 
     if (roleIds.length > 0) {
       const valuesSql = roleIds.map(() => '(?, ?)').join(', ')
       const values = roleIds.flatMap((role_id) => [user_id, role_id])
-      await connection.execute(`insert into UserRole (user_id, role_id) values ${valuesSql}`, values)
+      await connection.execute(`insert into sys_user_role (user_id, role_id) values ${valuesSql}`, values)
     }
 
     await connection.commit()
@@ -249,14 +249,14 @@ const updateUserRoles = async (user_id, roleIds) => {
 }
 
 /**
- * 删除用户（事务：清理 UserRole 后删用户）。
+ * 删除用户（事务：清理 sys_user_role 后删用户）。
  */
 const deleteUser = async (id) => {
   const connection = await getConnection()
   try {
     await connection.beginTransaction()
-    await connection.execute('delete from UserRole where user_id = ?', [id])
-    const [result] = await connection.execute('delete from Users where id = ?', [id])
+    await connection.execute('delete from sys_user_role where user_id = ?', [id])
+    const [result] = await connection.execute('delete from sys_user where id = ?', [id])
     await connection.commit()
     return result
   } catch (error) {
@@ -273,13 +273,13 @@ const deleteUser = async (id) => {
  * @returns {Promise<number[]>}
  */
 const getRoleIdsByUserId = async (user_id) => {
-  const sql = 'select role_id from UserRole where user_id = ? order by role_id asc'
+  const sql = 'select role_id from sys_user_role where user_id = ? order by role_id asc'
   const rows = await query(sql, [user_id])
   return rows.map((item) => item.role_id)
 }
 
 const listRoleOptions = async () => {
-  const sql = 'select role_id, role_name from Roles order by role_id asc'
+  const sql = 'select role_id, role_name from sys_role order by role_id asc'
   return query(sql)
 }
 

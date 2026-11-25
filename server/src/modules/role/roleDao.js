@@ -56,8 +56,8 @@ const listRoles = async ({ page = 1, pageSize = 10, role_name = '', role_code = 
   const sql = `
     select
       ${ROLE_LIST_COLUMNS}
-    from Roles r
-    left join UserRole ur on ur.role_id = r.role_id
+    from sys_role r
+    left join sys_user_role ur on ur.role_id = r.role_id
     ${whereSql}
     group by r.role_id, r.role_code, r.role_name, r.description, r.status, r.is_system
     order by r.role_id asc
@@ -80,7 +80,7 @@ const listAllRoles = async () => {
       description,
       status,
       is_system
-    from Roles
+    from sys_role
     order by role_id asc
   `
 
@@ -94,7 +94,7 @@ const listAllRoles = async () => {
  */
 const countRoles = async ({ role_name = '', role_code = '', status } = {}) => {
   const { whereSql, params } = buildRoleFilters({ role_name, role_code, status })
-  const sql = `select count(*) as total from Roles r${whereSql}`
+  const sql = `select count(*) as total from sys_role r${whereSql}`
   const rows = await query(sql, params)
   return rows[0]?.total || 0
 }
@@ -106,7 +106,7 @@ const countRoles = async ({ role_name = '', role_code = '', status } = {}) => {
  */
 const findRoleById = async (role_id) => {
   const sql =
-    'select role_id, role_code, role_name, description, status, is_system from Roles where role_id = ? limit 1'
+    'select role_id, role_code, role_name, description, status, is_system from sys_role where role_id = ? limit 1'
   const rows = await query(sql, [role_id])
   return rows[0] || null
 }
@@ -122,7 +122,7 @@ const findRolesByIds = async (role_ids) => {
   }
 
   const placeholders = role_ids.map(() => '?').join(', ')
-  const sql = `select role_id from Roles where role_id in (${placeholders})`
+  const sql = `select role_id from sys_role where role_id in (${placeholders})`
   return query(sql, role_ids)
 }
 
@@ -133,7 +133,7 @@ const findRolesByIds = async (role_ids) => {
  * @returns {Promise<any | null>}
  */
 const findRoleByName = async (role_name, role_code = role_name) => {
-  const sql = 'select role_id, role_code, role_name from Roles where role_name = ? or role_code = ? limit 1'
+  const sql = 'select role_id, role_code, role_name from sys_role where role_name = ? or role_code = ? limit 1'
   const rows = await query(sql, [role_name, role_code])
   return rows[0] || null
 }
@@ -144,33 +144,35 @@ const findRoleByName = async (role_name, role_code = role_name) => {
  * @returns {Promise<number[]>}
  */
 const getRouteIdsByRoleId = async (role_id) => {
-  const sql = 'select route_id from RoleRoute where role_id = ? order by route_id asc'
+  const sql = 'select route_id from sys_role_route where role_id = ? order by route_id asc'
   const rows = await query(sql, [role_id])
   return rows.map((item) => item.route_id)
 }
 
 /**
- * 创建角色（仅 Roles 表，不涉及路由绑定）。
+ * 创建角色（仅 sys_role 表，不涉及路由绑定）。
  * @param {{role_name:string,role_code:string,description:string,status:number}} payload
  * @returns {Promise<{role_id:number, affectedRows:number}>}
  */
 const createRole = async ({ role_name, role_code, description, status }) => {
-  const result = await query(
-    'insert into Roles (role_code, role_name, description, status) values (?, ?, ?, ?)',
-    [role_code || buildRoleCode(role_name), role_name, description, Number(status ?? 1)]
-  )
+  const result = await query('insert into sys_role (role_code, role_name, description, status) values (?, ?, ?, ?)', [
+    role_code || buildRoleCode(role_name),
+    role_name,
+    description,
+    Number(status ?? 1)
+  ])
   return { role_id: result.insertId, affectedRows: result.affectedRows }
 }
 
 /**
- * 更新角色（仅 Roles 表，不涉及路由绑定）。
+ * 更新角色（仅 sys_role 表，不涉及路由绑定）。
  * @param {number} role_id
  * @param {{role_name:string,role_code:string,description:string,status:number}} payload
  * @returns {Promise<{affectedRows:number}>}
  */
 const updateRole = async (role_id, { role_name, role_code, description, status }) => {
   const result = await query(
-    'update Roles set role_name = ?, role_code = ?, description = ?, status = ? where role_id = ?',
+    'update sys_role set role_name = ?, role_code = ?, description = ?, status = ? where role_id = ?',
     [role_name, role_code || buildRoleCode(role_name), description, Number(status ?? 1), role_id]
   )
   return { affectedRows: result.affectedRows }
@@ -185,9 +187,9 @@ const deleteRole = async (role_id) => {
   const connection = await getConnection()
   try {
     await connection.beginTransaction()
-    await connection.execute('delete from RoleRoute where role_id = ?', [role_id])
-    await connection.execute('delete from RoleButton where role_id = ?', [role_id])
-    const [result] = await connection.execute('delete from Roles where role_id = ?', [role_id])
+    await connection.execute('delete from sys_role_route where role_id = ?', [role_id])
+    await connection.execute('delete from sys_role_button where role_id = ?', [role_id])
+    const [result] = await connection.execute('delete from sys_role where role_id = ?', [role_id])
     await connection.commit()
     return result
   } catch (error) {
@@ -204,7 +206,7 @@ const deleteRole = async (role_id) => {
  * @returns {Promise<number>}
  */
 const countUsersByRoleId = async (role_id) => {
-  const sql = 'select count(*) as total from UserRole where role_id = ?'
+  const sql = 'select count(*) as total from sys_user_role where role_id = ?'
   const rows = await query(sql, [role_id])
   return rows[0]?.total || 0
 }

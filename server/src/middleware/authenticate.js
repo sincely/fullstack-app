@@ -47,7 +47,7 @@ async function authenticate(ctx, next) {
   if (userId && jwtSessionId) {
     const sql = `
       SELECT session_id, session_expire
-      FROM Users
+      FROM sys_user
       WHERE id = ?
       LIMIT 1
     `

@@ -385,14 +385,14 @@ const createUser = async (user) => {
 
     // 插入用户表
     const [result] = await connection.query(
-      'INSERT INTO Users (username, email, password, ...) VALUES (?, ?, ?, ...)',
+      'INSERT INTO sys_user (username, email, password, ...) VALUES (?, ?, ?, ...)',
       [user.username, user.email, user.passwordHash, ...]
     )
     const userId = result.insertId
 
     // 插入用户-角色关联表
     await connection.query(
-      'INSERT INTO UserRole (userId, roleId) VALUES (?, ?)',
+      'INSERT INTO sys_user_role (user_id, role_id) VALUES (?, ?)',
       [userId, user.roleId]
     )
 
@@ -409,65 +409,35 @@ const createUser = async (user) => {
 
 ## 数据库设计
 
-### ER 图
+### 表关系
 
 ```
-┌──────────────┐         ┌──────────────┐         ┌──────────────┐
-│    Users     │         │   UserRole   │         │    Roles     │
-├──────────────┤         ├──────────────┤         ├──────────────┤
-│ id (PK)      │◄────────│ userId (FK)  │         │ roleId (PK)  │
-│ username     │         │ roleId (FK)  │────────►│ roleName     │
-│ email        │         └──────────────┘         │ roleCode     │
-│ password     │                                   │ description  │
-│ status       │                                   │ status       │
-│ sessionId    │                                   └──────────────┘
-│ sessionExpire│
-│ currentToken │         ┌──────────────┐         ┌──────────────┐
-└──────────────┘         │  RoleRoute   │         │  RouteAuth   │
-                         ├──────────────┤         ├──────────────┤
-                         │ roleId (FK)  │         │ routeId (PK) │
-                         │ routeId (FK) │────────►│ routeName    │
-                         └──────────────┘         │ routePath    │
-                                                  │ component    │
-                         ┌──────────────┐         │ parentId     │
-                         │  RoleButton  │         │ orderNum     │
-                         ├──────────────┤         └──────────────┘
-                         │ roleId (FK)  │
-                         │ buttonId (FK)│────────►┌──────────────┐
-                         └──────────────┘         │ ButtonAuth   │
-                                                  ├──────────────┤
-┌──────────────┐         ┌──────────────┐         │ buttonId (PK)│
-│  LoginLog    │         │OperationLog  │         │ routeId (FK) │
-├──────────────┤         ├──────────────┤         │ buttonName   │
-│ logId (PK)   │         │ logId (PK)   │         │ buttonLabel  │
-│ userId       │         │ userId       │         └──────────────┘
-│ username     │         │ username     │
-│ loginType    │         │ action       │
-│ ipAddress    │         │ method       │
-│ browser      │         │ requestUrl   │
-│ os           │         │ requestParams│
-│ userAgent    │         │ responseStatus│
-│ status       │         │ executeTime  │
-│ message      │         │ ipAddress    │
-│ sessionId    │         │ userAgent    │
-│ createTime   │         │ status       │
-└──────────────┘         │ createTime   │
-                         └──────────────┘
+sys_user         1 ────── N  sys_user_role       N ────── 1  sys_role
+sys_role         1 ────── N  sys_role_route      N ────── 1  sys_route_auth
+sys_role         1 ────── N  sys_role_button     N ────── 1  sys_button_auth
+sys_route_auth   1 ────── N  sys_button_auth                    （按钮挂载在菜单下）
+sys_route_auth   1 ────── N  sys_route_auth                     （parent_id 自引用，构建菜单树）
+sys_user         1 ────── N  sys_login_log                      （user_id 逻辑关联，无物理外键）
+sys_user         1 ────── N  sys_operation_log                  （user_id 逻辑关联，无物理外键）
 ```
+
+> `sys_dict` 为独立表；`sys_migration` 由 `npm run db:migrate` 首次执行时自动创建；关联表均建有联合唯一索引（如 `uk_user_role(user_id, role_id)`）。
 
 ### 核心表说明
 
 | 表名 | 说明 | 关键字段 |
 |------|------|----------|
-| `Users` | 用户表 | id, username, email, password, status, sessionId, sessionExpire, currentRefreshToken |
-| `Roles` | 角色表 | roleId, roleName, roleCode, description, status |
-| `UserRole` | 用户-角色关联表 | userId, roleId |
-| `RouteAuth` | 菜单/路由权限表 | routeId, routeName, routePath, component, parentId, orderNum |
-| `RoleRoute` | 角色-菜单关联表 | roleId, routeId |
-| `ButtonAuth` | 按钮权限表 | buttonId, routeId, buttonName, buttonLabel |
-| `RoleButton` | 角色-按钮关联表 | roleId, buttonId |
-| `LoginLog` | 登录日志表 | logId, userId, username, loginType, ipAddress, status, message |
-| `OperationLog` | 操作日志表 | logId, userId, username, action, method, requestUrl, responseStatus |
+| `sys_user` | 用户表 | id, username, email, password, status, session_id, session_expire, current_refresh_token |
+| `sys_role` | 角色表 | role_id, role_code, role_name, description, status, is_system |
+| `sys_user_role` | 用户-角色关联表 | user_id, role_id |
+| `sys_route_auth` | 菜单/路由权限表 | id, parent_id, menu_name, route_name, route_path, component, order_num |
+| `sys_role_route` | 角色-菜单关联表 | role_id, route_id |
+| `sys_button_auth` | 按钮权限表 | button_id, route_id, button_name, button_label |
+| `sys_role_button` | 角色-按钮关联表 | role_id, button_id |
+| `sys_login_log` | 登录日志表 | id, user_id, username, login_type, ip_address, status, message |
+| `sys_operation_log` | 操作日志表 | id, user_id, username, action, module, method, request_url, response_status, execute_time |
+| `sys_dict` | 字典管理表 | id, dict_name, dict_code, status, remark |
+| `sys_migration` | 迁移记录表（由迁移运行器自动创建，不在初始化脚本中） | id, name, batch, executedAt |
 
 ## API 接口
 

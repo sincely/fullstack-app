@@ -45,7 +45,7 @@ const listDicts = async ({ page = 1, pageSize = 10, dict_name = '', dict_code = 
   const offset = (Number(page) - 1) * Number(pageSize)
   const sql = `
     select ${DICT_LIST_COLUMNS}
-    from Dict
+    from sys_dict
     ${whereSql}
     order by id asc
     limit ? offset ?
@@ -59,7 +59,7 @@ const listDicts = async ({ page = 1, pageSize = 10, dict_name = '', dict_code = 
  */
 const countDicts = async ({ dict_name = '', dict_code = '', status } = {}) => {
   const { whereSql, params } = buildDictFilters({ dict_name, dict_code, status })
-  const sql = `select count(*) as total from Dict${whereSql}`
+  const sql = `select count(*) as total from sys_dict${whereSql}`
   const rows = await query(sql, params)
   return rows[0]?.total || 0
 }
@@ -68,7 +68,7 @@ const countDicts = async ({ dict_name = '', dict_code = '', status } = {}) => {
  * 根据 ID 查询字典
  */
 const findDictById = async (id) => {
-  const sql = `select ${DICT_LIST_COLUMNS} from Dict where id = ? limit 1`
+  const sql = `select ${DICT_LIST_COLUMNS} from sys_dict where id = ? limit 1`
   const rows = await query(sql, [id])
   return rows[0] || null
 }
@@ -77,7 +77,7 @@ const findDictById = async (id) => {
  * 根据字典名称或编码查询字典（用于唯一性校验）
  */
 const findDictByName = async (dict_name, dict_code) => {
-  const sql = 'select id, dict_name, dict_code from Dict where dict_name = ? or dict_code = ? limit 1'
+  const sql = 'select id, dict_name, dict_code from sys_dict where dict_name = ? or dict_code = ? limit 1'
   const rows = await query(sql, [dict_name, dict_code])
   return rows[0] || null
 }
@@ -86,10 +86,12 @@ const findDictByName = async (dict_name, dict_code) => {
  * 创建字典
  */
 const createDict = async ({ dict_name, dict_code, status, remark }) => {
-  const result = await query(
-    'insert into Dict (dict_name, dict_code, status, remark) values (?, ?, ?, ?)',
-    [dict_name, dict_code, Number(status ?? 1), remark ?? '']
-  )
+  const result = await query('insert into sys_dict (dict_name, dict_code, status, remark) values (?, ?, ?, ?)', [
+    dict_name,
+    dict_code,
+    Number(status ?? 1),
+    remark ?? ''
+  ])
   return { id: result.insertId, affectedRows: result.affectedRows }
 }
 
@@ -97,10 +99,13 @@ const createDict = async ({ dict_name, dict_code, status, remark }) => {
  * 更新字典
  */
 const updateDict = async (id, { dict_name, dict_code, status, remark }) => {
-  const result = await query(
-    'update Dict set dict_name = ?, dict_code = ?, status = ?, remark = ? where id = ?',
-    [dict_name, dict_code, Number(status ?? 1), remark ?? '', id]
-  )
+  const result = await query('update sys_dict set dict_name = ?, dict_code = ?, status = ?, remark = ? where id = ?', [
+    dict_name,
+    dict_code,
+    Number(status ?? 1),
+    remark ?? '',
+    id
+  ])
   return { affectedRows: result.affectedRows }
 }
 
@@ -108,7 +113,7 @@ const updateDict = async (id, { dict_name, dict_code, status, remark }) => {
  * 删除字典
  */
 const deleteDict = async (id) => {
-  const result = await query('delete from Dict where id = ?', [id])
+  const result = await query('delete from sys_dict where id = ?', [id])
   return result
 }
 

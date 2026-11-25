@@ -175,11 +175,11 @@ export const updateRoleRouteIds = async ({ roleId, routeIds }) => {
   const connection = await getConnection()
   try {
     await connection.beginTransaction()
-    await connection.execute('delete from RoleRoute where role_id = ?', [roleId])
+    await connection.execute('delete from sys_role_route where role_id = ?', [roleId])
     if (routeIds && routeIds.length > 0) {
       const valuesSql = routeIds.map(() => '(?, ?)').join(', ')
       const values = routeIds.flatMap((id) => [roleId, id])
-      await connection.execute(`insert into RoleRoute (role_id, route_id) values ${valuesSql}`, values)
+      await connection.execute(`insert into sys_role_route (role_id, route_id) values ${valuesSql}`, values)
     }
     await connection.commit()
 

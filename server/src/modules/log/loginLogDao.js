@@ -56,7 +56,7 @@ const listLoginLogs = async ({ page, pageSize, username, ip_address, status, sta
       ll.message,
       ll.session_id,
       ll.create_time
-    FROM LoginLog ll
+    FROM sys_login_log ll
     ${whereSql}
     ORDER BY ll.create_time DESC
     LIMIT ?, ?
@@ -101,7 +101,7 @@ const countLoginLogs = async ({ username, ip_address, status, startTime, endTime
 
   const sql = `
     SELECT COUNT(*) as total
-    FROM LoginLog ll
+    FROM sys_login_log ll
     ${whereSql}
   `
 
@@ -114,7 +114,7 @@ const countLoginLogs = async ({ username, ip_address, status, startTime, endTime
  */
 const createLoginLog = async (data) => {
   const sql = `
-    INSERT INTO LoginLog (
+    INSERT INTO sys_login_log (
       user_id, username, login_type, ip_address, location,
       browser, os, user_agent, status, message, session_id
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -140,7 +140,7 @@ const createLoginLog = async (data) => {
  */
 const batchDeleteLoginLogs = async (ids) => {
   const placeholders = ids.map(() => '?').join(', ')
-  const sql = `DELETE FROM LoginLog WHERE id IN (${placeholders})`
+  const sql = `DELETE FROM sys_login_log WHERE id IN (${placeholders})`
   return query(sql, ids)
 }
 
@@ -148,14 +148,14 @@ const batchDeleteLoginLogs = async (ids) => {
  * 清空登录日志
  */
 const clearLoginLogs = async () => {
-  return query('TRUNCATE TABLE LoginLog')
+  return query('TRUNCATE TABLE sys_login_log')
 }
 
 /**
  * 获取登录日志详情
  */
 const getLoginLogById = async (id) => {
-  const sql = 'SELECT * FROM LoginLog WHERE id = ? LIMIT 1'
+  const sql = 'SELECT * FROM sys_login_log WHERE id = ? LIMIT 1'
   const rows = await query(sql, [id])
   return rows[0] || null
 }

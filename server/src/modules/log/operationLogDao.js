@@ -64,7 +64,7 @@ const listOperationLogs = async ({ page, pageSize, username, module, action, sta
       ol.execute_time,
       ol.status,
       ol.create_time
-    FROM OperationLog ol
+    FROM sys_operation_log ol
     ${whereSql}
     ORDER BY ol.create_time DESC
     LIMIT ?, ?
@@ -114,7 +114,7 @@ const countOperationLogs = async ({ username, module, action, status, startTime,
 
   const sql = `
     SELECT COUNT(*) as total
-    FROM OperationLog ol
+    FROM sys_operation_log ol
     ${whereSql}
   `
 
@@ -127,7 +127,7 @@ const countOperationLogs = async ({ username, module, action, status, startTime,
  */
 const createOperationLog = async (data) => {
   const sql = `
-    INSERT INTO OperationLog (
+    INSERT INTO sys_operation_log (
       user_id, username, action, module, method, request_url,
       request_params, response_status, response_msg, response_body, ip_address,
       user_agent, execute_time, status
@@ -157,7 +157,7 @@ const createOperationLog = async (data) => {
  */
 const batchDeleteOperationLogs = async (ids) => {
   const placeholders = ids.map(() => '?').join(', ')
-  const sql = `DELETE FROM OperationLog WHERE id IN (${placeholders})`
+  const sql = `DELETE FROM sys_operation_log WHERE id IN (${placeholders})`
   return query(sql, ids)
 }
 
@@ -165,14 +165,14 @@ const batchDeleteOperationLogs = async (ids) => {
  * 清空操作日志
  */
 const clearOperationLogs = async () => {
-  return query('TRUNCATE TABLE OperationLog')
+  return query('TRUNCATE TABLE sys_operation_log')
 }
 
 /**
  * 获取操作日志详情
  */
 const getOperationLogById = async (id) => {
-  const sql = 'SELECT * FROM OperationLog WHERE id = ? LIMIT 1'
+  const sql = 'SELECT * FROM sys_operation_log WHERE id = ? LIMIT 1'
   const rows = await query(sql, [id])
   return rows[0] || null
 }
@@ -181,7 +181,7 @@ const getOperationLogById = async (id) => {
  * 删除单条操作日志
  */
 const deleteOperationLogById = async (id) => {
-  return query('DELETE FROM OperationLog WHERE id = ?', [id])
+  return query('DELETE FROM sys_operation_log WHERE id = ?', [id])
 }
 
 export default {
